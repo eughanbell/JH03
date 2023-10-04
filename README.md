@@ -19,5 +19,14 @@ docker build -t pss protein-structure-storage
 ```
 * run the docker image
 ```
-docker run pss
+docker run --publish 8000:5000 pss
+```
+you should see "Hello, World!" followed by some flask messages
+* test the example endpoint by running in a different terminal
+```
+curl localhost:8000/example_endpoint
+```
+You should get
+```
+Hello from this endpoint!
 ```

@@ -20,3 +20,4 @@
 *.sdf
 *.pyc
 *.xml
+**__pycache__
