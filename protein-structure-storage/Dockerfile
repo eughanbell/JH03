@@ -1,13 +1,15 @@
 FROM python:3
 
 WORKDIR /src
-COPY requirements.txt requirements.txt
+# copy all files in this folder and subfolders to container
+COPY . .
 # ignore pip as root error
 ENV PIP_ROOT_USER_ACTION=ignore
+# install python dependancies
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
+# let port 5000 be seen
 EXPOSE 5000
 
+# command to start the server
 ENTRYPOINT [ "python", "src/main.py"]
