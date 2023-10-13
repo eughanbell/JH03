@@ -15,6 +15,27 @@ def example_endpoint():
     return "Hello from this endpoint!\n"
 
 
+@app.route("/retrieve_by_uniprot_id/<id>")
+def retrieve_by_uniprot_id(id):
+    return f"You asked for id {id}\n"
+
+
+@app.route("/retrieve_by_sequence/<seq>")
+def retrieve_by_sequence(seq):
+    return f"You asked for seq {seq}\n"
+
+
+@app.route("/retrieve_by_key/<key>")
+def retrieve_by_key(key):
+    print(f"got key: {key}")
+    return f"You asked for key {key}\n"
+
+
+@app.errorhandler(404)
+def unknown_url(error):
+    return "Error: The requested endpoint does not exist!\n", 404
+
+
 if __name__ == "__main__":
     if not DEBUG_MODE:
         # use waitress for WSGI server in a production setting
