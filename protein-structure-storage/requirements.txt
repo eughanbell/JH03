@@ -1,3 +1,2 @@
-waitress
 fastapi
 uvicorn
