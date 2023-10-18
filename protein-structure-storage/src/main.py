@@ -1,39 +1,49 @@
-from flask import Flask
+from fastapi import FastAPI
+import uvicorn
+
 
 # prints Hello World!
 print("Hello, World!")
 
-app = Flask(__name__)
+app = FastAPI()
 
 DEBUG_MODE = True
 HOST = "0.0.0.0"
 PORT = 5000
 
 
-@app.route("/example_endpoint")
+@app.get("/example_endpoint")
 def example_endpoint():
-    return "Hello from this endpoint!\n"
+    return {"Hello from this endpoint!\n"}
 
 
-@app.route("/retrieve_by_uniprot_id/<id>")
-def retrieve_by_uniprot_id(id):
-    return f"You asked for id {id}\n"
+@app.get("/retrieve_by_uniprot_id/{id}")
+def retrieve_by_uniprot_id(id: str):
+    return {"You asked for id": id}
 
 
-@app.route("/retrieve_by_sequence/<seq>")
-def retrieve_by_sequence(seq):
-    return f"You asked for seq {seq}\n"
+@app.get("/retrieve_by_sequence/{seq}")
+def retrieve_by_sequence(seq: str):
+    return {"You asked for seq": seq}
 
 
-@app.route("/retrieve_by_key/<key>")
-def retrieve_by_key(key):
-    print(f"got key: {key}")
-    return f"You asked for key {key}\n"
+@app.get("/retrieve_by_key/{key}")
+def retrieve_by_key(key: int):
+    #print(f"got key: {key}")
+    return {"You asked for key": key}
 
 
-@app.errorhandler(404)
+@app.exception_handler(404)
 def unknown_url(error):
     return "Error: The requested endpoint does not exist!\n", 404
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
 
 
 if __name__ == "__main__":
@@ -42,4 +52,4 @@ if __name__ == "__main__":
         from waitress import serve
         serve(app, host=HOST, port=PORT)
     else:
-        app.run(host=HOST, port=PORT, debug=DEBUG_MODE)
+        uvicorn.run(app ,host=HOST, port=PORT)
