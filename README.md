@@ -22,11 +22,9 @@ docker build -t pss protein-structure-storage
 docker run --publish 8000:5000 pss
 ```
 you should see "Hello, World!" followed by some flask messages
-* test the example endpoint by running in a different terminal
-```
-curl localhost:8000/example_endpoint
-```
-You should get
-```
-Hello from this endpoint!
-```
+* test the example endpoint by visiting `0.0.0.0:8000/retrieve_by_key/` in a browser. You should get some text with the id.
+
+
+#### Docs
+
+To see documentation on the available endpoints visit `0.0.0.0:8000/docs/` in a browser while the server is running.
