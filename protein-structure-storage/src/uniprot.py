@@ -4,6 +4,17 @@ from http.client import InvalidURL
 import xml.etree.ElementTree as et
 
 
+# list of databases used when found in uniprot
+# each entry contains a name which is used in uniprot as 'type'
+# and a dbobj which is the type of the ExternalDatabaseEntry object
+# that represents that databse
+EXTERNAL_DATABASES = (
+    # TODO: Add concerte DbEntry objects for these
+    {"name": "PDB", "dbobj": None},
+    {"name": "AlphaFoldDB", "dbobj": None}
+)
+
+
 def request_uniprot_file(uniprot_id, filetype):
     """given a uniprot id and file type, both as strings,
     return the text contents of the uniport entry"""
@@ -27,7 +38,8 @@ def request_uniprot_file(uniprot_id, filetype):
 
 def parse_uniprot_xml(uniprot_id):
     """returns a list of dictionaries containing
-    the 'type' (databse name) and 'id', databse id
+    the 'type' (databse name) 'id', databse id
+    and 'params' (list of parameters for that entry)
     for all the entries stored by uniport"""
     entries = list()
     xml_text = request_uniprot_file(uniprot_id, "xml")
@@ -38,7 +50,13 @@ def parse_uniprot_xml(uniprot_id):
         if child.tag.endswith("entry"):
             for entry in child:
                 if entry.tag.endswith("dbReference"):
-                    entries.append(entry.attrib)
+                    e = {}
+                    e['type'] = entry.attrib['type']
+                    e['id'] = entry.attrib['id']
+                    e['params'] = list()
+                    for params in entry:
+                        e['params'].append(params.attrib)
+                    entries.append(e)
     return entries
 
 
@@ -46,8 +64,14 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
     """Get list of DBEntry Objects for the supported databases
     using a uniprot id"""
     dbrefs = uniprot_retrieve_fn(uniprot_id)
-    for r in dbrefs:
-        print(r["type"])
+    for ref in dbrefs:
+        for d in EXTERNAL_DATABASES:
+            if d['name'] == ref["type"]:
+                # TODO: Use dbentry contructor to make these entries
+                #       Once they have been implimented
+                print(f"\ncreating dbentry for {d['name']} database")
+                for p in ref['params']:
+                    print(p)
 
 
 uniprot_get_entries("p02070")
