@@ -1,8 +1,8 @@
 class ExternalDatabaseEntry:
     """ Represents an entry in an external database. """
 
-    def __init__(self, internal_database_id:str):
-        self.internal_database_id = internal_database_id
+    def __init__(self, entry_data:dict):
+        self.entry_data = entry_data # Each subclass will have logic for processing it's own entry_data dict
         self.quality_score = 0
     
     def fetch(self) -> str:
