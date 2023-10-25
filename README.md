@@ -9,7 +9,21 @@ docker --version
 ```
 If you get a version number there are no issues
 
-### Running protein structure storage
+If you want to use docker compose, you may need to seperately install a package called something like `docker-compose`.
+
+### Running all containers with compose
+
+In the root of this project run 
+```
+docker compose up
+```
+Once the containers have all been set up, you can see the docs for each container at:
+
+* protein stucture storage: `0.0.0.0:8000/docs`
+* protein cache: `0.0.0.0:7000/docs`
+
+
+### manually running protein structure storage
 
 make sure you are in this project's root folder
 
@@ -29,9 +43,13 @@ you should see "Hello, World!" followed by some flask messages
 To see documentation on the available endpoints visit `0.0.0.0:8000/docs/` in a browser while the server is running.
 
 
-### Protein Cache Container
+### manually running protein cache
 	
-build in similar way to pss. to run, we will map to 7000 instead of 8000 to not conflict with pss.
+build in similar way to pss. 
+```
+docker build -t pc protein-cache
+```
+to run, we will map to 7000 instead of 8000 to not conflict with pss.
 ```
 docker run --publish 7000:6000 pc
 ```
@@ -40,4 +58,3 @@ test with curl:
 ```
 curl -X POST -H "Content-Type: application/json" -d '{"uniprot_id": "p02070", "pdb_file":"LOTS OF PROTEIN FILE DATA"}' 0.0.0.0:7000/protein_file/
 ```
-

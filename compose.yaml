@@ -1,0 +1,9 @@
+services:
+  pss:
+    build: protein-structure-storage
+    ports:
+      - "8000:5000"
+  pc:
+    build: protein-cache
+    ports:
+      - "7000:6000"
