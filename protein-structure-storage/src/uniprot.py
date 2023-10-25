@@ -52,10 +52,11 @@ def parse_uniprot_xml(uniprot_id):
                 if entry.tag.endswith("dbReference"):
                     e = {}
                     e['type'] = entry.attrib['type']
-                    e['params'] = list()
-                    e['params'].append(entry.attrib['id'])
+                    e['dict'] = {}
+                    e['dict']['id'] = entry.attrib['id']
                     for params in entry:
-                        e['params'].append(params.attrib)
+                        print(params.attrib)
+                        e['dict'][params.attrib['type']] = params.attrib['value']
                     entries.append(e)
     return entries
 
@@ -68,10 +69,9 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
     for ref in dbrefs:
         for d in EXTERNAL_DATABASES:
             if d['name'] == ref["type"]:
-                objs.append(d['dbobj'](ref['params']))
+                objs.append(d['dbobj'](ref['dict']))
                 print(f"\ncreating dbentry for {d['name']} database")
-                for p in ref['params']:
-                    print(p)
+                print(ref['dict'])
     return objs
 
 
