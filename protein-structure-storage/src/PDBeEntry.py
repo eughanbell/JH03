@@ -55,9 +55,9 @@ class PDBeEntry(ExternalDatabaseEntry):
         """ Extract the length of chain from chains self.entry_data """
 
         chains_string = self.entry_data.get("chains", "")
-        chain_ends = re.findall(r"^B/D=(\d+)\-(\d+)$", chains_string)
-        if len(chain_ends) == 2:
-            return int(chain_ends[1]) - int(chain_ends[0]) + 1 # Chain ends are assumed to be inclusive
+        chain_ends = re.findall(r"^B/D=(\d+)-(\d+)$", chains_string)
+        if len(chain_ends) == 1 and len(chain_ends[0]) == 2:
+            return int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # Chain ends are assumed to be inclusive
         else:
             logger.warning(f"Failed to calculate chain length: chains data of invalid format '{chains_string}'")
             return None
