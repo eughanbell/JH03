@@ -3,15 +3,15 @@ from urllib.error import HTTPError
 from http.client import InvalidURL
 import xml.etree.ElementTree as et
 
-
+import ExternalDatabaseEntry as EDBentry
 # list of databases used when found in uniprot
 # each entry contains a name which is used in uniprot as 'type'
 # and a dbobj which is the type of the ExternalDatabaseEntry object
 # that represents that databse
 EXTERNAL_DATABASES = (
     # TODO: Add concerte DbEntry objects for these
-    {"name": "PDB", "dbobj": None},
-    {"name": "AlphaFoldDB", "dbobj": None}
+    {"name": "PDB", "dbobj": EDBentry.ExternalDatabaseEntry},
+    {"name": "AlphaFoldDB", "dbobj": EDBentry.ExternalDatabaseEntry}
 )
 
 
@@ -52,8 +52,8 @@ def parse_uniprot_xml(uniprot_id):
                 if entry.tag.endswith("dbReference"):
                     e = {}
                     e['type'] = entry.attrib['type']
-                    e['id'] = entry.attrib['id']
                     e['params'] = list()
+                    e['params'].append(entry.attrib['id'])
                     for params in entry:
                         e['params'].append(params.attrib)
                     entries.append(e)
@@ -64,14 +64,15 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
     """Get list of DBEntry Objects for the supported databases
     using a uniprot id"""
     dbrefs = uniprot_retrieve_fn(uniprot_id)
+    objs = list()
     for ref in dbrefs:
         for d in EXTERNAL_DATABASES:
             if d['name'] == ref["type"]:
-                # TODO: Use dbentry contructor to make these entries
-                #       Once they have been implimented
+                objs.append(d['dbobj'](ref['params']))
                 print(f"\ncreating dbentry for {d['name']} database")
                 for p in ref['params']:
                     print(p)
+    return objs
 
 
 uniprot_get_entries("p02070")
