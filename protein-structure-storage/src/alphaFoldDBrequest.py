@@ -8,17 +8,11 @@ class AlphaFoldRequest:
     def __init__(self, uniprot_accession):
         self.uniprot_accession = uniprot_accession
 
-    def generate_request(self) -> str:
-        """ Creates a html request for this id"""
-        return "https://alphafold.ebi.ac.uk/prediction/" + str(self.uniprot_accession)
-
-    def request_all_models(self):
-        """To Do: sends html request for all alphafold models with the given id"""
-        f = urlopen(self.generate_request())
+    def request_pdb(self) -> bytes:
+        """Sends html request for all alphafold pdb file with the given id.
+        To Do: add error handling."""
+        alphafold_id = "AF-" + self.uniprot_accession + "-F1"
+        database_version = 'v4'
+        model_url = f'https://alphafold.ebi.ac.uk/files/{alphafold_id}-model_{database_version}.pdb'
+        f = urlopen(model_url)
         return f.read()
-
-
-if __name__ == "__main__":
-    test = AlphaFoldRequest("P00520")
-    print(type(test.request_all_models()))
-
