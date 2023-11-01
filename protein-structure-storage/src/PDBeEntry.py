@@ -2,18 +2,9 @@ import logging
 from math import log, e
 import re
 from ExternalDatabaseEntry import ExternalDatabaseEntry
+from scoring_weights import PDBe_SCORE_WEIGHTS as SCORE_WEIGHTS, PDBe_METHOD_WEIGHTS as METHOD_WEIGHTS, PDBe_RESOLUTION_WEIGHTS as RESOLUTION_WEIGHTS
 
 logger = logging.getLogger(__name__)
-
-METHOD_WEIGHTS = {
-    "X-ray": 1,   
-}
-
-RESOLUTION_WEIGHTS = {
-    "interpolation": "exponential",
-    # Weight at 0 is assumed to be 1 (infinite resolution scores 1)
-    "weight_at_1": 0.9
-}
 
 # {'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145'}
 
@@ -37,7 +28,9 @@ class PDBeEntry(ExternalDatabaseEntry):
         chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length)
 
         logger.warning("NotImplemented: calculating overall quality score not properly implemented. Will crash on invalid data.")
-        self.quality_score = (resolution_score + method_score + chain_length_score)/3
+        self.quality_score = (SCORE_WEIGHTS["resolution"] * resolution_score +
+                              SCORE_WEIGHTS["method"] *  method_score +
+                              SCORE_WEIGHTS["chain_length"] * chain_length_score)/(sum(SCORE_WEIGHTS.values()))
 
     def extract_resolution(self) -> float:
         """ Extract resolution in Angstroms from resolution self.entry_data  """
@@ -96,7 +89,7 @@ class PDBeEntry(ExternalDatabaseEntry):
         """ Determine score based on acquisition method """
         return METHOD_WEIGHTS.get(method, None)
     
-    def calculate_chain_length_score(file_chain_length, full_protein_chain_length) -> float:
+    def calculate_chain_length_score(self, file_chain_length, full_protein_chain_length) -> float:
         """ Calculate ratio of file chain length to full protein chain length"""
 
         if file_chain_length == None or full_protein_chain_length == None:
@@ -105,3 +98,9 @@ class PDBeEntry(ExternalDatabaseEntry):
         if file_chain_length <= 0 or full_protein_chain_length <= 0:
             return 0
         return file_chain_length / full_protein_chain_length
+    
+    def __lt__(self, other):
+        return self.get_quality_score() < other.get_quality_score()
+    
+    def __repr__(self):
+        return f"{self.entry_data}: {self.get_quality_score()}"

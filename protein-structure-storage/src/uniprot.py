@@ -4,13 +4,14 @@ from http.client import InvalidURL
 import xml.etree.ElementTree as et
 
 import ExternalDatabaseEntry as EDBentry
+import PDBeEntry
 # list of databases used when found in uniprot
 # each entry contains a name which is used in uniprot as 'type'
 # and a dbobj which is the type of the ExternalDatabaseEntry object
 # that represents that databse
 EXTERNAL_DATABASES = (
     # TODO: Add concerte DbEntry objects for these
-    {"name": "PDB", "dbobj": EDBentry.ExternalDatabaseEntry},
+    {"name": "PDB", "dbobj": PDBeEntry.PDBeEntry},
     {"name": "AlphaFoldDB", "dbobj": EDBentry.ExternalDatabaseEntry}
 )
 
