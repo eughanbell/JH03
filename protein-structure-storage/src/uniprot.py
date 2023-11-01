@@ -48,15 +48,14 @@ def parse_uniprot_xml(uniprot_id):
     root = et.fromstring(xml_text)
     for child in root:
         if child.tag.endswith("entry"):
-            for entry in child:
-                if entry.tag.endswith("dbReference"):
+            for dbentry in child:
+                if dbentry.tag.endswith("dbReference"):
                     e = {}
-                    e['type'] = entry.attrib['type']
+                    e['dbname'] = dbentry.attrib['type']
                     e['dict'] = {}
-                    e['dict']['id'] = entry.attrib['id']
-                    for params in entry:
-                        print(params.attrib)
-                        e['dict'][params.attrib['type']] = params.attrib['value']
+                    e['dict']['id'] = dbentry.attrib['id']
+                    for properties in dbentry:
+                        e['dict'][properties.attrib['type']] = properties.attrib['value']
                     entries.append(e)
     return entries
 
@@ -66,12 +65,12 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
     using a uniprot id"""
     dbrefs = uniprot_retrieve_fn(uniprot_id)
     objs = list()
-    for ref in dbrefs:
-        for d in EXTERNAL_DATABASES:
-            if d['name'] == ref["type"]:
-                objs.append(d['dbobj'](ref['dict']))
-                print(f"\ncreating dbentry for {d['name']} database")
-                print(ref['dict'])
+    for entry in dbrefs:
+        for db in EXTERNAL_DATABASES:
+            if entry['dbname'] == db['name']:
+                objs.append(db['dbobj'](entry['dict']))
+                print(f"\ncreating dbentry for {entry['dbname']} database")
+                print(entry['dict'])
     return objs
 
 
