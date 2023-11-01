@@ -3,8 +3,8 @@ import uvicorn
 from pydantic import BaseModel
 
 app = FastAPI()
-HOST = "127.0.0.1"
-PORT = 7000
+HOST = "0.0.0.0"
+PORT = 6000
 
 
 @app.get("/retrieve_by_uniprot_id/{id}")

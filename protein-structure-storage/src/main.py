@@ -5,8 +5,8 @@ import alphaFoldDBrequest
 app = FastAPI()
 
 DEBUG_MODE = True
-HOST = "127.0.0.1"
-PORT = 8000
+HOST = "0.0.0.0"
+PORT = 5000
 
 
 @app.get("/retrieve_by_uniprot_id/{id}")
@@ -16,7 +16,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
         request = alphaFoldDBrequest.AlphaFoldRequest(id)
         return {"pdb": request.request_pdb()}
     else:
-        return {"uniprot_id": id}
+        return {"test": id}
 
 
 @app.get("/retrieve_by_sequence/{seq}")
