@@ -2,7 +2,7 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from http.client import InvalidURL
 import xml.etree.ElementTree as et
-
+from helpers import get_from_url
 import ExternalDatabaseEntry as EDBentry
 import PDBeEntry
 # list of databases used when found in uniprot
@@ -20,21 +20,14 @@ def request_uniprot_file(uniprot_id, filetype):
     """given a uniprot id and file type, both as strings,
     return the text contents of the uniport entry"""
     if not isinstance(uniprot_id, str):
-        print("the supplied uniprot id was not a string")
-    else:
-        try:
-            f = urlopen("https://rest.uniprot.org/uniprotkb/"
-                        + uniprot_id + "." + filetype)
-            if f.getcode() != 200:
-                print(f"http status code: {f.getcode()}, uniprot id"
-                      " was invalid, id: {uniprot_id}")
-            else:
-                return f.read()
-        except HTTPError:
-            print("HTTP ERORR: uniprot id was invalid, id: " + uniprot_id)
-        except InvalidURL:
-            print("The uniprot id was invalid, id: " + uniprot_id)
-    return None
+        print("the uniport id was not a string")
+        return None
+    result = get_from_url("https://rest.uniprot.org/uniprotkb/" +
+                          uniprot_id + "." + filetype)
+    if result is None:
+        print("couldn't fulfil uniport request, id may be invalid" +
+              " or there may be a network issue")
+    return result
 
 
 def parse_uniprot_xml(uniprot_id):
