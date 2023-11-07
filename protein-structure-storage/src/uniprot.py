@@ -66,9 +66,3 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
                 print(f"\ncreating dbentry for {entry['dbname']} database")
                 print(entry['dict'])
     return objs
-
-
-uniprot_get_entries("p02070")
-uniprot_get_entries("p0207")
-uniprot_get_entries("p02 07")
-uniprot_get_entries(10)
