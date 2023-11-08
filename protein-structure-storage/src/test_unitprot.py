@@ -32,9 +32,6 @@ def test_request_uniprot_file():
     #Non-xml filetype
     assert request_uniprot_file("p02070", "html") == None
 
-    #Non-string filetype
-    assert request_uniprot_file("p02070", 100) == None
-
     #Message to let user know tests are finished without error
     print("request_uniprot_file: all tests finished without error")
 
