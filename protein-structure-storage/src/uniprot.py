@@ -74,8 +74,13 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
                 print(entry['dict'])
     return objs
 
+# def fetch(uniprot_id):
+#     objs = uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml)
+#     print(objs[0])
 
-uniprot_get_entries("p02070")
-uniprot_get_entries("p0207")
-uniprot_get_entries("p02 07")
-uniprot_get_entries(10)
+if __name__ == "__main__":
+    uniprot_get_entries("p02070")
+    uniprot_get_entries("Q14676")
+    uniprot_get_entries("p0207")
+    uniprot_get_entries("p02 07")
+    uniprot_get_entries(10)
