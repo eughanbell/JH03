@@ -1,6 +1,7 @@
 import logging
 from math import log, e
 import re
+
 from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeScores import *
 
@@ -14,8 +15,8 @@ class PDBeEntry(ExternalDatabaseEntry):
         """ Fetch a .pdb file from PDBe database and return in string format. """
         raise NotImplementedError("PDBe fetch not implemented.")
 
-    def calculate_quality_score(self):
-        """ Fetch or calculate quality score for this entry """
+    def calculate_quality_score(self) -> float:
+        """ Calculate quality score for this entry """
         
         # Load in uniprot metadata about this entry
         resolution = self.extract_resolution()
@@ -77,7 +78,7 @@ class PDBeEntry(ExternalDatabaseEntry):
         a perfect weight of 1.
         """
 
-        if not resolution:
+        if resolution == None:
             return None # Resolution score will be invalid if there is no resolution (thus resolution will be ignored in scoring)
         
         a = RESOLUTION_WEIGHTS["weight_at_1"] # The weight assigned to a resolution of 1, e.g., the point (1,a)
