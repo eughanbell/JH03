@@ -17,6 +17,12 @@ In the root of this project run
 ```
 docker compose up
 ```
+
+To rebuild first, you may need to run the following first
+```
+docker compose build
+```
+
 Once the containers have all been set up, you can see the docs for each container at:
 
 * protein stucture storage: `0.0.0.0:8000/docs`

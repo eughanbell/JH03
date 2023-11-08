@@ -1,0 +1,16 @@
+# All weights should be floats between 0 and 1 (inclusive)
+
+PDBe: # Weights for Protein Data Bank (Europe) entries
+
+  RELATIVE_WEIGHTS: # Relative weights to assign computed scores
+    chain_length: 1
+    method: 1
+    resolution: 0.02
+
+  METHOD_WEIGHTS:
+    X-ray: 1
+
+  RESOLUTION_WEIGHTS:
+    interpolation: exponential # Options: linear, exponential
+    # weight_at_0 is 1.0 (i.e., an infinite resolution of 0.0A is assigned the maximal score)
+    weight_at_1: 0.9 # The score a resolution of 1A should be assigned

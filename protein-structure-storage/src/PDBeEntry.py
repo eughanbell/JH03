@@ -2,7 +2,7 @@ import logging
 from math import log, e
 import re
 from ExternalDatabaseEntry import ExternalDatabaseEntry
-from scoring_weights import PDBe_SCORE_WEIGHTS as SCORE_WEIGHTS, PDBe_METHOD_WEIGHTS as METHOD_WEIGHTS, PDBe_RESOLUTION_WEIGHTS as RESOLUTION_WEIGHTS
+from ProteinScoringWeights.PDBeScores import *
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +28,9 @@ class PDBeEntry(ExternalDatabaseEntry):
         chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length)
 
         logger.warning("NotImplemented: calculating overall quality score not properly implemented. Will crash on invalid data.")
-        self.quality_score = (SCORE_WEIGHTS["resolution"] * resolution_score +
-                              SCORE_WEIGHTS["method"] *  method_score +
-                              SCORE_WEIGHTS["chain_length"] * chain_length_score)/(sum(SCORE_WEIGHTS.values()))
+        self.quality_score = (RELATIVE_WEIGHTS["resolution"] * resolution_score +
+                              RELATIVE_WEIGHTS["method"] *  method_score +
+                              RELATIVE_WEIGHTS["chain_length"] * chain_length_score)/(sum(RELATIVE_WEIGHTS.values()))
 
     def extract_resolution(self) -> float:
         """ Extract resolution in Angstroms from resolution self.entry_data  """
