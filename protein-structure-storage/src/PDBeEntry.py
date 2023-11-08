@@ -3,6 +3,7 @@ from math import log, e
 import re
 from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeScores import *
+from helpers import get_from_url
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +13,13 @@ class PDBeEntry(ExternalDatabaseEntry):
 
     def fetch(self) -> str:
         """ Fetch a .pdb file from PDBe database and return in string format. """
-        raise NotImplementedError("PDBe fetch not implemented.")
-
+        pdb_id = str(self.entry_data['id'])
+        molecules_url = "https://www.ebi.ac.uk/pdbe/api/pdb/entry/molecules/" + pdb_id
+        #many possible urls we could have chosen from see https://www.ebi.ac.uk/pdbe/api/doc/ . Each url gives different information
+        
+        protein_structure = get_from_url(molecules_url)
+        return protein_structure
+        
     def calculate_quality_score(self):
         """ Fetch or calculate quality score for this entry """
         
@@ -110,3 +116,4 @@ class PDBeEntry(ExternalDatabaseEntry):
     
     def __repr__(self):
         return f"{self.entry_data}: {self.get_quality_score()}"
+    
