@@ -46,20 +46,21 @@ def test_resolution_score_calculation(test_entry):
     logger.warning("Resolution scoring testing incomplete.")
     assert test_entry.calculate_resolution_score(0.0) == 1 # Perfect resolution, score should be 1
     assert test_entry.calculate_resolution_score(1.0) == 0.9 # 1A, score should be 0.9
-    logger.warning("Resolution scoring testing currently uses hardcoded values. Correct this before final release.")
+    logger.warning("Resolution scoring testing currently uses hardcoded test values. Correct this before final release.")
     assert test_entry.calculate_resolution_score(None) == None # No resolution, should return None, but not throw error
 
 def test_method_score_calculation(test_entry):
-    logger.warning("Method scoring tests not implemented.")
+    logger.warning("Not Implemented: method scoring tests not implemented")
 
 def test_chain_length_score_calculation(test_entry):
-    logger.warning("Chain length scoring tests not implemented.")
+    logger.warning("Not Implemented: chain length scoring tests.")
 
 def test_overall_score_calculation(test_entry):
-    logger.warning("Overall scoring tests not implemented.")
+    logger.warning("Not Implemented: Overall scoring tests.")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.ERROR)
+    logger.warning("NotImplemented: no tests for PDBeFetch.")
     test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145'})
     test_resolution_extraction(test_entry)
     test_method_extraction(test_entry)
