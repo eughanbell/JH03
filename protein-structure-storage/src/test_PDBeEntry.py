@@ -59,7 +59,7 @@ def test_overall_score_calculation(test_entry):
     logger.warning("Not Implemented: Overall scoring tests.")
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.INFO)
     logger.warning("NotImplemented: no tests for PDBeFetch.")
     test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145'})
     test_resolution_extraction(test_entry)
