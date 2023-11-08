@@ -1,4 +1,15 @@
 fastapi
-uvicorn
+http
+json
+logging
+math
 pyyaml
+re
 requests
+urllib
+uvicorn
+xml
+
+# Dependencies required for testing only
+unittest
+hashlib
