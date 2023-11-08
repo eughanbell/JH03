@@ -9,10 +9,10 @@ test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A',
 class TestPDBeEntry(unittest.TestCase):    
     def test_resolution_extraction(self):
         test_entry.entry_data["resolution"] = "1.34 A" # Valid float
-        self.assertEqual(test_entry.extract_resolution(), 1.34, "Failed to handle float import")
+        self.assertEqual(test_entry.extract_resolution(), 1.34, "Failed to handle float import: 1.34 A ")
 
         test_entry.entry_data["resolution"] = "7 A" # Valid int
-        self.assertEqual(test_entry.extract_resolution(), 7, "Failed to handle int import")
+        self.assertEqual(test_entry.extract_resolution(), 7, "Failed to handle int import: 7 A")
 
         test_entry.entry_data["resolution"] = "1.34a A" # Invalid
         self.assertEqual(test_entry.extract_resolution(), None)
@@ -37,16 +37,16 @@ class TestPDBeEntry(unittest.TestCase):
 
     def test_chain_length_extraction(self):
         test_entry.entry_data["chains"] = "B/D=1-145"
-        self.assertEqual(test_entry.extract_chain_length(), 145, "Failed to extract chain length")
+        self.assertEqual(test_entry.extract_chain_length(), 145, "Failed to extract chain length from B/D=1-145")
 
         test_entry.entry_data["chains"] = "B/D=73-100"
-        self.assertEqual(test_entry.extract_chain_length(), 28, "Failed to extract chain length")
+        self.assertEqual(test_entry.extract_chain_length(), 28, "Failed to extract chain length from B/D=73-100")
 
         test_entry.entry_data["chains"] = "C/E=73-100"
-        self.assertEqual(test_entry.extract_chain_length(), 28, "Failed to extract chain length")
+        self.assertEqual(test_entry.extract_chain_length(), 28, "Failed to extract chain length from C/E=73-100")
 
         test_entry.entry_data["chains"] = "C/E=100-73" # Invalid data (unlikely to be in DB, but worth checking this edge case)
-        self.assertEqual(test_entry.extract_chain_length(), None, "Imported invalid chain length")
+        self.assertEqual(test_entry.extract_chain_length(), None, "Imported invalid chain length from C/E=100-73 (should be None)")
 
         test_entry.entry_data["chains"] = "" # Invalid
         self.assertEqual(test_entry.extract_chain_length(), None)

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class PDBeEntry(ExternalDatabaseEntry):
 
-    def fetch(self) -> str:
+    def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
         raise NotImplementedError("PDBe fetch not implemented.")
 
@@ -54,10 +54,15 @@ class PDBeEntry(ExternalDatabaseEntry):
         """ Extract the length of chain from chains self.entry_data """
 
         chains_string = self.entry_data.get("chains", "") # Will be empty string if chains metadata unavailable
-        chain_ends = re.findall(r"^B/D=(\d+)-(\d+)$", chains_string) # Captures the beginning and end positions of the chain
+        chain_ends = re.findall(r"^[A-Z]/[A-Z]=(\d+)-(\d+)$", chains_string) # Captures the beginning and end positions of the chain
         if len(chain_ends) == 1 and len(chain_ends[0]) == 2:
             # If findall returns 1 match and that match includes both numbers
-            return int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # 1 is added as chain end positions are both included in the chain
+            chain_length = int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # 1 is added as chain end positions are both included in the chain
+            if chain_length >= 0:
+                return chain_length
+            else:
+                logger.warning(f"Failed to calculate chain length: got negative chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
+                return None
         else:
             logger.warning(f"Failed to calculate chain length: could not determine chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
             return None

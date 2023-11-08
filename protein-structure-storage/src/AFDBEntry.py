@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class AFDBEntry(ExternalDatabaseEntry):
 
-    def fetch(self) -> str:
+    def fetch(self) -> bytes:
         """ Fetch a .pdb file from AFDB database and return in string format. """
         # """Sends html request for all alphafold pdb file with the given id."""
 
