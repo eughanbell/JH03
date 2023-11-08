@@ -49,7 +49,8 @@ def parse_uniprot_xml(uniprot_id):
                     e['dict'] = {}
                     e['dict']['id'] = dbentry.attrib['id']
                     for properties in dbentry:
-                        e['dict'][properties.attrib['type']] = properties.attrib['value']
+                        if properties.tag.endswith("property"):
+                            e['dict'][properties.attrib['type']] = properties.attrib['value']
                     entries.append(e)
     return entries
 
@@ -66,3 +67,11 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
                 print(f"\ncreating dbentry for {entry['dbname']} database")
                 print(entry['dict'])
     return objs
+
+
+if __name__ == "__main__":
+    uniprot_get_entries("p02070")
+    uniprot_get_entries("Q14676")
+    uniprot_get_entries("p0207")
+    uniprot_get_entries("p02 07")
+    uniprot_get_entries(10)
