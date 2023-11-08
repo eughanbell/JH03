@@ -12,10 +12,11 @@ class AFDBEntry(ExternalDatabaseEntry):
 
     def fetch(self) -> str:
         """ Fetch a .pdb file from AFDB database and return in string format. """
-        """Sends html request for all alphafold pdb file with the given id."""
+        # """Sends html request for all alphafold pdb file with the given id."""
+
         alphafold_id = "AF-" + self.entry_data["id"] + "-F1"
-        database_version = 'v4'
-        model_url = f'https://alphafold.ebi.ac.uk/files/{alphafold_id}-model_{database_version}.pdb'
+        database_version = "v4"
+        model_url = f"https://alphafold.ebi.ac.uk/files/{alphafold_id}-model_{database_version}.pdb"
         try:
             f = urlopen(model_url)
             if f.getcode() == 200:
