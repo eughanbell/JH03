@@ -17,16 +17,19 @@ class PDBeEntry(ExternalDatabaseEntry):
     def calculate_quality_score(self):
         """ Fetch or calculate quality score for this entry """
         
+        # Load in uniprot metadata about this entry
         resolution = self.extract_resolution()
         method = self.extract_method()
         file_chain_length = self.extract_chain_length()
-        full_protein_chain_length = 500 # This needs to be calculated
-        logger.warning("NotImplemented: finding full protein length not yet implemented, assuming length to be 500.")
+        full_protein_chain_length = 500
+        logger.warning(f"NotImplemented: finding full protein length to compute coverage not yet implemented, assuming full length to be {full_protein_chain_length}.")
 
+        # Calculate individual scores for each category, based on protein metadata
         resolution_score = self.calculate_resolution_score(resolution)
         method_score = self.calculate_method_score(method)
         chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length)
 
+        # Weight and combine all scores into a single quality score
         logger.warning("NotImplemented: calculating overall quality score not properly implemented. Will crash on invalid data.")
         self.quality_score = (RELATIVE_WEIGHTS["resolution"] * resolution_score +
                               RELATIVE_WEIGHTS["method"] *  method_score +
@@ -35,31 +38,34 @@ class PDBeEntry(ExternalDatabaseEntry):
     def extract_resolution(self) -> float:
         """ Extract resolution in Angstroms from resolution self.entry_data  """
 
-        resolution_string = self.entry_data.get("resolution","")
+        resolution_string = self.entry_data.get("resolution","") # Will be empty string if resolution metadata unavailable
 
         resolution_float_string = re.findall(r"^(\d+(?:\.?\d+)?) A$", resolution_string) # Captures decimal floats or ints in Angstroms
         if not resolution_float_string:
-            logger.warning(f"Failed to calculate resolution score: entry_data resolution of invalid format '{resolution_string}'.")
+            # Received corrupt or unusually formatted metadata.
+            logger.warning(f"Failed to calculate resolution score: could not determine resolution from Uniprot metadata. Found resolution of invalid format '{resolution_string}' (expected '[integer] A' or '[float] A).")
             return None
-        resolution = float(resolution_float_string[0])
+        
+        resolution = float(resolution_float_string[0]) # This line is safe because regex always extracts a string which can yield either an integer or float
         return resolution
 
     def extract_chain_length(self) -> int:
         """ Extract the length of chain from chains self.entry_data """
 
-        chains_string = self.entry_data.get("chains", "")
-        chain_ends = re.findall(r"^B/D=(\d+)-(\d+)$", chains_string)
+        chains_string = self.entry_data.get("chains", "") # Will be empty string if chains metadata unavailable
+        chain_ends = re.findall(r"^B/D=(\d+)-(\d+)$", chains_string) # Captures the beginning and end positions of the chain
         if len(chain_ends) == 1 and len(chain_ends[0]) == 2:
-            return int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # Chain ends are assumed to be inclusive
+            # If findall returns 1 match and that match includes both numbers
+            return int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # 1 is added as chain end positions are both included in the chain
         else:
-            logger.warning(f"Failed to calculate chain length: chains data of invalid format '{chains_string}'")
+            logger.warning(f"Failed to calculate chain length: could not determine chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
             return None
     
     def extract_method(self) -> str:
         """ Extract the method of data acquisition from chains self.entry_data """
         method = self.entry_data.get("method", "")
         if not method:
-            logger.warning(f"Failed to determine method score: entry_data method of invalid format '{method}'")
+            logger.warning(f"Failed to determine method score: could not determine data acquisition method from Uniprot metadata. Found method data of invalid format '{method}'")
             return None
         return method
 
@@ -72,8 +78,8 @@ class PDBeEntry(ExternalDatabaseEntry):
         """
 
         if not resolution:
-            return None
-
+            return None # Resolution score will be invalid if there is no resolution (thus resolution will be ignored in scoring)
+        
         a = RESOLUTION_WEIGHTS["weight_at_1"] # The weight assigned to a resolution of 1, e.g., the point (1,a)
         if RESOLUTION_WEIGHTS["interpolation"] == "linear":
             gradient = (1-a) / 1.0
@@ -99,7 +105,7 @@ class PDBeEntry(ExternalDatabaseEntry):
             return 0
         return file_chain_length / full_protein_chain_length
     
-    def __lt__(self, other):
+    def __lt__(self, other): # Sorting / comparision is based on quality score
         return self.get_quality_score() < other.get_quality_score()
     
     def __repr__(self):
