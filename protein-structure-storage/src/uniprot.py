@@ -70,7 +70,7 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
 
 
 if __name__ == "__main__":
-    x = uniprot_get_entries("p02070")
+    x = uniprot_get_entries("p01966")
     print(x[0])
     print("=========================")
     print(x[0].fetch())
