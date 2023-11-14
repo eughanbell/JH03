@@ -4,6 +4,8 @@ import re
 from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeScores import *
 
+print(RELATIVE_WEIGHTS)
+
 logger = logging.getLogger(__name__)
 
 # {'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145'}
