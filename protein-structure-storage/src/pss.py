@@ -28,12 +28,16 @@ def get_pdb_file(uniprot_id):
             print("Error: no proteins found in uniprot database, "
                   + f"id: {uniprot_id}")
             return ""
-        entries.sort(key=lambda entry: entry.calculate_quality_score(),
-                     reverse=True)
-        protein_file = entries[0].fetch()
-        r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
+        else:
+            # entries.sort(key=lambda entry: entry.calculate_quality_score(),
+            #          reverse=True)
+            protein_file = entries[0].fetch().decode()
+        
+            r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
                           json={"uniprot_id": uniprot_id,
                                 "pdb_file": protein_file})
-        if r.status_code != 200:
-            print(f"Failed to store protein file in cache: {r.text}")
+            if r.status_code != 200:
+                print(f"Failed to store protein file in cache: {r.text}")
     return protein_file
+
+#print(get_pdb_file('p02070'))

@@ -4,7 +4,7 @@ from http.client import InvalidURL
 import xml.etree.ElementTree as et
 from helpers import get_from_url
 import ExternalDatabaseEntry as EDBentry
-import PDBeEntry
+import PDBeEntry, AFDBEntry
 # list of databases used when found in uniprot
 # each entry contains a name which is used in uniprot as 'type'
 # and a dbobj which is the type of the ExternalDatabaseEntry object
@@ -12,7 +12,7 @@ import PDBeEntry
 EXTERNAL_DATABASES = (
     # TODO: Add concerte DbEntry objects for these
     {"name": "PDB", "dbobj": PDBeEntry.PDBeEntry},
-    {"name": "AlphaFoldDB", "dbobj": EDBentry.ExternalDatabaseEntry}
+    {"name": "AlphaFoldDB", "dbobj": AFDBEntry.AFDBEntry}
 )
 
 
@@ -70,8 +70,11 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
 
 
 if __name__ == "__main__":
-    uniprot_get_entries("p02070")
-    uniprot_get_entries("Q14676")
-    uniprot_get_entries("p0207")
-    uniprot_get_entries("p02 07")
-    uniprot_get_entries(10)
+    x = uniprot_get_entries("p01966")
+    print(x[0])
+    print("=========================")
+    print(x[0].fetch())
+    # uniprot_get_entries("Q14676")
+    # uniprot_get_entries("p0207")
+    # uniprot_get_entries("p02 07")
+    # uniprot_get_entries(10)
