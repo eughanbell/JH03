@@ -1,9 +1,6 @@
 import logging
 from math import log, e
 import re
-
-import json
-import tarfile
 from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeScores import *
 from helpers import get_from_url
@@ -19,15 +16,8 @@ class PDBeEntry(ExternalDatabaseEntry):
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
         pdb_id = self.entry_data['id']
-        archive_url = f"https://www.ebi.ac.uk/pdbe/download/api/pdb/entry/archive?data_format=pdb&id={pdb_id}"
-        #many possible urls we could have chosen from see https://www.ebi.ac.uk/pdbe/download/api/docs#/ . Each url gives different information
-        download_url = json.loads(get_from_url(archive_url))['url']
-        # print("##########################################")
-        # print(download_url, type(download_url))
-        # print("###########################################")
-        pdb_file_zipped = get_from_url(download_url)
-
-        return pdb_file_zipped
+        pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id.lower()}.ent")
+        return pdb_file
         
     def calculate_quality_score(self):
         """ Fetch or calculate quality score for this entry """
