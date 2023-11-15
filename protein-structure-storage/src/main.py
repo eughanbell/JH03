@@ -1,6 +1,7 @@
+from urllib.error import HTTPError
 from fastapi import FastAPI, HTTPException
 import uvicorn
-import alphaFoldDBrequest
+import AFDBEntry
 from pss import get_pdb_file
 
 app = FastAPI()
@@ -12,11 +13,16 @@ PORT = 5000
 
 @app.get("/retrieve_by_uniprot_id/{id}")
 def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
-    """If optional parameter alphafold_only == True then returns "
-    "only the alphafold predicted entry"""
+    """If optional parameter alphafold_only == True then returns
+    only the alphafold predicted entry"""
     if alphafold_only:
-        request = alphaFoldDBrequest.AlphaFoldRequest(id)
-        return {"pdb": request.request_pdb()}
+        try:
+            request = AFDBEntry.AlphaFoldRequest(id)
+            return {"pdb": request.request_pdb()}
+        except HTTPError as e:
+            return {"Error": "404: page not found check you have entered the URL correctly"}
+        except Exception as e:
+            return {"Error": e.args[0]}
     else:
         return {"pdb_file": get_pdb_file(id)}
 

@@ -1,9 +1,11 @@
 import logging
 from math import log, e
 import re
-
 from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeScores import *
+from helpers import get_from_url
+
+print(RELATIVE_WEIGHTS)
 
 logger = logging.getLogger(__name__)
 
@@ -13,10 +15,12 @@ class PDBeEntry(ExternalDatabaseEntry):
 
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
-        raise NotImplementedError("PDBe fetch not implemented.")
-
-    def calculate_quality_score(self) -> float:
-        """ Calculate quality score for this entry """
+        pdb_id = self.entry_data['id']
+        pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id.lower()}.ent")
+        return pdb_file
+        
+    def calculate_quality_score(self):
+        """ Fetch or calculate quality score for this entry """
         
         # Load in uniprot metadata about this entry
         resolution = self.extract_resolution()
