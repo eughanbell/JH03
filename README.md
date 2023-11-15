@@ -1,6 +1,5 @@
 # Protein Database 
 
-
 ## Docker Setup
 
 * Install docker, to make sure you have installed it correctly run
@@ -18,7 +17,7 @@ In the root of this project run
 docker compose up
 ```
 
-To rebuild first, you may need to run the following first
+If the code has changed, you will need to run the following first
 ```
 docker compose build
 ```
@@ -28,6 +27,19 @@ Once the containers have all been set up, you can see the docs for each containe
 * protein stucture storage: `0.0.0.0:8000/docs`
 * protein cache: `0.0.0.0:7000/docs`
 
+## Accessing MongoDB express web service
+
+Once `docker compose up` is running, you can inspect the cache database at
+```
+0.0.0.0:8081
+```
+You will need to login, the credentials are 
+```
+username: admin
+password: pass
+```
+
+## Manual Usage
 
 ### manually running protein structure storage
 
