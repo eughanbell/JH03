@@ -18,28 +18,31 @@ EXTERNAL_DATABASES = (
 
 def request_uniprot_file(uniprot_id, filetype):
     """given a uniprot id and file type, both as strings,
-    return the text contents of the uniport entry"""
+    return the text contents of the uniprot entry"""
     if not isinstance(uniprot_id, str):
-        print("the uniport id was not a string")
+        print("the uniprot id was not a string")
         return None
     result = get_from_url("https://rest.uniprot.org/uniprotkb/" +
                           uniprot_id + "." + filetype)
     if result is None:
-        print("couldn't fulfil uniport request, id may be invalid" +
+        print("couldn't fulfil uniprot request, id may be invalid" +
               " or there may be a network issue")
     return result
 
 
 def parse_uniprot_xml(uniprot_id):
-    """returns a list of dictionaries containing
-    the 'type' (databse name) 'id', databse id
-    and 'params' (list of parameters for that entry)
-    for all the entries stored by uniport"""
-    entries = list()
+    """Return a list of dictionaries containing
+    the 'dbame' (database name) and 'dict', containing
+    the 'id' (entry id in the database), 'method',
+    'resolution', 'chains' and 'protein_metadata' 
+    (general protein metadata not specific to each
+    database entry) for all the entries stored by uniprot"""
+    entries = []
     xml_text = request_uniprot_file(uniprot_id, "xml")
     if xml_text is None:
         return entries
     root = et.fromstring(xml_text)
+    extracted_metadata = {} # Any additional metadata that is extracted and stored (this is generic to the protein, not specific to each database)
     for child in root:
         if child.tag.endswith("entry"):
             for dbentry in child:
@@ -52,6 +55,16 @@ def parse_uniprot_xml(uniprot_id):
                         if properties.tag.endswith("property"):
                             e['dict'][properties.attrib['type']] = properties.attrib['value']
                     entries.append(e)
+                elif dbentry.tag.endswith("sequence"):
+                    extracted_metadata["sequence"] = dbentry.text
+                    extracted_metadata["mass"] = dbentry.attrib['mass']
+                    extracted_metadata["sequence_length"] = dbentry.attrib['length']
+                # If we wanted to extract feature metadata, this could go here
+
+    # Add metadata to each entry
+    for entry in entries:
+        entry["dict"]["protein_metadata"] = extracted_metadata
+    
     return entries
 
 
@@ -64,7 +77,7 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
         for db in EXTERNAL_DATABASES:
             if entry['dbname'] == db['name']:
                 objs.append(db['dbobj'](entry['dict']))
-                print(f"\ncreating dbentry for {entry['dbname']} database")
+                print(f"\nCreating dbentry for {entry['dbname']} database")
                 print(entry['dict'])
     return objs
 
