@@ -2,14 +2,12 @@ import logging
 from math import log, e
 import re
 from ExternalDatabaseEntry import ExternalDatabaseEntry
-from ProteinScoringWeights.PDBeScores import *
+from ProteinScoringWeights.PDBeWeights import *
 from helpers import get_from_url
 
 print(RELATIVE_WEIGHTS)
 
 logger = logging.getLogger(__name__)
-
-# {'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145'}
 
 class PDBeEntry(ExternalDatabaseEntry):
 
@@ -26,7 +24,7 @@ class PDBeEntry(ExternalDatabaseEntry):
         resolution = self.extract_resolution()
         method = self.extract_method()
         file_chain_length = self.extract_chain_length()
-        full_protein_chain_length = 500
+        full_protein_chain_length = self.extract_full_chain_length()
         logger.warning(f"NotImplemented: finding full protein length to compute coverage not yet implemented, assuming full length to be {full_protein_chain_length}.")
 
         # Calculate individual scores for each category, based on protein metadata
@@ -78,6 +76,12 @@ class PDBeEntry(ExternalDatabaseEntry):
             logger.warning(f"Failed to determine method score: could not determine data acquisition method from Uniprot metadata. Found method data of invalid format '{method}'")
             return None
         return method
+
+    def extract_full_chain_length(self) -> int:
+        """ Extract the chain length of the full protein from protein metadata """
+        reported_chain_length = self.entry_data.get("protein_metadata",{})
+
+
 
     def calculate_resolution_score(self, resolution) -> float:
         """ Calculate score for this entry based on imaging resolution 

@@ -4,7 +4,7 @@ from urllib.error import HTTPError
 from http.client import InvalidURL
 
 from ExternalDatabaseEntry import ExternalDatabaseEntry
-from ProteinScoringWeights.AFDBScores import *
+from ProteinScoringWeights.AFDBWeights import *
 
 logger = logging.getLogger(__name__)
 

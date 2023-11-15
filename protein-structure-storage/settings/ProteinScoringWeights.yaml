@@ -2,6 +2,8 @@
 
 PDBe: # Weights for Protein Data Bank (Europe) entries
 
+  MASTER_WEIGHT: 1.0
+
   RELATIVE_WEIGHTS: # Relative weights to assign computed scores
     chain_length: 1
     method: 1
@@ -17,3 +19,4 @@ PDBe: # Weights for Protein Data Bank (Europe) entries
 
 AFDB: # Weights for AlphaFold Database Entry
   
+  MASTER_WEIGHT: 0.1
