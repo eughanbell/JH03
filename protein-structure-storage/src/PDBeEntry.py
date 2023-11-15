@@ -1,9 +1,12 @@
 import logging
 from math import log, e
 import re
+
 from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeScores import *
 from helpers import get_from_url
+
+print(RELATIVE_WEIGHTS)
 
 logger = logging.getLogger(__name__)
 
@@ -11,19 +14,10 @@ logger = logging.getLogger(__name__)
 
 class PDBeEntry(ExternalDatabaseEntry):
 
-    def fetch(self) -> str:
+    def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
-        pdb_id = self.entry_data['id']
-        archive_url = f"https://www.ebi.ac.uk/pdbe/download/api/pdb/entry/archive?data_format=pdb&id={pdb_id}"
-        #many possible urls we could have chosen from see https://www.ebi.ac.uk/pdbe/download/api/docs#/ . Each url gives different information
-        protein_structure = get_from_url(archive_url)
-        protein_structure_string = protein_structure.decode()
-        print("******************************************")
-        print(f"TYPE {type(protein_structure_string)}")
-        #this gets the url which downloads the pdb file
-        #next we have to use requests to open the url which downloads the file
-        return protein_structure_string
-        
+        raise NotImplementedError("PDBe fetch not implemented.")
+
     def calculate_quality_score(self):
         """ Fetch or calculate quality score for this entry """
         
@@ -66,7 +60,12 @@ class PDBeEntry(ExternalDatabaseEntry):
         chain_ends = re.findall(r"^[A-Z]/[A-Z]=(\d+)-(\d+)$", chains_string) # Captures the beginning and end positions of the chain
         if len(chain_ends) == 1 and len(chain_ends[0]) == 2:
             # If findall returns 1 match and that match includes both numbers
-            return int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # 1 is added as chain end positions are both included in the chain
+            chain_length = int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # 1 is added as chain end positions are both included in the chain
+            if chain_length >= 0:
+                return chain_length
+            else:
+                logger.warning(f"Failed to calculate chain length: got negative chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
+                return None
         else:
             logger.warning(f"Failed to calculate chain length: could not determine chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
             return None
@@ -87,7 +86,7 @@ class PDBeEntry(ExternalDatabaseEntry):
         a perfect weight of 1.
         """
 
-        if not resolution:
+        if resolution == None:
             return None # Resolution score will be invalid if there is no resolution (thus resolution will be ignored in scoring)
         
         a = RESOLUTION_WEIGHTS["weight_at_1"] # The weight assigned to a resolution of 1, e.g., the point (1,a)
@@ -120,4 +119,3 @@ class PDBeEntry(ExternalDatabaseEntry):
     
     def __repr__(self):
         return f"{self.entry_data}: {self.get_quality_score()}"
-    

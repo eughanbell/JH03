@@ -1,10 +1,13 @@
-import yaml
 import logging
+import os
+import yaml
+
 logger = logging.getLogger(__name__)
 
 def __get_scores_from_yaml():
     try:
-        with open('../settings/ProteinScoringWeights.yaml', 'r') as yaml_file:
+        fpath = os.path.abspath(f'{__file__}/../../../settings/ProteinScoringWeights.yaml')
+        with open(fpath, 'r') as yaml_file:
             all_scores = yaml.safe_load(yaml_file)
         return all_scores
     except FileNotFoundError:
