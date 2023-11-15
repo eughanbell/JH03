@@ -5,7 +5,7 @@ class ExternalDatabaseEntry:
         self.entry_data = entry_data # Each subclass will have logic for processing it's own entry_data dict
         self.quality_score = None # Quality score from 0 to 1
     
-    def fetch(self) -> str:
+    def fetch(self) -> bytes:
         """ Fetch a .pdb file from external database and return in string format. """
         raise NotImplementedError("External database fetch not implemented.")
     
@@ -17,6 +17,6 @@ class ExternalDatabaseEntry:
         else:
             return self.quality_score
 
-    def calculate_quality_score(self):
+    def calculate_quality_score(self) -> float:
         """ Calculate quality score for this entry """
         raise NotImplementedError("Quality score calculator not implemented.")

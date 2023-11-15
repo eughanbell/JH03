@@ -14,3 +14,6 @@ PDBe: # Weights for Protein Data Bank (Europe) entries
     interpolation: exponential # Options: linear, exponential
     # weight_at_0 is 1.0 (i.e., an infinite resolution of 0.0A is assigned the maximal score)
     weight_at_1: 0.9 # The score a resolution of 1A should be assigned
+
+AFDB: # Weights for AlphaFold Database Entry
+  
