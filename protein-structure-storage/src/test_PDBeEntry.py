@@ -36,26 +36,28 @@ class TestPDBeEntry(unittest.TestCase):
         self.assertEqual(test_entry.extract_method(), None)
 
     def test_chain_length_extraction(self):
-        test_entry.entry_data["chains"] = "B/D=1-145"
-        self.assertEqual(test_entry.extract_chain_length(), 145, "Failed to extract chain length from B/D=1-145")
-
-        test_entry.entry_data["chains"] = "B/D=73-100"
-        self.assertEqual(test_entry.extract_chain_length(), 28, "Failed to extract chain length from B/D=73-100")
-
-        test_entry.entry_data["chains"] = "C/E=73-100"
-        self.assertEqual(test_entry.extract_chain_length(), 28, "Failed to extract chain length from C/E=73-100")
-
-        test_entry.entry_data["chains"] = "C/E=100-73" # Invalid data (unlikely to be in DB, but worth checking this edge case)
-        self.assertEqual(test_entry.extract_chain_length(), None, "Imported invalid chain length from C/E=100-73 (should be None)")
-
-        test_entry.entry_data["chains"] = "" # Invalid
-        self.assertEqual(test_entry.extract_chain_length(), None)
-
-        test_entry.entry_data["chains"] = "B/D73-100" # Invalid
-        self.assertEqual(test_entry.extract_chain_length(), None)
-
-        test_entry.entry_data["chains"] = "B/D=73100" # Invalid
-        self.assertEqual(test_entry.extract_chain_length(), None)
+        test_cases = [ # List of (input, expected_output) tuples
+            ("B/D=1-145", 145),
+            ("B/D=73-100", 28),
+            ("C/E=73-100", 28),
+            ("C/E=100-73", 28), # Reverse ordering should still give positive value
+            ("F=73-100", 28),
+            ("A=1-23, B=50-79", 53),
+            ("A=1-23,B=50-79", 53),
+            ("A=1-23,       B=50-79", 53),
+            ("A/B=1-23, C/D=50-79", 53),
+            ("A=1-23, C/D=50-79", 53),
+            ("A/B=1-23, D=50-79", 53),
+            # Invalid / partially cases
+            ("", None),
+            ("B/D73-100", None),
+            ("A=1, B=3", None),
+            ("B/D=73100", None),
+            ("A=1-28, B=3", 28),
+        ] 
+        for test_case in test_cases:
+            test_entry.entry_data["chains"] = test_case[0]
+            self.assertEqual(test_entry.extract_chain_length(), test_case[1], f"Failed to extract chain length from {test_case[0]}")
 
     def test_resolution_score_calculation(self):
         logger.warning("Resolution scoring testing incomplete.")
