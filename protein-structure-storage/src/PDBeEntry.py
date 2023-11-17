@@ -5,8 +5,6 @@ from ExternalDatabaseEntry import ExternalDatabaseEntry
 from ProteinScoringWeights.PDBeWeights import *
 from helpers import get_from_url
 
-print(RELATIVE_WEIGHTS)
-
 logger = logging.getLogger(__name__)
 
 class PDBeEntry(ExternalDatabaseEntry):
@@ -25,8 +23,7 @@ class PDBeEntry(ExternalDatabaseEntry):
         method = self.extract_method()
         file_chain_length = self.extract_chain_length()
         full_protein_chain_length = self.extract_full_chain_length()
-        logger.warning(f"NotImplemented: finding full protein length to compute coverage not yet implemented, assuming full length to be {full_protein_chain_length}.")
-
+        
         # Calculate individual scores for each category, based on protein metadata
         resolution_score = self.calculate_resolution_score(resolution)
         method_score = self.calculate_method_score(method)
@@ -56,15 +53,14 @@ class PDBeEntry(ExternalDatabaseEntry):
         """ Extract the length of chain from chains self.entry_data """
 
         chains_string = self.entry_data.get("chains", "") # Will be empty string if chains metadata unavailable
-        chain_ends = re.findall(r"^[A-Z]/[A-Z]=(\d+)-(\d+)$", chains_string) # Captures the beginning and end positions of the chain
-        if len(chain_ends) == 1 and len(chain_ends[0]) == 2:
-            # If findall returns 1 match and that match includes both numbers
-            chain_length = int(chain_ends[0][1]) - int(chain_ends[0][0]) + 1 # 1 is added as chain end positions are both included in the chain
-            if chain_length >= 0:
-                return chain_length
-            else:
-                logger.warning(f"Failed to calculate chain length: got negative chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
-                return None
+        chain_ends = re.findall(r"[A-Z](?:/[A-Z]])?=(\d+)-(\d+)", chains_string) # Captures the beginning and end positions of the chain parts (there could be more than one, e.g. "A/B=1-23, C/D=47-94")
+        chain_length = 0 # Cumulative chain length of all parts
+        for chain_part_ends in chain_ends:
+            chain_part_length = abs(int(chain_part_ends[1]) - int(chain_part_ends[0])) + 1 # 1 is added as chain end positions are both included in the chain
+            chain_length += chain_part_length
+        
+        if chain_length > 0:
+            return chain_length
         else:
             logger.warning(f"Failed to calculate chain length: could not determine chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
             return None
@@ -79,9 +75,30 @@ class PDBeEntry(ExternalDatabaseEntry):
 
     def extract_full_chain_length(self) -> int:
         """ Extract the chain length of the full protein from protein metadata """
-        reported_chain_length = self.entry_data.get("protein_metadata",{})
-
-
+        protein_metadata = self.entry_data.get("protein_metadata",{})
+        sequence = self.entry_data.get("sequence","")
+        reported_chain_length = 0
+        string_chain_length = 0
+        
+        try:
+            reported_chain_length = int(protein_metadata.get("sequence_length", 0))
+        except ValueError:
+            pass
+        try:
+            string_chain_length = len(sequence)
+        except TypeError:
+            pass
+        
+        if reported_chain_length != string_chain_length:
+            logger.warning(f"Protein chain length doesn't match reported chain length: attempting to select largest one. Reported chain length: '{reported_chain_length}', actual sequence: '{sequence}'.")
+            full_chain_length = max(reported_chain_length, string_chain_length)
+            if full_chain_length <= 0:
+                logger.warning(f"Failed to reconcile protein chain lengths.")
+                return None
+            else:
+                return full_chain_length
+        else:
+            return reported_chain_length
 
     def calculate_resolution_score(self, resolution) -> float:
         """ Calculate score for this entry based on imaging resolution 
