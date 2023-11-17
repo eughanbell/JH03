@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 from PDBeEntry import PDBeEntry
 
-test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145'})
+test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 
 class TestPDBeEntry(unittest.TestCase):    
     def test_resolution_extraction(self):
@@ -58,6 +58,9 @@ class TestPDBeEntry(unittest.TestCase):
         for test_case in test_cases:
             test_entry.entry_data["chains"] = test_case[0]
             self.assertEqual(test_entry.extract_chain_length(), test_case[1], f"Failed to extract chain length from {test_case[0]}")
+
+    def test_full_chain_length_extraction(self):
+        logger.warning("Not Implemented: extraction of full protein chain length from metadata.")
 
     def test_resolution_score_calculation(self):
         logger.warning("Resolution scoring testing incomplete.")
