@@ -19,13 +19,16 @@ class ProteinFile(BaseModel):
     "Structure of json object to POST to store functions"
     uniprot_id: str
     pdb_file: str
+    sequence: str
 
 
 @app.post("/protein_file/")
-def store_by_uniprot_id(protein_file: ProteinFile):
+def store_protein_in_cache(protein_file: ProteinFile):
     print(f"storing protein file: id:{protein_file.uniprot_id}"
           + " file:{protein_file.pdb_file}")
-    store_cache(protein_file.uniprot_id, protein_file.pdb_file)
+    store_cache(protein_file.uniprot_id,
+                protein_file.pdb_file,
+                protein_file.sequence)
     return protein_file
 
 if __name__ == "__main__":
