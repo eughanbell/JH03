@@ -13,14 +13,16 @@ class PDBeEntry(ExternalDatabaseEntry):
     method_score = None
     resolution_score = None
 
+    master_weight = MASTER_WEIGHT
+
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
         pdb_id = self.entry_data['id']
         pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id.lower()}.ent")
         return pdb_file
         
-    def calculate_quality_score(self) -> float:
-        """ Fetch or calculate quality score for this entry """
+    def calculate_raw_quality_score(self) -> float:
+        """ Calculate unweighted quality score for this entry """
         
         # Load in uniprot metadata about this entry
         resolution = self.extract_resolution()
@@ -88,7 +90,7 @@ class PDBeEntry(ExternalDatabaseEntry):
             reported_chain_length = int(protein_metadata.get("sequence_length", 0))
         except ValueError:
             pass
-        
+
         if reported_chain_length != string_chain_length:
             logger.warning(f"Protein chain length doesn't match reported chain length: attempting to select largest one. Reported chain length: '{reported_chain_length}', actual sequence: '{sequence}'.")
             full_chain_length = max(reported_chain_length, string_chain_length)
@@ -142,9 +144,3 @@ class PDBeEntry(ExternalDatabaseEntry):
             return CHAIN_LENGTH_WEIGHTS["default_score"]
         
         return file_chain_length / full_protein_chain_length
-    
-    def __lt__(self, other): # Sorting / comparision is based on quality score
-        return self.get_quality_score() < other.get_quality_score()
-    
-    def __repr__(self):
-        return f"{self.entry_data}: {self.get_quality_score()}"
