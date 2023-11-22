@@ -9,13 +9,17 @@ logger = logging.getLogger(__name__)
 
 class PDBeEntry(ExternalDatabaseEntry):
 
+    chain_length_score = None
+    method_score = None
+    resolution_score = None
+
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
         pdb_id = self.entry_data['id']
         pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id.lower()}.ent")
         return pdb_file
         
-    def calculate_quality_score(self):
+    def calculate_quality_score(self) -> float:
         """ Fetch or calculate quality score for this entry """
         
         # Load in uniprot metadata about this entry
@@ -25,15 +29,15 @@ class PDBeEntry(ExternalDatabaseEntry):
         full_protein_chain_length = self.extract_full_chain_length()
         
         # Calculate individual scores for each category, based on protein metadata
-        resolution_score = self.calculate_resolution_score(resolution)
-        method_score = self.calculate_method_score(method)
-        chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length)
+        self.resolution_score = self.calculate_resolution_score(resolution)
+        self.method_score = self.calculate_method_score(method)
+        self.chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length)
 
         # Weight and combine all scores into a single quality score
-        logger.warning("NotImplemented: calculating overall quality score not properly implemented. Will crash on invalid data.")
-        self.quality_score = (RELATIVE_WEIGHTS["resolution"] * resolution_score +
-                              RELATIVE_WEIGHTS["method"] *  method_score +
-                              RELATIVE_WEIGHTS["chain_length"] * chain_length_score)/(sum(RELATIVE_WEIGHTS.values()))
+        self.quality_score = (RELATIVE_WEIGHTS["resolution"] * self.resolution_score +
+                              RELATIVE_WEIGHTS["method"] *  self.method_score +
+                              RELATIVE_WEIGHTS["chain_length"] * self.chain_length_score)/(sum(RELATIVE_WEIGHTS.values()))
+        return self.quality_score
 
     def extract_resolution(self) -> float:
         """ Extract resolution in Angstroms from resolution self.entry_data  """
@@ -106,10 +110,12 @@ class PDBeEntry(ExternalDatabaseEntry):
         Determines a weight to assign the entry, based on its image resolution in
         Angstroms. Infinite resolution (resolution value of 0 A) would receive
         a perfect weight of 1.
+
+        If calculation cannot be performed, return default score.
         """
 
         if resolution == None:
-            return None # Resolution score will be invalid if there is no resolution (thus resolution will be ignored in scoring)
+            return RESOLUTION_WEIGHTS["default_score"] # Resolution score will be invalid if there is no resolution (thus resolution will be ignored in scoring)
         
         a = RESOLUTION_WEIGHTS["weight_at_1"] # The weight assigned to a resolution of 1, e.g., the point (1,a)
         if RESOLUTION_WEIGHTS["interpolation"] == "linear":
@@ -120,20 +126,25 @@ class PDBeEntry(ExternalDatabaseEntry):
             return e**(decay_rate * resolution)
         else:
             logger.error(f"Failed to calculate resolution score: weights table specifies invalid interpolation scheme '{RESOLUTION_WEIGHTS['interpolation']}' for resolution.")
-            return None
+            return RESOLUTION_WEIGHTS["default_score"]
     
     def calculate_method_score(self, method) -> float:
-        """ Determine score based on acquisition method """
-        return METHOD_WEIGHTS.get(method, None)
+        """ Determine score based on acquisition method
+         If calculation cannot be performed, return default score. """
+        
+        return METHOD_WEIGHTS.get(method, METHOD_WEIGHTS["default_score"])
     
     def calculate_chain_length_score(self, file_chain_length, full_protein_chain_length) -> float:
-        """ Calculate ratio of file chain length to full protein chain length"""
+        """ Calculate ratio of file chain length to full protein chain length
+
+         If calculation cannot be performed, return default score. """
 
         if file_chain_length == None or full_protein_chain_length == None:
-            return None
+            return CHAIN_LENGTH_WEIGHTS["default_score"]
         
         if file_chain_length <= 0 or full_protein_chain_length <= 0:
-            return 0
+            return CHAIN_LENGTH_WEIGHTS["default_score"]
+        
         return file_chain_length / full_protein_chain_length
     
     def __lt__(self, other): # Sorting / comparision is based on quality score

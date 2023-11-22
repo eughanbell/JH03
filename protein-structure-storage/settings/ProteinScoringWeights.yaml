@@ -4,18 +4,23 @@ PDBe: # Weights for Protein Data Bank (Europe) entries
 
   MASTER_WEIGHT: 1.0
 
-  RELATIVE_WEIGHTS: # Relative weights to assign computed scores
+  RELATIVE_WEIGHTS: # Relative weights to assign computed scores for each field (fraction of whole protein chain present, method of data acquisition, resolution of data)
     chain_length: 1
     method: 1
     resolution: 0.02
 
+  CHAIN_LENGTH_WEIGHTS:
+    default_score: 0.1 # Score to give if a chain if chain length data is missing
+
   METHOD_WEIGHTS:
     X-ray: 1
+    default_score: 0.1
 
   RESOLUTION_WEIGHTS:
     interpolation: exponential # Options: linear, exponential
     # weight_at_0 is 1.0 (i.e., an infinite resolution of 0.0A is assigned the maximal score)
     weight_at_1: 0.9 # The score a resolution of 1A should be assigned
+    default_score: 0.1
 
 AFDB: # Weights for AlphaFold Database Entry
   
