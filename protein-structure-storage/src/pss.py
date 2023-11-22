@@ -29,8 +29,7 @@ def get_pdb_file(uniprot_id):
                   + f"id: {uniprot_id}")
             return ""
         else:
-            # entries.sort(key=lambda entry: entry.calculate_quality_score(),
-            #          reverse=True)
+            entries.sort(reverse=True)
             protein_file = entries[0].fetch().decode()
         
             r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
