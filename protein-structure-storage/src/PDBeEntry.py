@@ -15,9 +15,9 @@ class PDBeEntry(ExternalDatabaseEntry):
 
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
-        pdb_id = self.entry_data['id']
-        pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id.lower()}.ent")
-        return pdb_file
+        pdb_id = self.extract_id()
+        pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id}.ent")
+        return pdb_file.decode()
         
     def calculate_quality_score(self):
         """ Fetch or calculate quality score for this entry """
@@ -39,6 +39,14 @@ class PDBeEntry(ExternalDatabaseEntry):
         self.quality_score = (RELATIVE_WEIGHTS["resolution"] * resolution_score +
                               RELATIVE_WEIGHTS["method"] *  method_score +
                               RELATIVE_WEIGHTS["chain_length"] * chain_length_score)/(sum(RELATIVE_WEIGHTS.values()))
+    
+    def extract_id(self) -> str:
+        id = self.entry_data.get("id", "") #Will be empty string if id metadata unavailable
+        if not id:
+            logger.warning(f"Failed to determine id: could not determine data id from Uniprot metadata. Found method data of invalid format '{id}'")
+            return None
+        
+        return id.lower()
 
     def extract_resolution(self) -> float:
         """ Extract resolution in Angstroms from resolution self.entry_data  """
