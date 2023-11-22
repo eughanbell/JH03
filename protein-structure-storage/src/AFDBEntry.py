@@ -3,8 +3,8 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from http.client import InvalidURL
 
-from ExternalDatabaseEntry import ExternalDatabaseEntry
-from ProteinScoringWeights.AFDBWeights import *
+from .ExternalDatabaseEntry import ExternalDatabaseEntry
+from .ProteinScoringWeights.AFDBWeights import *
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,10 @@
 import logging
 from math import log, e
 import re
-from ExternalDatabaseEntry import ExternalDatabaseEntry
-from ProteinScoringWeights.PDBeWeights import *
-from helpers import get_from_url
+
+from .ExternalDatabaseEntry import ExternalDatabaseEntry
+from .ProteinScoringWeights.PDBeWeights import *
+from .helpers import get_from_url
 
 logger = logging.getLogger(__name__)
 
