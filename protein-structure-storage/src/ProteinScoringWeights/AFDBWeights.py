@@ -3,10 +3,7 @@ logger = logging.getLogger(__name__)
 
 from . import __all_scores
 
-MASTER_WEIGHT = __all_scores.get("AFDB", {}).get("MASTER_WEIGHT", {})
-# RELATIVE_WEIGHTS = __all_scores.get("AFDB", {}).get("RELATIVE_WEIGHTS", {})
-# METHOD_WEIGHTS = __all_scores.get("AFDB", {}).get("METHOD_WEIGHTS", {})
-# RESOLUTION_WEIGHTS = __all_scores.get("AFDB", {}).get("RESOLUTION_WEIGHTS", {})
+MASTER_WEIGHT = __all_scores.get("AFDB", {}).get("MASTER_WEIGHT", None)
 
-if not MASTER_WEIGHT:
+if MASTER_WEIGHT == None:
     logger.critical("Cannot perform protein scoring: AFDB section of scoring file corrupted.")
