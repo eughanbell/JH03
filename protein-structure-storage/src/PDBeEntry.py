@@ -80,17 +80,13 @@ class PDBeEntry(ExternalDatabaseEntry):
     def extract_full_chain_length(self) -> int:
         """ Extract the chain length of the full protein from protein metadata """
         protein_metadata = self.entry_data.get("protein_metadata",{})
-        sequence = self.entry_data.get("sequence","")
+        sequence = protein_metadata.get("sequence","")
         reported_chain_length = 0
-        string_chain_length = 0
+        string_chain_length = len(sequence)
         
         try:
             reported_chain_length = int(protein_metadata.get("sequence_length", 0))
         except ValueError:
-            pass
-        try:
-            string_chain_length = len(sequence)
-        except TypeError:
             pass
         
         if reported_chain_length != string_chain_length:
