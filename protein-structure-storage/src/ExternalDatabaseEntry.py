@@ -20,3 +20,6 @@ class ExternalDatabaseEntry:
     def calculate_quality_score(self) -> float:
         """ Calculate quality score for this entry """
         raise NotImplementedError("Quality score calculator not implemented.")
+    
+    def get_protein_metadata(self) -> dict:
+        return self.entry_data["protein_metadata"]
