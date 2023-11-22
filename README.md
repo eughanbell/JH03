@@ -76,3 +76,6 @@ test with curl:
 ```
 curl -X POST -H "Content-Type: application/json" -d '{"uniprot_id": "p02070", "pdb_file":"LOTS OF PROTEIN FILE DATA"}' 0.0.0.0:7000/protein_file/
 ```
+
+### Testing
+`protein-structure-storage` unittests can be run by executing `python -m unittest` in that folder.
