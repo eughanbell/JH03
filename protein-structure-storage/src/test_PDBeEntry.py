@@ -3,6 +3,7 @@ import unittest
 logger = logging.getLogger(__name__)
 
 from PDBeEntry import PDBeEntry
+from ProteinScoringWeights.PDBeWeights import *
 
 test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 
@@ -27,13 +28,17 @@ class TestPDBeEntry(unittest.TestCase):
         self.assertEqual(test_entry.extract_resolution(), None)
 
     def test_method_extraction(self):
-        test_entry.entry_data["method"] = "X-ray" # Valid method
-        self.assertEqual(test_entry.extract_method(), "X-ray")
+        test_cases = [ # List of (input, expected_output, error message fragment) tuples
+            ("X-ray", "X-ray", "valid input"),
+            ("badmethod", None, "invalid method."),
+            ("", None, "missing method")
+        ]
+        for test_case in test_cases:
+            test_entry.entry_data["method"] = test_case[0]
+            val = test_entry.extract_method()
+            self.assertEqual(val, test_case[1], f"Failed to parse {test_case[2]}, expected {test_case[1]}, got {val}")
 
         logger.warning("Partially implemented: need to implement more tests for extracting valid methods")
-
-        test_entry.entry_data["method"] = "" # Invalid
-        self.assertEqual(test_entry.extract_method(), None)
 
     def test_chain_length_extraction(self):
         test_cases = [ # List of (input, expected_output) tuples
@@ -61,14 +66,34 @@ class TestPDBeEntry(unittest.TestCase):
 
     def test_full_chain_length_extraction(self):
         logger.warning("Not Implemented: extraction of full protein chain length from metadata.")
+        test_cases = [ # List of (protein metadata dict, expected output, error message fragment) tuples
+            ({"sequence":"", "sequence_length":"0"}, 0, "0-length input"),
+            ({"sequence":"A", "sequence_length":"1"}, 1, "1-length input"),
+            ({"sequence":"DKAMFOWEMVLA", "sequence_length":"12"}, 12, "input"),
+            ({"sequence":"", "sequence_length":"12"}, 12, "missing sequence data"),
+            ({"sequence":"DKAMFOWEMVLA"}, 12, "missing reported sequence length data"),
+            ({"sequence":"DKAMFOWEMVLA", "sequence_length":"na"}, 12, "corrupted reported sequence length data"),
+            ({"sequence":"DKAMFOWEMVLA", "sequence_length":""}, 12, "corrupted reported sequence length data"),
+            ({"sequence":"DKAMFOWEMVLA", "sequence_length":"0"}, 12, "mismatch between sequence and reported sequence length"),
+            ({"sequence":"DKAMFOWEMVLA", "sequence_length":"10"}, 12, "mismatch between sequence and reported sequence length"),
+            ({"sequence":"DKAMFOWEMVLA", "sequence_length":"20"}, 20, "mismatch between sequence and reported sequence length"),
+            ({"sequence":"PQRMCUWEXI"*1000, "sequence_length":"10000"}, 10_000, "large input"),
+            ({"sequence":"PQRMCUWEXI"*10000, "sequence_length":"100000"}, 100_000, "very large input"),
+        ]
+
+        for test_case in test_cases:
+            test_entry.entry_data["protein_metadata"] = test_case[0]
+            val = test_entry.extract_full_chain_length()
+            self.assertEqual(val, test_case[1], f"Failed to handle {test_case[2]}, expected {test_case[1]}, got {val}.")
 
     def test_resolution_score_calculation(self):
+        DEFAULT = RESOLUTION_WEIGHTS["default_score"]
         logger.warning("Resolution scoring testing incomplete.")
         self.assertEqual(test_entry.calculate_resolution_score(0.0), 1) # Perfect resolution, score should be 1
-        self.assertEqual(test_entry.calculate_resolution_score(1.0), 0.9) # 1A, score should be 0.9
+        self.assertEqual(test_entry.calculate_resolution_score(1.0), 0.9) # 1 angstrom, score should be 0.9
         logger.warning("Resolution scoring testing currently uses hardcoded test values. Correct this before final release.")
 
-        self.assertEqual(test_entry.calculate_resolution_score(None), None) # No resolution, should return None, but not throw error
+        self.assertEqual(test_entry.calculate_resolution_score(None), DEFAULT, f"Failed to return default value on invalid resolution data.")
 
     def test_method_score_calculation(self):
         logger.warning("Not Implemented: method scoring tests not implemented")
