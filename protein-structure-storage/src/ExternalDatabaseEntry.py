@@ -16,7 +16,7 @@ class ExternalDatabaseEntry:
         """ Get the quality score, recalculating it if necessary. """
 
         if recalculate == True or self.quality_score == None:
-            self.calculate_raw_quality_score()
+            self.quality_score = self.calculate_raw_quality_score()
         
         return self.quality_score * self.master_weight
 

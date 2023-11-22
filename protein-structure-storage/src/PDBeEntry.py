@@ -36,10 +36,9 @@ class PDBeEntry(ExternalDatabaseEntry):
         self.chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length)
 
         # Weight and combine all scores into a single quality score
-        self.quality_score = (RELATIVE_WEIGHTS["resolution"] * self.resolution_score +
-                              RELATIVE_WEIGHTS["method"] *  self.method_score +
-                              RELATIVE_WEIGHTS["chain_length"] * self.chain_length_score)/(sum(RELATIVE_WEIGHTS.values()))
-        return self.quality_score
+        return (RELATIVE_WEIGHTS["resolution"] * self.resolution_score +
+                RELATIVE_WEIGHTS["method"] *  self.method_score +
+                RELATIVE_WEIGHTS["chain_length"] * self.chain_length_score)/(sum(RELATIVE_WEIGHTS.values()))
 
     def extract_resolution(self) -> float:
         """ Extract resolution in Angstroms from resolution self.entry_data  """
