@@ -18,4 +18,3 @@ __all_scores = __get_scores_from_yaml()
 
 from . import PDBeWeights
 from . import AFDBWeights
-from . import DBRelativeWeights
