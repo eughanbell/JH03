@@ -2,9 +2,11 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from http.client import InvalidURL
 import xml.etree.ElementTree as et
-from helpers import get_from_url
-import ExternalDatabaseEntry as EDBentry
-import PDBeEntry, AFDBEntry
+
+from .helpers import get_from_url
+from . import ExternalDatabaseEntry as EDBentry
+from . import PDBeEntry, AFDBEntry
+
 # list of databases used when found in uniprot
 # each entry contains a name which is used in uniprot as 'type'
 # and a dbobj which is the type of the ExternalDatabaseEntry object
