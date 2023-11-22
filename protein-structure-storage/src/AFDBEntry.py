@@ -22,7 +22,7 @@ class AFDBEntry(ExternalDatabaseEntry):
         try:
             f = urlopen(model_url)
             if f.getcode() == 200:
-                return f.read()
+                return f.read().decode()
             else:
                 raise HTTPError(model_url, 404, "File not found")
         except Exception as e:

@@ -59,12 +59,12 @@ def parse_uniprot_xml(uniprot_id):
                     extracted_metadata["sequence"] = dbentry.text
                     extracted_metadata["mass"] = dbentry.attrib['mass']
                     extracted_metadata["sequence_length"] = dbentry.attrib['length']
-                # If we wanted to extract feature metadata, this could go here
+                    # If we wanted to extract feature metadata,
+                    # this could go here
 
     # Add metadata to each entry
     for entry in entries:
         entry["dict"]["protein_metadata"] = extracted_metadata
-    
     return entries
 
 

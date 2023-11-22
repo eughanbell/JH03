@@ -29,3 +29,7 @@ class ExternalDatabaseEntry:
     
     def __repr__(self):
         return f"{self.entry_data}: {self.get_quality_score()}"
+
+    def get_protein_metadata(self) -> dict:
+        return self.entry_data["protein_metadata"]
+
