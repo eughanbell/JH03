@@ -4,7 +4,6 @@ from http.client import InvalidURL
 import xml.etree.ElementTree as et
 
 from .helpers import get_from_url
-from . import ExternalDatabaseEntry as EDBentry
 from . import PDBeEntry, AFDBEntry
 
 # list of databases used when found in uniprot
