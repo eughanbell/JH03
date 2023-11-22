@@ -30,7 +30,7 @@ class TestPDBeEntry(unittest.TestCase):
     def test_method_extraction(self):
         test_cases = [ # List of (input, expected_output, error message fragment) tuples
             ("X-ray", "X-ray", "valid input"),
-            ("badmethod", None, "invalid method."),
+            ("othermethod", "othermethod", "valid input not in weights dictionary"),
             ("", None, "missing method")
         ]
         for test_case in test_cases:
