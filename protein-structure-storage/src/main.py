@@ -1,8 +1,8 @@
 from urllib.error import HTTPError
 from fastapi import FastAPI, HTTPException
 import uvicorn
-import AFDBEntry
-from pss import get_pdb_file
+from . import AFDBEntry
+from .pss import get_pdb_file
 
 app = FastAPI()
 
@@ -35,7 +35,3 @@ def retrieve_by_sequence(seq: str):
 @app.get("/retrieve_by_key/{key}")
 def retrieve_by_key(key: int):
     return {"key": key}
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host=HOST, port=PORT)

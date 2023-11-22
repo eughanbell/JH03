@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # command to start the server
-ENTRYPOINT [ "python", "src/main.py"]
+ENTRYPOINT [ "python", "-m", "protein-structure-storage"]

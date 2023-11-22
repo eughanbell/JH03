@@ -1,5 +1,5 @@
-from helpers import get_from_url
-from uniprot import uniprot_get_entries
+from .helpers import get_from_url
+from .uniprot import uniprot_get_entries
 import json
 import requests
 
@@ -30,7 +30,7 @@ def get_pdb_file(uniprot_id):
             return ""
         else:
             entries.sort(reverse=True)
-            protein_file = entries[0].fetch().decode()
+            protein_file = entries[0].fetch()
         
             r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
                               json={"uniprot_id": uniprot_id,

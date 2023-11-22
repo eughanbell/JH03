@@ -79,17 +79,4 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
         for db in EXTERNAL_DATABASES:
             if entry['dbname'] == db['name']:
                 objs.append(db['dbobj'](entry['dict']))
-                print(f"\nCreating dbentry for {entry['dbname']} database")
-                print(entry['dict'])
     return objs
-
-
-if __name__ == "__main__":
-    x = uniprot_get_entries("p01966")
-    print(x[0])
-    print("=========================")
-    print(x[0].fetch())
-    # uniprot_get_entries("Q14676")
-    # uniprot_get_entries("p0207")
-    # uniprot_get_entries("p02 07")
-    # uniprot_get_entries(10)
