@@ -4,9 +4,9 @@ logger = logging.getLogger(__name__)
 
 from urllib.request import urlopen
 
-from uniprot import request_uniprot_file
-from uniprot import parse_uniprot_xml
-from uniprot import uniprot_get_entries
+from src.uniprot import request_uniprot_file
+from src.uniprot import parse_uniprot_xml
+from src.uniprot import uniprot_get_entries
 
 class TestUniprot(unittest.TestCase):
     def test_request_uniprot_file(self):

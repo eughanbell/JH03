@@ -2,8 +2,8 @@ import logging
 import unittest
 logger = logging.getLogger(__name__)
 
-from PDBeEntry import PDBeEntry
-from ProteinScoringWeights.PDBeWeights import *
+from src.PDBeEntry import PDBeEntry
+from src.ProteinScoringWeights.PDBeWeights import *
 
 test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 

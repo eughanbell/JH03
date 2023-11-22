@@ -3,7 +3,7 @@ import unittest
 import hashlib
 logger = logging.getLogger(__name__)
 
-from AFDBEntry import AFDBEntry
+from src.AFDBEntry import AFDBEntry
 
 class TestAFDBEntry(unittest.TestCase):
     def test_fetching(self):
