@@ -4,11 +4,13 @@ from urllib.error import HTTPError
 from http.client import InvalidURL
 
 from ExternalDatabaseEntry import ExternalDatabaseEntry
-from ProteinScoringWeights.AFDBScores import *
+from ProteinScoringWeights.AFDBWeights import *
 
 logger = logging.getLogger(__name__)
 
 class AFDBEntry(ExternalDatabaseEntry):
+
+    master_weight = MASTER_WEIGHT
 
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from AFDB database and return in string format. """
@@ -26,7 +28,7 @@ class AFDBEntry(ExternalDatabaseEntry):
         except Exception as e:
             raise Exception(e)
 
-    def calculate_quality_score(self) -> float:
+    def calculate_raw_quality_score(self) -> float:
         """ Calculate quality score for this entry """
         logger.warning("AFDB Quality Score calculation not implemented: returning perfect score (1.0).")
         return 1.0

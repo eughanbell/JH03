@@ -16,4 +16,5 @@ def __get_scores_from_yaml():
     
 __all_scores = __get_scores_from_yaml()
 
-from . import PDBeScores
+from . import PDBeWeights
+from . import AFDBWeights
