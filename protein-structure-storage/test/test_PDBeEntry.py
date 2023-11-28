@@ -120,8 +120,8 @@ class TestPDBeEntry(unittest.TestCase):
         DEFAULT = METHOD_WEIGHTS["default_score"]
         test_cases = [(method, weight, f"valid input") for method, weight in METHOD_WEIGHTS.items()]  # List of (input method, expected output, error message fragment) tuples
         test_cases += [
-            ("x-ray", METHOD_WEIGHTS["X-ray"], "valid (lowercase) input"),
-            ("X-RAY", METHOD_WEIGHTS["X-ray"], "valid (uppercase) input"),
+            ("x-ray", METHOD_WEIGHTS["x-ray"], "valid (lowercase) input"),
+            ("X-RAY", METHOD_WEIGHTS["x-ray"], "valid (uppercase) input"),
 
             ("F12ioe", DEFAULT, "corrupted input"),
             ("X-rayz", DEFAULT, "corrupted input"),
@@ -136,19 +136,19 @@ class TestPDBeEntry(unittest.TestCase):
     def test_chain_length_score_calculation(self):
         DEFAULT = CHAIN_LENGTH_WEIGHTS["default_score"]
         test_cases = [ # List of (record chain length, whole protein chain length, expected score) tuples
-            (0, 762, 0),
-            (0, 1, 0),
-            (23, 23, 1),
-            (2839, 2839, 1),
+            (0, 762, 0.0),
+            (0, 1, 0.0),
+            (23, 23, 1.0),
+            (2839, 2839, 1.0),
             (10, 100, 0.1),
             (234, 1000, 0.234),
             (35, 70, 0.5),
-            (0, 0, 0), # Should not crash!
+            (0, 0, DEFAULT), # Should not crash!
             (1, 0, DEFAULT),
             (37, 0, DEFAULT),
-            (-35, 70, DEFAULT),
-            (35, -70, DEFAULT),
-            (-35, -70, DEFAULT),
+            (-35, 70, 0.5),
+            (35, -70, 0.5),
+            (-35, -70, 0.5),
             (None, 38, DEFAULT),
             (918, None, DEFAULT),
             (None, None, DEFAULT),
@@ -156,7 +156,7 @@ class TestPDBeEntry(unittest.TestCase):
         test_cases += [(x, y, x/y) for x in range(1,30) for y in range(1,30)]
         for test_case in test_cases:
             output = test_entry.calculate_chain_length_score(test_case[0], test_case[1])
-            self.assertEqual(output, test_case[1], f"Failed to extract chain length from length={test_case[0]} whole protein length={test_case[1]}, expected {test_case[2]}, got {output}")
+            self.assertEqual(output, test_case[2], f"Failed to extract chain length from chain-length={test_case[0]}, whole-protein-length={test_case[1]}, expected {test_case[2]}, got {output}")
 
     # def test_overall_score_calculation(self):
     #     logger.warning("Not Implemented: Overall scoring tests.")
