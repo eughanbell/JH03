@@ -5,6 +5,7 @@ from http.client import InvalidURL
 
 from .ExternalDatabaseEntry import ExternalDatabaseEntry
 from .ProteinScoringWeights.AFDBWeights import *
+from .helpers import get_from_url
 
 logger = logging.getLogger(__name__)
 
@@ -19,16 +20,9 @@ class AFDBEntry(ExternalDatabaseEntry):
         alphafold_id = "AF-" + self.entry_data["id"] + "-F1"
         database_version = "v4"
         model_url = f"https://alphafold.ebi.ac.uk/files/{alphafold_id}-model_{database_version}.pdb"
-        try:
-            f = urlopen(model_url)
-            if f.getcode() == 200:
-                return f.read().decode()
-            else:
-                raise HTTPError(model_url, 404, "File not found")
-        except Exception as e:
-            raise Exception(e)
+        return get_from_url(model_url)
 
     def calculate_raw_quality_score(self) -> float:
         """ Calculate quality score for this entry """
-        logger.warning("AFDB Quality Score calculation not implemented: returning perfect score (1.0).")
-        return 1.0
+        logger.warning("AFDB Quality Score calculation not implemented: returning worst score (0.0).")
+        return 0.0
