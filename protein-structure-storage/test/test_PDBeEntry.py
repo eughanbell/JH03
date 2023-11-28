@@ -2,30 +2,27 @@ import logging
 import unittest
 logger = logging.getLogger(__name__)
 
-from src.PDBeEntry import PDBeEntry
-from src.ProteinScoringWeights.PDBeWeights import *
+import math
 
-test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
+import src.PDBeEntry as PDBeEntry
+
+test_entry = PDBeEntry.PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 
 class TestPDBeEntry(unittest.TestCase):    
     def test_resolution_extraction(self):
-        test_entry.entry_data["resolution"] = "1.34 A" # Valid float
-        self.assertEqual(test_entry.extract_resolution(), 1.34, "Failed to handle float import: 1.34 A ")
-
-        test_entry.entry_data["resolution"] = "7 A" # Valid int
-        self.assertEqual(test_entry.extract_resolution(), 7, "Failed to handle int import: 7 A")
-
-        test_entry.entry_data["resolution"] = "1.34a A" # Invalid
-        self.assertEqual(test_entry.extract_resolution(), None)
-
-        test_entry.entry_data["resolution"] = "1.34" # Invalid
-        self.assertEqual(test_entry.extract_resolution(), None)
-
-        test_entry.entry_data["resolution"] = "1.34a A" # Invalid
-        self.assertEqual(test_entry.extract_resolution(), None)
-
-        test_entry.entry_data["resolution"] = "" # Invalid
-        self.assertEqual(test_entry.extract_resolution(), None)
+        test_cases = [ # List of (input, expected_output, error message fragment) tuples
+            ("1.34 A", 1.34, "valid float"),
+            ("7 A", 7, "valid int"),
+            ("1.34a A", None, "corrupted input"),
+            ("1.34", None, "corrupted input"),
+            ("1.34A", None, "corrupted input"),
+            (".7 A", None, "corrupted input"),
+            ("", None, "empty input"),
+        ]
+        for test_case in test_cases:
+            test_entry.entry_data["resolution"] = test_case[0]
+            val = test_entry.extract_resolution()
+            self.assertEqual(val, test_case[1], f"Failed to parse {test_case[2]} correctly, expected {test_case[1]}, got {val}")
 
     def test_method_extraction(self):
         test_cases = [ # List of (input, expected_output, error message fragment) tuples
@@ -36,7 +33,7 @@ class TestPDBeEntry(unittest.TestCase):
         for test_case in test_cases:
             test_entry.entry_data["method"] = test_case[0]
             val = test_entry.extract_method()
-            self.assertEqual(val, test_case[1], f"Failed to parse {test_case[2]}, expected {test_case[1]}, got {val}")
+            self.assertEqual(val, test_case[1], f"Failed to parse {test_case[2]} correctly, expected {test_case[1]}, got {val}")
 
         logger.warning("Partially implemented: need to implement more tests for extracting valid methods")
 
@@ -87,14 +84,37 @@ class TestPDBeEntry(unittest.TestCase):
             self.assertEqual(val, test_case[1], f"Failed to handle {test_case[2]}, expected {test_case[1]}, got {val}.")
 
     def test_resolution_score_calculation(self):
-        DEFAULT = RESOLUTION_WEIGHTS["default_score"]
-        logger.warning("Resolution scoring testing incomplete.")
-        self.assertEqual(test_entry.calculate_resolution_score(0.0), 1) # Perfect resolution, score should be 1
-        self.assertEqual(test_entry.calculate_resolution_score(1.0), 0.9) # 1 angstrom, score should be 0.9
-        logger.warning("Resolution scoring testing currently uses hardcoded test values. Correct this before final release.")
+        DEFAULT = PDBeEntry.RESOLUTION_WEIGHTS["default_score"]
 
-        self.assertEqual(test_entry.calculate_resolution_score(None), DEFAULT, f"Failed to return default value on invalid resolution data.")
+        def test_vals (test_cases, precision=10):
+            output = test_entry.calculate_resolution_score(None)
+            self.assertEqual(output, DEFAULT, f"Failed to return default value on invalid resolution data, got {output}")
+            for test_val, expected_output in test_cases:
+                output = test_entry.calculate_resolution_score(test_val)
+                self.assertAlmostEqual(output, expected_output, places=precision, msg=f"Failed to handle resolution of {test_val}, expected {expected_output}, got {output}")
+        
 
+        test_vals([]) # Just test for invalid value handling
+        test_range = [i/10 for i in range(0, 100)]
+
+        # Test linear weights scoring
+        PDBeEntry.RESOLUTION_WEIGHTS["interpolation"] = "linear"
+        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.5
+        test_vals([(x, max(0, (PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
+        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.9
+        test_vals([(x, max(0,(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
+        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.99
+        test_vals([(x, max(0,(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
+        
+        # Test exponential weights scoring
+        PDBeEntry.RESOLUTION_WEIGHTS["interpolation"] = "exponential"
+        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.5
+        test_vals([(0,1), (0.25,0.841), (0.5,0.707), (1,0.5), (1.5, 0.354), (5, 0.031), (10, 0.001), (15, 0.000)], precision=3) # Value for x should follow exponential decay curve (test val is correct to within 3 d.p.)
+        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.9
+        test_vals([(x, max(0,math.e**(math.log(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
+        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.99
+        test_vals([(x, max(0,math.e**(math.log(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
+        
     def test_method_score_calculation(self):
         logger.warning("Not Implemented: method scoring tests not implemented")
 
