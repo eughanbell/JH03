@@ -131,10 +131,32 @@ class TestPDBeEntry(unittest.TestCase):
 
         for test_case in test_cases:
             output = test_entry.calculate_method_score(test_case[0])
-            self.assertEqual(output, test_case[1], f"Failed to extract chain length from {test_case[0]}, expected {test_case[1]}, got {output}")
+            self.assertEqual(output, test_case[1], f"Failed to extract chain length from {test_case[2]}: {test_case[0]}, expected {test_case[1]}, got {output}")
 
     def test_chain_length_score_calculation(self):
-        logger.warning("Not Implemented: chain length scoring tests.")
+        DEFAULT = CHAIN_LENGTH_WEIGHTS["default_score"]
+        test_cases = [ # List of (record chain length, whole protein chain length, expected score) tuples
+            (0, 762, 0),
+            (0, 1, 0),
+            (23, 23, 1),
+            (2839, 2839, 1),
+            (10, 100, 0.1),
+            (234, 1000, 0.234),
+            (35, 70, 0.5),
+            (0, 0, 0), # Should not crash!
+            (1, 0, DEFAULT),
+            (37, 0, DEFAULT),
+            (-35, 70, DEFAULT),
+            (35, -70, DEFAULT),
+            (-35, -70, DEFAULT),
+            (None, 38, DEFAULT),
+            (918, None, DEFAULT),
+            (None, None, DEFAULT),
+        ]
+        test_cases += [(x, y, x/y) for x in range(1,30) for y in range(1,30)]
+        for test_case in test_cases:
+            output = test_entry.calculate_chain_length_score(test_case[0], test_case[1])
+            self.assertEqual(output, test_case[1], f"Failed to extract chain length from length={test_case[0]} whole protein length={test_case[1]}, expected {test_case[2]}, got {output}")
 
     def test_overall_score_calculation(self):
         logger.warning("Not Implemented: Overall scoring tests.")
