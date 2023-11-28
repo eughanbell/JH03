@@ -125,8 +125,8 @@ class PDBeEntry(ExternalDatabaseEntry):
         
         a = RESOLUTION_WEIGHTS["weight_at_1"] # The weight assigned to a resolution of 1, e.g., the point (1,a)
         if RESOLUTION_WEIGHTS["interpolation"] == "linear":
-            gradient = (1-a) / 1.0
-            return max((resolution * gradient) + a, 0) # y = m*x + y-intercept
+            gradient = (a-1) / 1.0
+            return max((resolution * gradient) + 1, 0) # y = m*x + y-intercept
         elif RESOLUTION_WEIGHTS["interpolation"] == "exponential":
             decay_rate = log(a)
             return e**(decay_rate * resolution)
