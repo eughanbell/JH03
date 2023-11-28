@@ -158,8 +158,8 @@ class TestPDBeEntry(unittest.TestCase):
             output = test_entry.calculate_chain_length_score(test_case[0], test_case[1])
             self.assertEqual(output, test_case[1], f"Failed to extract chain length from length={test_case[0]} whole protein length={test_case[1]}, expected {test_case[2]}, got {output}")
 
-    def test_overall_score_calculation(self):
-        logger.warning("Not Implemented: Overall scoring tests.")
+    # def test_overall_score_calculation(self):
+    #     logger.warning("Not Implemented: Overall scoring tests.")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
