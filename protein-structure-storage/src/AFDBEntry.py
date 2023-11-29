@@ -24,5 +24,5 @@ class AFDBEntry(ExternalDatabaseEntry):
 
     def calculate_raw_quality_score(self) -> float:
         """ Calculate quality score for this entry """
-        logger.warning("AFDB Quality Score calculation not implemented: returning worst score (0.0).")
-        return 0.0
+        logger.warning("AFDB Quality Score calculation not implemented: returning perfect score (1.0).")
+        return 1.0
