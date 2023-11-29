@@ -2,7 +2,7 @@ from urllib.error import HTTPError
 from fastapi import FastAPI, HTTPException
 import uvicorn
 from . import AFDBEntry
-from .pss import get_pdb_file
+from .pss import get_pdb_file, get_pdb_file_by_sequence
 
 app = FastAPI()
 
@@ -29,7 +29,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
 
 @app.get("/retrieve_by_sequence/{seq}")
 def retrieve_by_sequence(seq: str):
-    return {"seq": seq}
+    return {"pdbfile": get_pdb_file_by_sequence(seq)}
 
 
 @app.get("/retrieve_by_key/{key}")
