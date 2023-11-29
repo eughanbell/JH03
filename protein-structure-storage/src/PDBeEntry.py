@@ -137,8 +137,7 @@ class PDBeEntry(ExternalDatabaseEntry):
     def calculate_method_score(self, method) -> float:
         """ Determine score based on acquisition method
          If calculation cannot be performed, return default score. """
-        
-        return METHOD_WEIGHTS.get(method, METHOD_WEIGHTS["default_score"])
+        return METHOD_WEIGHTS.get(method.lower(), METHOD_WEIGHTS["default_score"]) # METHOD_WEIGHTS is lower case for comparison
     
     def calculate_chain_length_score(self, file_chain_length, full_protein_chain_length) -> float:
         """ Calculate ratio of file chain length to full protein chain length
@@ -146,9 +145,9 @@ class PDBeEntry(ExternalDatabaseEntry):
          If calculation cannot be performed, return default score. """
 
         if file_chain_length == None or full_protein_chain_length == None:
+            return CHAIN_LENGTH_WEIGHTS["default_score"] # Missing data, return default
+        
+        if full_protein_chain_length == 0: # If the whole protein length is 0, data is likely corrupted and the fraction that file_chain_length represents cannot be meaningfully extracted, so return default
             return CHAIN_LENGTH_WEIGHTS["default_score"]
         
-        if file_chain_length <= 0 or full_protein_chain_length <= 0:
-            return CHAIN_LENGTH_WEIGHTS["default_score"]
-        
-        return file_chain_length / full_protein_chain_length
+        return abs(file_chain_length) / abs(full_protein_chain_length) # Convert to absolute value to handle accidental negation of input data

@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)
 import math
 
 import src.PDBeEntry as PDBeEntry
+from src.ProteinScoringWeights.PDBeWeights import *
 
 test_entry = PDBeEntry.PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 
@@ -84,7 +85,7 @@ class TestPDBeEntry(unittest.TestCase):
             self.assertEqual(val, test_case[1], f"Failed to handle {test_case[2]}, expected {test_case[1]}, got {val}.")
 
     def test_resolution_score_calculation(self):
-        DEFAULT = PDBeEntry.RESOLUTION_WEIGHTS["default_score"]
+        DEFAULT = RESOLUTION_WEIGHTS["default_score"]
 
         def test_vals (test_cases, precision=10):
             output = test_entry.calculate_resolution_score(None)
@@ -116,13 +117,49 @@ class TestPDBeEntry(unittest.TestCase):
         test_vals([(x, max(0,math.e**(math.log(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
         
     def test_method_score_calculation(self):
-        logger.warning("Not Implemented: method scoring tests not implemented")
+        DEFAULT = METHOD_WEIGHTS["default_score"]
+        test_cases = [(method, weight, f"valid input") for method, weight in METHOD_WEIGHTS.items()]  # List of (input method, expected output, error message fragment) tuples
+        test_cases += [
+            ("x-ray", METHOD_WEIGHTS["x-ray"], "valid (lowercase) input"),
+            ("X-RAY", METHOD_WEIGHTS["x-ray"], "valid (uppercase) input"),
+
+            ("F12ioe", DEFAULT, "corrupted input"),
+            ("X-rayz", DEFAULT, "corrupted input"),
+            ("     ", DEFAULT, "whitespace input"),
+            ("", DEFAULT, "missing input"),
+        ]
+
+        for test_case in test_cases:
+            output = test_entry.calculate_method_score(test_case[0])
+            self.assertEqual(output, test_case[1], f"Failed to extract chain length from {test_case[2]}: {test_case[0]}, expected {test_case[1]}, got {output}")
 
     def test_chain_length_score_calculation(self):
-        logger.warning("Not Implemented: chain length scoring tests.")
+        DEFAULT = CHAIN_LENGTH_WEIGHTS["default_score"]
+        test_cases = [ # List of (record chain length, whole protein chain length, expected score) tuples
+            (0, 762, 0.0),
+            (0, 1, 0.0),
+            (23, 23, 1.0),
+            (2839, 2839, 1.0),
+            (10, 100, 0.1),
+            (234, 1000, 0.234),
+            (35, 70, 0.5),
+            (0, 0, DEFAULT), # Should not crash!
+            (1, 0, DEFAULT),
+            (37, 0, DEFAULT),
+            (-35, 70, 0.5),
+            (35, -70, 0.5),
+            (-35, -70, 0.5),
+            (None, 38, DEFAULT),
+            (918, None, DEFAULT),
+            (None, None, DEFAULT),
+        ]
+        test_cases += [(x, y, x/y) for x in range(1,30) for y in range(1,30)]
+        for test_case in test_cases:
+            output = test_entry.calculate_chain_length_score(test_case[0], test_case[1])
+            self.assertEqual(output, test_case[2], f"Failed to extract chain length from chain-length={test_case[0]}, whole-protein-length={test_case[1]}, expected {test_case[2]}, got {output}")
 
-    def test_overall_score_calculation(self):
-        logger.warning("Not Implemented: Overall scoring tests.")
+    # def test_overall_score_calculation(self):
+    #     logger.warning("Not Implemented: Overall scoring tests.")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
