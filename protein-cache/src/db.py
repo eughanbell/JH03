@@ -21,13 +21,18 @@ def get_cache(uniprot_id, field="pdb_file"):
         return None
     return e.get(field)
 
+def get_by_sequence(sequence, field="pdb_file"):
+    e = db.cache.find_one({"sequence" : {"$regex": sequence.upper()}})
+    if e is None:
+        return None
+    return e.get(field)
 
 def store_cache(uniprot_id, pdb_file, sequence):
     "stores the given id and file in the cache"
     if get_cache(uniprot_id) is None:
         db.cache.insert_one({"uniprot_id": uniprot_id.upper(),
                              "pdb_file": pdb_file,
-                             "sequence": sequence})
+                             "sequence": sequence.upper()})
     else:
         print("WARNING: tried to store pdb file into database"
               + " That already contains an element with the same"

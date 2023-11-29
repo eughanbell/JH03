@@ -6,10 +6,10 @@ import requests
 # docker compose internal protein cache url
 CACHE_CONTAINER_URL = "http://pc:6000"
 
-def request_from_cache(uniprot_id):
+def request_from_cache(search_value, cache_endpoint):
     f = get_from_url(CACHE_CONTAINER_URL
-                     + "/retrieve_by_uniprot_id/"
-                     + uniprot_id)
+                     + cache_endpoint
+                     + search_value)
     if f is None:
         print("Error: Network issue when requesting protein file from cache")
         return None
@@ -20,7 +20,7 @@ def request_from_cache(uniprot_id):
 
 
 def get_pdb_file(uniprot_id):
-    protein_file = request_from_cache(uniprot_id)
+    protein_file = request_from_cache(uniprot_id, "/retrieve_by_uniprot_id/")
     if protein_file is None:
         # check uniprot if file not in cache
         entries = uniprot_get_entries(uniprot_id)
@@ -41,5 +41,10 @@ def get_pdb_file(uniprot_id):
             if r.status_code != 200:
                 print(f"Failed to store protein file in cache: {r.text}")
     return protein_file
+
+
+def get_pdb_file_by_sequence(sequence):
+    return request_from_cache(sequence, "/retrieve_by_sequence/")
+        
 
 #print(get_pdb_file('p02070'))
