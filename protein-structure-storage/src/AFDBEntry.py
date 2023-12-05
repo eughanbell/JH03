@@ -20,7 +20,7 @@ class AFDBEntry(ExternalDatabaseEntry):
         alphafold_id = "AF-" + self.entry_data["id"] + "-F1"
         database_version = "v4"
         model_url = f"https://alphafold.ebi.ac.uk/files/{alphafold_id}-model_{database_version}.pdb"
-        return get_from_url(model_url)
+        return get_from_url(model_url).decode()
 
     def calculate_raw_quality_score(self) -> float:
         """ Calculate quality score for this entry """
