@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson import ObjectId
 
 # connect to running database
 client = MongoClient(host="mongo:27017", # the internal docker address
@@ -21,11 +22,23 @@ def get_cache(uniprot_id, field="pdb_file"):
         return None
     return e.get(field)
 
+
 def get_by_sequence(sequence, field="pdb_file"):
-    e = db.cache.find_one({"sequence" : {"$regex": sequence.upper()}})
+    e = db.cache.find_one({"sequence": {"$regex": sequence.upper()}})
     if e is None:
         return None
     return e.get(field)
+
+
+def get_by_db_id(obj_id, field="pdb_file"):
+    try:
+        e = db.cache.find_one({"_id": ObjectId(obj_id)})
+        if e is None:
+            return None
+        return e.get(field)
+    except Exception:
+        return None
+
 
 def store_cache(uniprot_id, pdb_file, sequence):
     "stores the given id and file in the cache"
