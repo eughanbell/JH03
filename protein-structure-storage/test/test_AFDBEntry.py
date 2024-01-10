@@ -4,6 +4,7 @@ import hashlib
 logger = logging.getLogger(__name__)
 
 from src.AFDBEntry import AFDBEntry
+logging.getLogger("src.AFDBEntry").setLevel(logging.ERROR) # Disable warnings in PDBeEntry class
 
 class TestAFDBEntry(unittest.TestCase):
     def test_fetching(self):
@@ -11,7 +12,7 @@ class TestAFDBEntry(unittest.TestCase):
             test_entry = AFDBEntry(metadata_dict)
             return test_entry.fetch()
         self.assertEqual(len(get_output({'id': 'P02070'})), 96227, "Mismatching lengths")
-        self.assertEqual(hashlib.sha256(get_output({'id': 'P02070'})).hexdigest()[:16], "b9d5cede21b982e1", "Invalid .pdb file fetched for P02070 entry (hash mismatch)")
+        self.assertEqual(hashlib.sha256(get_output({'id': 'P02070'}).encode("utf-8")).hexdigest()[:16], "b9d5cede21b982e1", "Invalid .pdb file fetched for P02070 entry (hash mismatch)")
 
         logger.warning("Paritally Implemented: more thorough fetching tests missing.")
 
@@ -20,5 +21,4 @@ class TestAFDBEntry(unittest.TestCase):
     
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     unittest.main()

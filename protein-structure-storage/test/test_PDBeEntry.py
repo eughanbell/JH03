@@ -6,6 +6,7 @@ import math
 
 import src.PDBeEntry as PDBeEntry
 from src.ProteinScoringWeights.PDBeWeights import *
+logging.getLogger("src.PDBeEntry").setLevel(logging.ERROR) # Disable warnings in PDBeEntry class
 
 test_entry = PDBeEntry.PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 
@@ -158,10 +159,11 @@ class TestPDBeEntry(unittest.TestCase):
             output = test_entry.calculate_chain_length_score(test_case[0], test_case[1])
             self.assertEqual(output, test_case[2], f"Failed to extract chain length from chain-length={test_case[0]}, whole-protein-length={test_case[1]}, expected {test_case[2]}, got {output}")
 
-    # def test_overall_score_calculation(self):
-    #     logger.warning("Not Implemented: Overall scoring tests.")
+    def test_fetch(self):
+        logger.warning("NotImplemented: no tests for PDBeFetch.")
+    
+    def test_overall_score_calculation(self):
+        logger.warning("Not Implemented: Overall scoring tests.")
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    logger.warning("NotImplemented: no tests for PDBeFetch.")
     unittest.main()
