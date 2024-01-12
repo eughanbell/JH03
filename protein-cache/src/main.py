@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from pydantic import BaseModel
-from db import get_cache, store_cache, get_by_sequence
+from db import get_cache, store_cache, get_by_sequence, get_by_db_id
 
 app = FastAPI()
 HOST = "0.0.0.0"
@@ -22,6 +22,11 @@ def retrieve_by_uniprot_id(id: str):
 @app.get("/retrieve_by_sequence/{sequence}")
 def retrieve_by_sequence(sequence: str):
     return pdb_response(get_by_sequence(sequence))
+
+
+@app.get("/retrieve_by_db_id/{db_id}")
+def retrieve_by_db_id(db_id: str):
+    return pdb_response(get_by_db_id(db_id))
 
 
 class ProteinFile(BaseModel):
