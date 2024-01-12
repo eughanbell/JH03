@@ -15,7 +15,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
     only the alphafold predicted entry"""
     if alphafold_only:
         try:
-            request = AFDBEntry.AFDBEntry({"id": id})
+            request = AFDBEntry.AFDBEntry({"id": id.upper()})
             return request.fetch()
         except Exception:
             return ""
