@@ -7,7 +7,6 @@ app = FastAPI()
 HOST = "0.0.0.0"
 PORT = 6000
 
-
 def json_response(data, field="pdb_file"):
     if data is None or data == "None":
         return {"present": False, field: ""}
