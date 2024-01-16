@@ -8,25 +8,30 @@ HOST = "0.0.0.0"
 PORT = 6000
 
 
-def pdb_response(pdb_file):
-    if pdb_file is None:
-        return {"present": False, "pdb_file": ""}
-    return {"present": True, "pdb_file": pdb_file}
+def json_response(data, field="pdb_file"):
+    if data is None or data == "None":
+        return {"present": False, field: ""}
+    return {"present": True, field: data}
 
 
 @app.get("/retrieve_by_uniprot_id/{id}")
 def retrieve_by_uniprot_id(id: str):
-    return pdb_response(get_cache(id))
+    return json_response(get_cache(id))
 
 
 @app.get("/retrieve_by_sequence/{sequence}")
 def retrieve_by_sequence(sequence: str):
-    return pdb_response(get_by_sequence(sequence))
+    return json_response(get_by_sequence(sequence))
 
 
 @app.get("/retrieve_by_db_id/{db_id}")
 def retrieve_by_db_id(db_id: str):
-    return pdb_response(get_by_db_id(db_id))
+    return json_response(get_by_db_id(db_id))
+
+
+@app.get("/retrieve_db_id_by_uniprot_id/{id}")
+def retrieve_db_id_by_uniprot_id(id: str):
+    return json_response(str(get_cache(id, field="_id")), field="db_id")
 
 
 class ProteinFile(BaseModel):

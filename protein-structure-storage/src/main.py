@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from . import AFDBEntry
-from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id
+from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id
 
 app = FastAPI()
 
@@ -31,3 +31,8 @@ def retrieve_by_sequence(seq: str):
 @app.get("/retrieve_by_key/{key}", response_class=PlainTextResponse)
 def retrieve_by_key(key: str):
     return get_pdb_file_by_db_id(key)
+
+
+@app.get("/retrieve_key_by_uniprot_id/{id}", response_class=PlainTextResponse)
+def retrieve_key_by_uniprot_id(id: str):
+    return get_db_id_by_uniprot_id(id)

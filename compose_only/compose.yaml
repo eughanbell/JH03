@@ -1,0 +1,21 @@
+services:
+  pss:
+    image: noamzeise/protein-structure-storage
+    ports:
+      - "8000:5000"
+  pc:
+    image: noamzeise/protein-cache
+    ports:
+      - "7000:6000"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
