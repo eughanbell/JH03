@@ -12,7 +12,6 @@ def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
                      + cache_endpoint
                      + search_value)
     if f is None:
-        print("Error: Network issue when requesting protein file from cache")
         return ""
     response = json.loads(f)
     if not response['present']:
@@ -26,8 +25,7 @@ def get_pdb_file(uniprot_id):
         # check uniprot if file not in cache
         entries = uniprot_get_entries(uniprot_id)
         if len(entries) == 0:
-            print("Error: no proteins found in uniprot database, "
-                  + f"id: {uniprot_id}")
+            print(f"no entry with id `{uniprot_id}` found in uniprot database")
             return ""
         else:
             entries.sort(reverse=True)

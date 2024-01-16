@@ -77,3 +77,18 @@ docker run --publish 7000:6000 pc
 
 ## Testing
 `protein-structure-storage` unittests can be run by executing `python -m unittest` in the `protein-structure-storage/` folder.
+
+## Pushing Built Containers to Docker Hub
+
+TODO: push containers from shared account
+at the moment only works for one person
+
+
+```
+docker build -t pss protein-structure-storage
+docker image tag pss noamzeise/protein-structure-storage:latest
+docker image push noamzeise/protein-structure-storage:latest
+docker build -t pc protein-cache
+docker image tag pc noamzeise/protein-cache:latest
+docker image push noamzeise/protein-cache:latest
+```

@@ -4,7 +4,6 @@ from . import AFDBEntry
 from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id
 
 app = FastAPI()
-
 HOST = "0.0.0.0"
 PORT = 5000
 

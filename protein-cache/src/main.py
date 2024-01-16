@@ -7,6 +7,7 @@ app = FastAPI()
 HOST = "0.0.0.0"
 PORT = 6000
 
+
 def json_response(data, field="pdb_file"):
     if data is None or data == "None":
         return {"present": False, field: ""}
@@ -42,8 +43,7 @@ class ProteinFile(BaseModel):
 
 @app.post("/protein_file/")
 def store_protein_in_cache(protein_file: ProteinFile):
-    print(f"storing protein file: id:{protein_file.uniprot_id}"
-          + " file:{protein_file.pdb_file}")
+    print(f"storing protein file: id:{protein_file.uniprot_id}")
     store_cache(protein_file.uniprot_id,
                 protein_file.pdb_file,
                 protein_file.sequence)
