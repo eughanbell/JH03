@@ -85,10 +85,8 @@ at the moment only works for one person
 
 
 ```
-docker build -t pss protein-structure-storage
-docker image tag pss noamzeise/protein-structure-storage:latest
+docker build -t noamzeise/protein-structure-storage:latest protein-structure-storagbe
 docker image push noamzeise/protein-structure-storage:latest
-docker build -t pc protein-cache
-docker image tag pc noamzeise/protein-cache:latest
+docker build -t noamzeise/protein-cache:latest protein-cache
 docker image push noamzeise/protein-cache:latest
 ```
