@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 # docker compose internal protein cache url
 CACHE_CONTAINER_URL = "http://pc:6000"
 
-
-def request_from_cache(search_value, cache_endpoint):
+def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
     logger.info(f"Attempting fetch from cache {cache_endpoint} - looking for {search_value}.")
     f = get_from_url(CACHE_CONTAINER_URL
                      + cache_endpoint
@@ -22,8 +21,8 @@ def request_from_cache(search_value, cache_endpoint):
     if not response['present']:
         logger.info("Cache miss.")
         return ""
-    logger.info("Cache hit.")
-    return response['pdb_file']
+    logger.info(f"Cache hit, returning requested field {field}.")
+    return response[field]
 
 
 def get_pdb_file(uniprot_id):
@@ -54,3 +53,15 @@ def get_pdb_file_by_sequence(sequence):
 
 def get_pdb_file_by_db_id(db_id):
     return request_from_cache(db_id, "/retrieve_by_db_id/")
+
+
+# return the database id of the pdb file with the matching uniprot id
+# if that uniprot id is not in the local cache, then first add it to cache
+def get_db_id_by_uniprot_id(uniprot_id):
+    db_id = request_from_cache(uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
+    if db_id == "":
+        if get_pdb_file(uniprot_id) != "":
+            db_id = request_from_cache(uniprot_id,
+                                       "/retrieve_db_id_by_uniprot_id/",
+                                       field="db_id")
+    return db_id

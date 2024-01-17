@@ -1,47 +1,57 @@
-# Protein Database 
+# Protein Database Requests And Cache 
 
-## Docker Setup
+## Quickstart with single docker compose file
 
-* Install docker, to make sure you have installed it correctly run
+copy the compose file from `compose_only/compose.yaml` into your files and run 
+```docker compose up```
+which should automatically start the webapp.
+
+You can now access the webapp and check the docs by going to
+`0.0.0.0:8000/docs`. If this doesn't work, try `127.0.0.1:8000/docs`
+
+## Usage
+
+Protein files can be requested using uniprot ids. Any requested proteins
+will be cached locally.
+
+### Example Usage
+
 ```
-docker --version
-```
-If you get a version number there are no issues
-
-If you want to use docker compose, you may need to seperately install a package called something like `docker-compose`.
-
-### Running all containers with compose
-
-In the root of this project run 
-```
-docker compose up
-```
-
-If the code has changed, you will need to run the following first
-```
-docker compose build
+curl 'http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070'
 ```
 
-Once the containers have all been set up, you can see the docs for each container at:
+see `example_scripts/` for more usage examples.
 
-* protein stucture storage: `0.0.0.0:8000/docs`
-* protein cache: `0.0.0.0:7000/docs`
-
-## Accessing MongoDB express web service
-
-Once `docker compose up` is running, you can inspect the cache database at
-```
-0.0.0.0:8081
-```
+### Accessing MongoDB express web service
+To inspect the cache database manually, if the containers are running, go to
+`0.0.0.0:8081` or `127.0.0.1:8081`.
 You will need to login, the credentials are 
 ```
 username: admin
 password: pass
 ```
 
-## Manual Usage
+The cache database will only be present if at least one pdb file has been requested.
 
-### manually running protein structure storage
+## Building Docker Containers Locally
+
+### With Docker Compose
+
+If you have `docker` and `docker compose` installed you can do
+```
+git clone https://github.com/eughanbell/JH03.git
+cd JH03
+docker compose up
+```
+
+When you edit the code, you will need to run the following first to see your changes reflected
+```
+docker compose build
+```
+
+### Without Docker Compose
+
+#### Protein Structure Storage
 
 make sure you are in this project's root folder
 
@@ -53,17 +63,10 @@ docker build -t pss protein-structure-storage
 ```
 docker run --publish 8000:5000 pss
 ```
-you should see "Hello, World!" followed by some flask messages
-* test the example endpoint by visiting `0.0.0.0:8000/retrieve_by_key/` in a browser. You should get some text with the id.
 
-#### Docs
-
-To see documentation on the available endpoints visit `0.0.0.0:8000/docs/` in a browser while the server is running.
-
-
-### manually running protein cache
+#### Protein Cache
 	
-build in similar way to pss. 
+build in similar way to pss, but make sure pss is still running.
 ```
 docker build -t pc protein-cache
 ```
@@ -72,10 +75,20 @@ to run, we will map to 7000 instead of 8000 to not conflict with pss.
 docker run --publish 7000:6000 pc
 ```
 
-test with curl:
-```
-curl -X POST -H "Content-Type: application/json" -d '{"uniprot_id": "p02070", "pdb_file":"LOTS OF PROTEIN FILE DATA"}' 0.0.0.0:7000/protein_file/
-```
+## Testing
+`protein-structure-storage` unittests can be run by executing `python -m unittest` in the `protein-structure-storage/` folder.
 
-### Testing
-`protein-structure-storage` unittests can be run by executing `python -m unittest` in that folder.
+## Pushing Built Containers to Docker Hub
+
+TODO: push containers from shared account
+at the moment only works for one person
+
+
+```
+docker build -t pss protein-structure-storage
+docker image tag pss noamzeise/protein-structure-storage:latest
+docker image push noamzeise/protein-structure-storage:latest
+docker build -t pc protein-cache
+docker image tag pc noamzeise/protein-cache:latest
+docker image push noamzeise/protein-cache:latest
+```
