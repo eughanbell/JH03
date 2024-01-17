@@ -8,7 +8,7 @@ test-job1:
   script:
     - echo "This job tests something."
 
-test-job2:
+test-protein-structure-storage:
   stage: test
   before_script:
     - pip install -r requirements.txt
