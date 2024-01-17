@@ -78,11 +78,22 @@ docker run --publish 7000:6000 pc
 ## Testing
 `protein-structure-storage` unittests can be run by executing `python -m unittest` in the `protein-structure-storage/` folder.
 
+## Running on Kubernetes
+
+Using [minikube](https://minikube.sigs.k8s.io/docs/start/), you can simulate a kubernetes cluster locally by doing
+```minikube start```
+
+You can then add workloads and services for the cluster by using [kubectl](https://kubernetes.io/docs/tasks/tools/). Run the script at `compose_only/k8s/kubectl-apply.sh`, to start them.
+You may have to wait a while for the mongo database to start.
+
+Get the url for the protein structure storage service by using 
+```minikube service pss --url```
+
+To clear the cluster you can use the script at `compose_only/k8s/kubectl-delete.sh`.
+
 ## Pushing Built Containers to Docker Hub
 
-TODO: push containers from shared account
-at the moment only works for one person
-
+This is done automaically by a gitlab pipeline.
 
 ```
 docker build -t noamzeise/protein-structure-storage:latest protein-structure-storagbe

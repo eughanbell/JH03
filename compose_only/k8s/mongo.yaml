@@ -1,28 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.31.2 (HEAD)
-  creationTimestamp: null
   labels:
-    io.kompose.service: mongo
+    service: mongo
   name: mongo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: mongo
+      service: mongo
   strategy: {}
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.31.2 (HEAD)
-      creationTimestamp: null
       labels:
-        io.kompose.network/compose-only-default: "true"
-        io.kompose.service: mongo
+        network/compose-only-default: "true"
+        service: mongo
     spec:
       containers:
         - image: mongo
@@ -39,7 +31,7 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    io.kompose.service: mongo
+    service: mongo
   name: mongo
 spec:
   ports:
@@ -47,6 +39,6 @@ spec:
       port: 27017
       targetPort: 27017
   selector:
-    io.kompose.service: mongo
+    service: mongo
 status:
   loadBalancer: {}

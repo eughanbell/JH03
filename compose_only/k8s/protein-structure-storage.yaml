@@ -1,28 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.31.2 (HEAD)
-  creationTimestamp: null
   labels:
-    io.kompose.service: pss
+    service: pss
   name: pss
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: pss
+      service: pss
   strategy: {}
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.31.2 (HEAD)
-      creationTimestamp: null
       labels:
-        io.kompose.network/compose-only-default: "true"
-        io.kompose.service: pss
+        service: pss
     spec:
       containers:
         - image: noamzeise/protein-structure-storage
@@ -38,12 +29,8 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.31.2 (HEAD)
-  creationTimestamp: null
   labels:
-    io.kompose.service: pss
+    service: pss
   name: pss
 spec:
   type: NodePort
@@ -52,6 +39,6 @@ spec:
       port: 8000
       targetPort: 5000
   selector:
-    io.kompose.service: pss
+    service: pss
 status:
   loadBalancer: {}
