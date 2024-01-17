@@ -1,8 +1,8 @@
 build-job:
   stage: build
   script:
-    - docker build -t '$DOCKERHUB_USERNAME'/protein-structure-storage:latest protein-structure-storage
-    - docker build -t '$DOCKERHUB_USERNAME'/protein-cache:latest protein-cache
+    - docker build -t $DOCKERHUB_USERNAME/protein-structure-storage:latest protein-structure-storage
+    - docker build -t $DOCKERHUB_USERNAME/protein-cache:latest protein-cache
   environment: production
 
 test-protein-structure-storage:
@@ -17,7 +17,7 @@ test-protein-structure-storage:
 deploy-prod:
   stage: deploy
   script:
-    - docker login -u '$DOCKERHUB_USERNAME' -p '$DOCKERHUB_AUTHCODE'
-    - docker image push '$DOCKERHUB_USERNAME'/protein-structure-storage:latest
-    - docker image push '$DOCKERHUB_USERNAME'/protein-cache:latest
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
+    - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
+    - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
   environment: production
