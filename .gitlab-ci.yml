@@ -9,7 +9,7 @@ test-protein-structure-storage:
     - pip3 install -r requirements.txt
   script:
     - cd protein-structure-storage
-    - python3 -m unittest &> protein-structure-storage-unittest-report.txt
+    - python3 -m unittest
 
 # deploy-prod:
 #   stage: deploy
