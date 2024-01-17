@@ -1,21 +1,27 @@
 from .helpers import get_from_url
 from .uniprot import uniprot_get_entries
 import json
+import logging
 import requests
+
+logger = logging.getLogger(__name__)
 
 # docker compose internal protein cache url
 CACHE_CONTAINER_URL = "http://pc:6000"
 
-
 def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
+    logger.info(f"Attempting fetch from cache {cache_endpoint} - looking for {search_value}.")
     f = get_from_url(CACHE_CONTAINER_URL
                      + cache_endpoint
                      + search_value)
     if f is None:
+        logger.error("Network issue while fetching protein file from cache.")
         return ""
     response = json.loads(f)
     if not response['present']:
+        logger.info("Cache miss.")
         return ""
+    logger.info(f"Cache hit, returning requested field {field}.")
     return response[field]
 
 
@@ -25,7 +31,7 @@ def get_pdb_file(uniprot_id):
         # check uniprot if file not in cache
         entries = uniprot_get_entries(uniprot_id)
         if len(entries) == 0:
-            print(f"no entry with id `{uniprot_id}` found in uniprot database")
+            logger.warning(f"No proteins found in UniProt database, id: {uniprot_id}")
             return ""
         else:
             entries.sort(reverse=True)
@@ -37,7 +43,7 @@ def get_pdb_file(uniprot_id):
                                     entries[0]
                                     .get_protein_metadata()["sequence"]})
             if r.status_code != 200:
-                print(f"Failed to store protein file in cache: {r.text}")
+                logger.error(f"Failed to store protein file in cache: {r.text}")
     return protein_file
 
 
