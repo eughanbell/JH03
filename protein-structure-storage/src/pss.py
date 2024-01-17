@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 # docker compose internal protein cache url
 CACHE_CONTAINER_URL = "http://pc:6000"
 
+
 def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
     logger.info(f"Attempting fetch from cache {cache_endpoint} - looking for {search_value}.")
     f = get_from_url(CACHE_CONTAINER_URL

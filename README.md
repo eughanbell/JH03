@@ -24,7 +24,7 @@ see `example_scripts/` for more usage examples.
 
 ### Accessing MongoDB express web service
 To inspect the cache database manually, if the containers are running, go to
-`0.0.0.0:8081` or `127.0.0.1:8081`.
+`0.0.0.0:8082` or `127.0.0.1:8082`.
 You will need to login, the credentials are 
 ```
 username: admin
