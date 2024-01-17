@@ -16,8 +16,13 @@ class TestAFDBEntry(unittest.TestCase):
 
         logger.warning("Paritally Implemented: more thorough fetching tests missing.")
 
-    def test_overall_score_calculation(test_entry):
-        logger.warning("Not Implemented: overall scoring tests.")
+    def test_overall_score_calculation(self):
+        entry_id = "P02070"
+        test_entry = AFDBEntry({'id': entry_id})
+        test_entry.fetch()
+        score = test_entry.calculate_raw_quality_score()
+        # All AFDB entries should currently return a perfect score.
+        self.assertEqual(score, 1.0, f"Incorrect quality score calculated for entry {entry_id}, expected 1.0, got {score}")
     
 
 if __name__ == "__main__":

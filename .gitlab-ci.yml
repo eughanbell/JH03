@@ -1,23 +1,32 @@
-build-job:
+test-protein-structure-storage:
+  stage: test
+  image: python:3
+  before_script:
+    - cd protein-structure-storage
+    - pip install -r requirements.txt
+  script:
+    - python -m unittest
+
+build-and-deploy-job:
   stage: build
+  image: docker
+  services:
+    - "docker:dind"
   script:
-    - echo "Hello, $GITLAB_USER_LOGIN!"
-
-test-job1:
-  stage: test
-  script:
-    - echo "This job tests something."
-
-test-job2:
-  stage: test
-  script:
-    - echo "This job tests something, but takes more time than test-job1."
-    - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
-    - echo "which simulates a test that runs 20 seconds longer than test-job1"
-    - sleep 20
-
-deploy-prod:
-  stage: deploy
-  script:
-    - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
+    - docker build -t $DOCKERHUB_USERNAME/protein-structure-storage:latest protein-structure-storage
+    - docker build -t $DOCKERHUB_USERNAME/protein-cache:latest protein-cache
+    - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
+    - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
+    - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
   environment: production
+
+# deploy-prod:
+#   stage: deploy
+#   image: docker
+#   services:
+#     - "docker:dind"
+#   script:
+#     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
+#     - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
+#     - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
+#   environment: production
