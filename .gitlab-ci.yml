@@ -5,6 +5,7 @@
 
 test-protein-structure-storage:
   stage: test
+  image: python:3.6
   before_script:
     - pip3 install -r requirements.txt
   script:
