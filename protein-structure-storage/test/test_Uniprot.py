@@ -32,6 +32,9 @@ class TestUniprot(unittest.TestCase):
         #Invalid filetype
         self.assertEqual(request_uniprot_file("p02070", "ImNotAFiletype"), None)
 
+        #Invalid filetype
+        self.assertEqual(request_uniprot_file("p02070", None), None)
+
         #Non-string uniprot_id
         self.assertEqual(request_uniprot_file(2070, "xml"), None)
 
