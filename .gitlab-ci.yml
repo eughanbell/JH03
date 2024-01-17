@@ -1,7 +1,9 @@
-# build-job:
-#   stage: build
-#   script:
-#     - echo "Hello, $GITLAB_USER_LOGIN!"
+build-job:
+  stage: build
+  script:
+    - docker build -t '$DOCKERHUB_USERNAME'/protein-structure-storage:latest protein-structure-storage
+    - docker build -t '$DOCKERHUB_USERNAME'/protein-cache:latest protein-cache
+  environment: production
 
 test-protein-structure-storage:
   stage: test
@@ -12,8 +14,10 @@ test-protein-structure-storage:
   script:
     - python -m unittest
 
-# deploy-prod:
-#   stage: deploy
-#   script:
-#     - echo "This job deploys something from the $CI_COMMIT_BRANCH branch."
-#   environment: production
+deploy-prod:
+  stage: deploy
+  script:
+    - docker login -u '$DOCKERHUB_USERNAME' -p '$DOCKERHUB_AUTHCODE'
+    - docker image push '$DOCKERHUB_USERNAME'/protein-structure-storage:latest
+    - docker image push '$DOCKERHUB_USERNAME'/protein-cache:latest
+  environment: production
