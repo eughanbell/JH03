@@ -7,10 +7,9 @@ test-protein-structure-storage:
   stage: test
   image: python:3
   before_script:
-    - ls
+    - cd protein-structure-storage
     - pip install -r requirements.txt
   script:
-    - cd protein-structure-storage
     - python -m unittest
 
 # deploy-prod:
