@@ -21,8 +21,8 @@ EXTERNAL_DATABASES = {
 
 
 def request_uniprot_file(uniprot_id, filetype):
-    """given a uniprot id and file type, both as strings,
-    return the text contents of the uniprot entry"""
+    """ Given UniProt id and file type strings, return the text contents of
+    the UniProt entry. """
     if not isinstance(uniprot_id, str):
         logger.error(f"Failed to fetch UniProt entry, the given UniProt ID was {type(uniprot_id)}, not string")
         return None
@@ -35,7 +35,7 @@ def request_uniprot_file(uniprot_id, filetype):
 
 
 def parse_uniprot_xml(uniprot_id):
-    """Return a list of dictionaries containing
+    """ Return a list of dictionaries containing
     the 'dbame' (database name) and 'dict', containing
     the 'id' (entry id in the database), 'method',
     'resolution', 'chains' and 'protein_metadata' 
@@ -46,18 +46,17 @@ def parse_uniprot_xml(uniprot_id):
     if xml_text is None:
         return entries
     root = ElementTree.fromstring(xml_text)
-    extracted_metadata = {} # Any additional metadata that is extracted and stored (this is generic to the protein, not specific to each database)
+    extracted_metadata = {} # Any additional metadata that is extracted and stored (this is generic to the protein, not specific to each database entry)
     for child in root:
         if child.tag.endswith("entry"):
             for dbentry in child:
                 if dbentry.tag.endswith("dbReference"):
                     new_entry = {}
-                    new_entry['dbname'] = dbentry.attrib['type']
-                    new_entry['dict'] = {}
-                    new_entry['dict']['id'] = dbentry.attrib['id']
+                    new_entry['external_database_name'] = dbentry.attrib['type']
+                    new_entry['id'] = dbentry.attrib['id']
                     for properties in dbentry:
                         if properties.tag.endswith("property"):
-                            new_entry['dict'][properties.attrib['type']] = properties.attrib['value']
+                            new_entry[properties.attrib['type']] = properties.attrib['value']
                     entries.append(new_entry)
                 elif dbentry.tag.endswith("sequence"):
                     extracted_metadata["sequence"] = dbentry.text
@@ -66,9 +65,9 @@ def parse_uniprot_xml(uniprot_id):
                     # If we wanted to extract feature metadata,
                     # this could go here
 
-    # Add metadata to each entry
+    # Add generic protein metadata to each database entry of this protein
     for entry in entries:
-        entry["dict"]["protein_metadata"] = extracted_metadata
+        entry["protein_metadata"] = extracted_metadata
     return entries
 
 
@@ -76,9 +75,9 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieval_function=parse_uniprot_xml
     """Get list of DBEntry Objects for the supported databases
     using a uniprot id"""
     uniprot_entries_data = uniprot_retrieval_function(uniprot_id)
-    objects = list()
+    entries = list()
     for entry_data in uniprot_entries_data:
-        database = EXTERNAL_DATABASES.get(entry_data["dbname"])
-        if database:
-            objects.append(database(entry_data['dict']))
-    return objects
+        database_object = EXTERNAL_DATABASES.get(entry_data["external_database_name"])
+        if database_object:
+            entries.append(database_object(entry_data))
+    return entries
