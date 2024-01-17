@@ -26,6 +26,9 @@ def request_uniprot_file(uniprot_id, filetype):
     if not isinstance(uniprot_id, str):
         logger.error(f"Failed to fetch UniProt entry, the given UniProt ID was {type(uniprot_id)}, not string")
         return None
+    if not isinstance(filetype, str):
+        logger.error(f"Failed to fetch UniProt entry, the given filetype was {type(filetype)}, not string")
+        return None
     result = get_from_url("https://rest.uniprot.org/uniprotkb/" +
                           uniprot_id + "." + filetype)
     if result is None:
