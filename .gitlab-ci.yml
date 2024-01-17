@@ -1,5 +1,8 @@
 build-job:
   stage: build
+  image: docker
+  services:
+    - "docker:dind"
   script:
     - docker build -t $DOCKERHUB_USERNAME/protein-structure-storage:latest protein-structure-storage
     - docker build -t $DOCKERHUB_USERNAME/protein-cache:latest protein-cache
@@ -16,6 +19,9 @@ test-protein-structure-storage:
 
 deploy-prod:
   stage: deploy
+  image: docker
+  services:
+    - "docker:dind"
   script:
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
     - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
