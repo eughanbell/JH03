@@ -35,12 +35,10 @@ def request_uniprot_file(uniprot_id, filetype):
 
 
 def parse_uniprot_xml(uniprot_id):
-    """ Return a list of dictionaries containing
-    the 'dbame' (database name) and 'dict', containing
-    the 'id' (entry id in the database), 'method',
-    'resolution', 'chains' and 'protein_metadata' 
-    (general protein metadata not specific to each
-    database entry) for all the entries stored by uniprot"""
+    """ Return a list of dictionaries containing the 'external_database_name',
+    'id' (entry id in the database), 'method', 'resolution', 'chains' and
+    'protein_metadata'  (general protein metadata not specific to each database
+    entry) for all the entries stored by UniProt. """
     entries = []
     xml_text = request_uniprot_file(uniprot_id, "xml")
     if xml_text is None:
@@ -72,8 +70,8 @@ def parse_uniprot_xml(uniprot_id):
 
 
 def uniprot_get_entries(uniprot_id, uniprot_retrieval_function=parse_uniprot_xml):
-    """Get list of DBEntry Objects for the supported databases
-    using a uniprot id"""
+    """ Get list of ExternalDatabaseEntry objects for the supported databases
+    using a uniprot id. """
     uniprot_entries_data = uniprot_retrieval_function(uniprot_id)
     entries = list()
     for entry_data in uniprot_entries_data:
