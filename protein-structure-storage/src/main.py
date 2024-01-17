@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
+import logging
 from . import AFDBEntry
 from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id
 
+logger = logging.getLogger(__name__)
 app = FastAPI()
 
 HOST = "0.0.0.0"

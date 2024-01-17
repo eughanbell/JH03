@@ -1,10 +1,13 @@
 from urllib.request import urlopen
 from urllib.error import HTTPError
 from http.client import InvalidURL
+import logging
 import xml.etree.ElementTree as et
 
 from .helpers import get_from_url
 from . import PDBeEntry, AFDBEntry
+
+logger = logging.getLogger(__name__)
 
 # list of databases used when found in uniprot
 # each entry contains a name which is used in uniprot as 'type'
@@ -21,13 +24,13 @@ def request_uniprot_file(uniprot_id, filetype):
     """given a uniprot id and file type, both as strings,
     return the text contents of the uniprot entry"""
     if not isinstance(uniprot_id, str):
-        print("the uniprot id was not a string")
+        logger.error(f"Failed to fetch UniProt entry, the given UniProt ID was {type(uniprot_id)}, not string")
         return None
     result = get_from_url("https://rest.uniprot.org/uniprotkb/" +
                           uniprot_id + "." + filetype)
     if result is None:
-        print("couldn't fulfil uniprot request, id may be invalid" +
-              " or there may be a network issue")
+        logger.error("Failed to fetch UniProt entry, id may be invalid or there may be a network issue.")
+    logger.info(f"Successfully fetched UniProt entry for {uniprot_id}.")
     return result
 
 
