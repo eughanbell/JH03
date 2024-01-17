@@ -7,17 +7,16 @@ import requests
 CACHE_CONTAINER_URL = "http://pc:6000"
 
 
-def request_from_cache(search_value, cache_endpoint):
+def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
     f = get_from_url(CACHE_CONTAINER_URL
                      + cache_endpoint
                      + search_value)
     if f is None:
-        print("Error: Network issue when requesting protein file from cache")
         return ""
     response = json.loads(f)
     if not response['present']:
         return ""
-    return response['pdb_file']
+    return response[field]
 
 
 def get_pdb_file(uniprot_id):
@@ -26,8 +25,7 @@ def get_pdb_file(uniprot_id):
         # check uniprot if file not in cache
         entries = uniprot_get_entries(uniprot_id)
         if len(entries) == 0:
-            print("Error: no proteins found in uniprot database, "
-                  + f"id: {uniprot_id}")
+            print(f"no entry with id `{uniprot_id}` found in uniprot database")
             return ""
         else:
             entries.sort(reverse=True)
@@ -49,3 +47,15 @@ def get_pdb_file_by_sequence(sequence):
 
 def get_pdb_file_by_db_id(db_id):
     return request_from_cache(db_id, "/retrieve_by_db_id/")
+
+
+# return the database id of the pdb file with the matching uniprot id
+# if that uniprot id is not in the local cache, then first add it to cache
+def get_db_id_by_uniprot_id(uniprot_id):
+    db_id = request_from_cache(uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
+    if db_id == "":
+        if get_pdb_file(uniprot_id) != "":
+            db_id = request_from_cache(uniprot_id,
+                                       "/retrieve_db_id_by_uniprot_id/",
+                                       field="db_id")
+    return db_id
