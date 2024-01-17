@@ -2,22 +2,22 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from http.client import InvalidURL
 import logging
-import xml.etree.ElementTree as et
+from xml.etree import ElementTree
 
 from .helpers import get_from_url
 from . import PDBeEntry, AFDBEntry
 
 logger = logging.getLogger(__name__)
 
-# list of databases used when found in uniprot
-# each entry contains a name which is used in uniprot as 'type'
-# and a dbobj which is the type of the ExternalDatabaseEntry object
-# that represents that databse
-EXTERNAL_DATABASES = (
-    # TODO: Add concerte DbEntry objects for these
-    {"name": "PDB", "dbobj": PDBeEntry.PDBeEntry},
-    {"name": "AlphaFoldDB", "dbobj": AFDBEntry.AFDBEntry}
-)
+# Mappings of external database names to their corresponding
+# ExternalDatabaseEntry objects, which are used to represent
+# entries in that database.
+
+EXTERNAL_DATABASES = {
+    # TODO: Add concrete DbEntry objects for these
+    "PDB": PDBeEntry.PDBeEntry,
+    "AlphaFoldDB": AFDBEntry.AFDBEntry
+}
 
 
 def request_uniprot_file(uniprot_id, filetype):
@@ -45,20 +45,20 @@ def parse_uniprot_xml(uniprot_id):
     xml_text = request_uniprot_file(uniprot_id, "xml")
     if xml_text is None:
         return entries
-    root = et.fromstring(xml_text)
+    root = ElementTree.fromstring(xml_text)
     extracted_metadata = {} # Any additional metadata that is extracted and stored (this is generic to the protein, not specific to each database)
     for child in root:
         if child.tag.endswith("entry"):
             for dbentry in child:
                 if dbentry.tag.endswith("dbReference"):
-                    e = {}
-                    e['dbname'] = dbentry.attrib['type']
-                    e['dict'] = {}
-                    e['dict']['id'] = dbentry.attrib['id']
+                    new_entry = {}
+                    new_entry['dbname'] = dbentry.attrib['type']
+                    new_entry['dict'] = {}
+                    new_entry['dict']['id'] = dbentry.attrib['id']
                     for properties in dbentry:
                         if properties.tag.endswith("property"):
-                            e['dict'][properties.attrib['type']] = properties.attrib['value']
-                    entries.append(e)
+                            new_entry['dict'][properties.attrib['type']] = properties.attrib['value']
+                    entries.append(new_entry)
                 elif dbentry.tag.endswith("sequence"):
                     extracted_metadata["sequence"] = dbentry.text
                     extracted_metadata["mass"] = dbentry.attrib['mass']
@@ -72,13 +72,13 @@ def parse_uniprot_xml(uniprot_id):
     return entries
 
 
-def uniprot_get_entries(uniprot_id, uniprot_retrieve_fn=parse_uniprot_xml):
+def uniprot_get_entries(uniprot_id, uniprot_retrieval_function=parse_uniprot_xml):
     """Get list of DBEntry Objects for the supported databases
     using a uniprot id"""
-    dbrefs = uniprot_retrieve_fn(uniprot_id)
-    objs = list()
-    for entry in dbrefs:
-        for db in EXTERNAL_DATABASES:
-            if entry['dbname'] == db['name']:
-                objs.append(db['dbobj'](entry['dict']))
-    return objs
+    uniprot_entries_data = uniprot_retrieval_function(uniprot_id)
+    objects = list()
+    for entry_data in uniprot_entries_data:
+        database = EXTERNAL_DATABASES.get(entry_data["dbname"])
+        if database:
+            objects.append(database(entry_data['dict']))
+    return objects
