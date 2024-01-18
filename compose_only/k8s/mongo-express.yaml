@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: mongo-express
+  name: mongo-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: mongo-express
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        network/compose-only-default: "true"
+        service: mongo-express
+    spec:
+      containers:
+        - image: mongo-express
+          name: mongo-express
+          ports:
+            - containerPort: 8081
+              hostPort: 8081
+              protocol: TCP
+          env:
+          - name: ME_CONFIG_MONGODB_SERVER
+            value: mongo
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: mongo-express
+  name: mongo-express
+spec:
+  type: NodePort
+  ports:
+    - name: "8081"
+      port: 8081
+      targetPort: 8081
+  selector:
+    service: mongo-express
+status:
+  loadBalancer: {}

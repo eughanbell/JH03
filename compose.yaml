@@ -6,7 +6,7 @@ services:
   pc:
     build: protein-cache
     ports:
-      - "7000:6000"
+      - "6000:6000"
     depends_on:
       - mongo
   mongo:

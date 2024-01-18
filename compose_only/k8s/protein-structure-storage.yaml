@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: pss
+  name: pss
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: pss
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: pss
+    spec:
+      containers:
+        - image: noamzeise/protein-structure-storage
+          name: pss
+          ports:
+            - containerPort: 5000
+              hostPort: 8000
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: pss
+  name: pss
+spec:
+  type: NodePort
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 5000
+  selector:
+    service: pss
+status:
+  loadBalancer: {}

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: pc
+  name: pc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: pc
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: pc
+    spec:
+      containers:
+        - image: noamzeise/protein-cache
+          name: pc
+          ports:
+            - containerPort: 6000
+              hostPort: 6000
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: pc
+  name: pc
+spec:
+  type: NodePort
+  ports:
+    - name: "6000"
+      port: 6000
+      targetPort: 6000
+  selector:
+    service: pc
+status:
+  loadBalancer: {}
