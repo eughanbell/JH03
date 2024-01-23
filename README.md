@@ -16,11 +16,17 @@ will be cached locally.
 
 ### Example Usage
 
+* Get by uniprot ID
 ```
 curl 'http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070'
 ```
 
-see `example_scripts/` for more usage examples.
+* Upload file and get database key as response
+```
+curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
+```
+
+* see `example_scripts/` for more usage examples.
 
 ### Accessing MongoDB express web service
 To inspect the cache database manually, if the containers are running, go to

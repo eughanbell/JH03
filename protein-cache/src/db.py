@@ -42,12 +42,14 @@ def get_by_db_id(obj_id, field="pdb_file"):
 
 def store_cache(uniprot_id, pdb_file, sequence, source_db):
     "stores the given id and file in the cache"
-    if get_cache(uniprot_id) is None:
-        db.cache.insert_one({"uniprot_id": uniprot_id.upper(),
-                             "pdb_file": pdb_file,
-                             "sequence": sequence.upper(),
-                             "source_db": source_db})
+    if uniprot_id == "" or get_cache(uniprot_id) is None:
+        result = db.cache.insert_one({"uniprot_id": uniprot_id.upper(),
+                                      "pdb_file": pdb_file,
+                                      "sequence": sequence.upper(),
+                                      "source_db": source_db})
+        return str(result.inserted_id)
     else:
         print("WARNING: tried to store pdb file into database"
               + " That already contains an element with the same"
               + " uniprot id")
+        return ""

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 import uvicorn
 from pydantic import BaseModel
 from db import get_cache, store_cache, get_by_sequence, get_by_db_id
@@ -42,14 +43,14 @@ class ProteinFile(BaseModel):
     source_db: str
 
 
-@app.post("/protein_file/")
+@app.post("/protein_file/", response_class=PlainTextResponse)
 def store_protein_in_cache(protein_file: ProteinFile):
     print(f"storing protein file: id:{protein_file.uniprot_id}")
-    store_cache(protein_file.uniprot_id,
+    id = store_cache(protein_file.uniprot_id,
                 protein_file.pdb_file,
                 protein_file.sequence,
                 protein_file.source_db)
-    return protein_file
+    return id
 
 
 if __name__ == "__main__":

@@ -2,4 +2,4 @@ fastapi
 pyyaml
 requests
 uvicorn
-# Dependencies required for testing only
+python-multipart
