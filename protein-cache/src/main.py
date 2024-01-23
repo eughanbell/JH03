@@ -39,6 +39,7 @@ class ProteinFile(BaseModel):
     uniprot_id: str
     pdb_file: str
     sequence: str
+    source_db: str
 
 
 @app.post("/protein_file/")
@@ -46,7 +47,8 @@ def store_protein_in_cache(protein_file: ProteinFile):
     print(f"storing protein file: id:{protein_file.uniprot_id}")
     store_cache(protein_file.uniprot_id,
                 protein_file.pdb_file,
-                protein_file.sequence)
+                protein_file.sequence,
+                protein_file.source_db)
     return protein_file
 
 

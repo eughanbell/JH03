@@ -42,7 +42,9 @@ def get_pdb_file(uniprot_id):
                                     "pdb_file": protein_file,
                                     "sequence":
                                     entries[0]
-                                    .get_protein_metadata()["sequence"]})
+                                    .get_protein_metadata()["sequence"],
+                                    "source_db": entries[0]
+                                    .get_entry_data("external_db_name")})
             if r.status_code != 200:
                 logger.error(f"Failed to store protein file in cache: {r.text}")
     return protein_file
