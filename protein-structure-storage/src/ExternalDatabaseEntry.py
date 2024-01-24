@@ -33,3 +33,6 @@ class ExternalDatabaseEntry:
     def get_protein_metadata(self) -> dict:
         return self.entry_data["protein_metadata"]
 
+    def get_entry_data(self, field):
+        return self.entry_data[field]
+

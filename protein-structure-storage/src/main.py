@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import PlainTextResponse
+from typing import Annotated
 import logging
 from . import AFDBEntry
-from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id
+from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id, upload_pdb_file
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
@@ -37,3 +38,8 @@ def retrieve_by_key(key: str):
 @app.get("/retrieve_key_by_uniprot_id/{id}", response_class=PlainTextResponse)
 def retrieve_key_by_uniprot_id(id: str):
     return get_db_id_by_uniprot_id(id)
+
+
+@app.post("/upload_pdb/", response_class=PlainTextResponse)
+async def upload_pdb(file: UploadFile):
+    return upload_pdb_file(file.file.read().decode('utf-8'), "User Upload")

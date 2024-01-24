@@ -25,6 +25,15 @@ def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
     logger.info(f"Cache hit, returning requested field {field}.")
     return response[field]
 
+def upload_pdb_file(text, source_db, uniprot_id="", sequence=""):
+    r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
+                      json={"uniprot_id": uniprot_id,
+                            "pdb_file": text,
+                            "sequence": sequence,
+                            "source_db": source_db})
+    if r.status_code != 200:
+        logger.error(f"Failed to store protein file in cache: {r.text}")
+    return r.text
 
 def get_pdb_file(uniprot_id):
     protein_file = request_from_cache(uniprot_id, "/retrieve_by_uniprot_id/")
@@ -37,14 +46,11 @@ def get_pdb_file(uniprot_id):
         else:
             entries.sort(reverse=True)
             protein_file = entries[0].fetch()
-            r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
-                              json={"uniprot_id": uniprot_id,
-                                    "pdb_file": protein_file,
-                                    "sequence":
-                                    entries[0]
-                                    .get_protein_metadata()["sequence"]})
-            if r.status_code != 200:
-                logger.error(f"Failed to store protein file in cache: {r.text}")
+            upload_pdb_file(
+                protein_file,
+                entries[0].get_entry_data("external_db_name"),
+                uniprot_id,
+                entries[0].get_protein_metadata()["sequence"])
     return protein_file
 
 

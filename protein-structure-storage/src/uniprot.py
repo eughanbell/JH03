@@ -1,9 +1,5 @@
-from urllib.request import urlopen
-from urllib.error import HTTPError
-from http.client import InvalidURL
 import logging
 from xml.etree import ElementTree
-
 from .helpers import get_from_url
 from . import PDBeEntry, AFDBEntry
 
@@ -14,7 +10,6 @@ logger = logging.getLogger(__name__)
 # entries in that database.
 
 EXTERNAL_DATABASES = {
-    # TODO: Add concrete DbEntry objects for these
     "PDB": PDBeEntry.PDBeEntry,
     "AlphaFoldDB": AFDBEntry.AFDBEntry
 }
@@ -53,7 +48,7 @@ def parse_uniprot_xml(uniprot_id):
             for dbentry in child:
                 if dbentry.tag.endswith("dbReference"):
                     new_entry = {}
-                    new_entry['external_database_name'] = dbentry.attrib['type']
+                    new_entry['external_db_name'] = dbentry.attrib['type']
                     new_entry['id'] = dbentry.attrib['id']
                     for properties in dbentry:
                         if properties.tag.endswith("property"):
@@ -78,7 +73,7 @@ def uniprot_get_entries(uniprot_id, uniprot_retrieval_function=parse_uniprot_xml
     uniprot_entries_data = uniprot_retrieval_function(uniprot_id)
     entries = list()
     for entry_data in uniprot_entries_data:
-        database_object = EXTERNAL_DATABASES.get(entry_data["external_database_name"])
+        database_object = EXTERNAL_DATABASES.get(entry_data["external_db_name"])
         if database_object:
             entries.append(database_object(entry_data))
     return entries
