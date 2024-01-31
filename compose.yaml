@@ -9,6 +9,10 @@ services:
       - "6000:6000"
     depends_on:
       - mongo
+  psp:
+    build: protein-structure-prediction
+    ports:
+      - "7000:7000"
   mongo:
     image: mongo
     restart: always

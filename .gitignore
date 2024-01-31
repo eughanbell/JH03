@@ -20,4 +20,5 @@
 *.sdf
 *.pyc
 *.xml
+*.pdb
 **__pycache__
