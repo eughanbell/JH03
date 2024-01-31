@@ -15,7 +15,7 @@ class CalculationState(Enum):
         return self.name
 
 
-class Calculations:
+class CalculationManager:
     @classmethod
     def list_calculations(cls):
         return json.dumps(cls.calculations_list)
