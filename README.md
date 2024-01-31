@@ -28,6 +28,25 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 
 * see `example_scripts/` for more usage examples.
 
+# Protein Structure Prediction
+
+## Example Usage
+
+* Add new protein sequence to predict structure of. Will add to calculations queue.
+```
+curl 'http://0.0.0.0:7000/calculate_protein_structure_from_sequence/{protein-sequence}'
+```
+
+* List all calculations (pending, processing and complete) in the calculations queue.
+```
+curl 'http://0.0.0.0:7000/list_calculations/'
+```
+
+* Download the .pdb protein structure file from a completed prediction (giving protein sequence to identify the result file).
+```
+curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}'
+```
+
 ### Accessing MongoDB express web service
 To inspect the cache database manually, if the containers are running, go to
 `0.0.0.0:8082` or `127.0.0.1:8082`.
@@ -102,7 +121,7 @@ To clear the cluster you can use the script at `compose_only/k8s/kubectl-delete.
 This is done automaically by a gitlab pipeline.
 
 ```
-docker build -t noamzeise/protein-structure-storage:latest protein-structure-storagbe
+docker build -t noamzeise/protein-structure-storage:latest protein-structure-storage
 docker image push noamzeise/protein-structure-storage:latest
 docker build -t noamzeise/protein-cache:latest protein-cache
 docker image push noamzeise/protein-cache:latest
