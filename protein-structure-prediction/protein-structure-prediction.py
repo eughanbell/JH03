@@ -1,4 +1,5 @@
-
+from src.main import app, HOST, PORT
+import uvicorn
 
 if __name__ == "__main__":
-    print("Protein Structure Prediction 'running'.")
+    uvicorn.run(app, host=HOST, port=PORT)
