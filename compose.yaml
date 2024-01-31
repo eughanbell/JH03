@@ -3,6 +3,8 @@ services:
     build: protein-structure-storage
     ports:
       - "8000:5000"
+    volumes:
+      - ./config:/src/config/
   pc:
     build: protein-cache
     ports:
