@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import PlainTextResponse
-from . import CalculationManager
+from .CalculationManager import CalculationManager
 from typing import Annotated
 import logging
 

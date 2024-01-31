@@ -1,4 +1,4 @@
-from src.main import app, HOST, PORT
+from src.manager.main import app, HOST, PORT
 import uvicorn
 
 if __name__ == "__main__":

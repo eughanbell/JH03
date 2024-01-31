@@ -16,13 +16,16 @@ class CalculationState(Enum):
 
 
 class CalculationManager:
+
+    calculations_list = []
+
     @classmethod
     def list_calculations(cls):
-        return json.dumps(cls.calculations_list)
+        return f"[{','.join([str(elem) for elem in cls.calculations_list])}]"
 
     @classmethod
     def add_calculation(cls, sequence: str):
-        cls.calculations_list.append( Calculations(sequence=sequence) )
+        cls.calculations_list.append( CalculationManager(sequence=sequence) )
     
     @classmethod
     def download_calculation_result(cls, search_sequence: str):
@@ -49,10 +52,10 @@ class CalculationManager:
         self.start_time = time.time()
         # Actually begin PSP calculations
     
-    def __repr__(self):
-        return {
+    def __str__(self):
+        return json.dumps({
             "sequence": self.sequence,
             "calculation_state": str(self.status),
             "waiting_since_timestamp": self.waiting_since,
             "calculation_start_timestamp": self.start_time,
-        }
+        })
