@@ -20,7 +20,7 @@ def calculate_protein_structure_from_sequence(sequence: str):
     """ Enqueue another protein sequence to have its structure predicted.  """
     print(f"Adding {sequence} to calculation queue.")
 
-@app.get("/download_structure/{sequence}")
+@app.get("/download_structure/{sequence}", response_class=PlainTextResponse)
 def download_structure(sequence: str):
     """ Download the structure of a sequence whose structure has been
      predicted, will return nothing if prediction not yet complete. """
