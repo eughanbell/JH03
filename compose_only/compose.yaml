@@ -3,6 +3,8 @@ services:
     image: noamzeise/protein-structure-storage
     ports:
       - "8000:5000"
+    volumes:
+      - ./config:/src/config/
   pc:
     image: noamzeise/protein-cache
     ports:

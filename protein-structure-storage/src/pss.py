@@ -45,6 +45,9 @@ def get_pdb_file(uniprot_id):
             return ""
         else:
             entries.sort(reverse=True)
+            logger.info(f"Considered {len(entries)} entries, "
+                        + f"choosing best. id: {uniprot_id} db:"
+                        + f"{entries[0].get_entry_data('external_db_name')}")
             protein_file = entries[0].fetch()
             upload_pdb_file(
                 protein_file,

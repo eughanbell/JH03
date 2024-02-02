@@ -2,9 +2,10 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import PlainTextResponse
 from typing import Annotated
 import logging
-from . import AFDBEntry
+from .database_entries import afdb_entry
 from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id, upload_pdb_file
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 app = FastAPI()
 HOST = "0.0.0.0"
@@ -17,7 +18,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
     only the alphafold predicted entry"""
     if alphafold_only:
         try:
-            request = AFDBEntry.AFDBEntry({"id": id.upper()})
+            request = afdb_entry.AFDBEntry({"id": id.upper()})
             return request.fetch()
         except Exception:
             return ""

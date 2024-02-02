@@ -4,11 +4,12 @@ logger = logging.getLogger(__name__)
 
 import math
 
-import src.PDBeEntry as PDBeEntry
-from src.ProteinScoringWeights.PDBeWeights import *
+from src.database_entries.pdbe_entry import *
 logging.getLogger("src.PDBeEntry").setLevel(logging.ERROR) # Disable warnings in PDBeEntry class
 
-test_entry = PDBeEntry.PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
+pdbe_weights["method_multiplier"]["x-ray"] = 0.8
+
+test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A', 'chains': 'B/D=1-145', 'protein_metadata': {'mass':15389, 'sequence_length':145, 'sequence': 'MVLSAADKGNVKAAWGKVGGHAAEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGAKVAAALTKAVEHLDDLPGALSELSDLHAHKLRVDPVNFKLLSHSLLVTLASHLPSDFTPAVHASLDKFLANVSTVLTSKYRPSD'}})
 
 class TestPDBeEntry(unittest.TestCase):    
     def test_resolution_extraction(self):
@@ -86,7 +87,7 @@ class TestPDBeEntry(unittest.TestCase):
             self.assertEqual(val, test_case[1], f"Failed to handle {test_case[2]}, expected {test_case[1]}, got {val}.")
 
     def test_resolution_score_calculation(self):
-        DEFAULT = RESOLUTION_WEIGHTS["default_score"]
+        DEFAULT = pdbe_weights["resolution"]["default"]
 
         def test_vals (test_cases, precision=10):
             output = test_entry.calculate_resolution_score(None)
@@ -100,29 +101,29 @@ class TestPDBeEntry(unittest.TestCase):
         test_range = [i/10 for i in range(0, 100)]
 
         # Test linear weights scoring
-        PDBeEntry.RESOLUTION_WEIGHTS["interpolation"] = "linear"
-        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.5
-        test_vals([(x, max(0, (PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
-        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.9
-        test_vals([(x, max(0,(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
-        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.99
-        test_vals([(x, max(0,(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
+        pdbe_weights["resolution"]["interpolation"] = "linear"
+        pdbe_weights["resolution"]["weight_at_1"] = 0.5
+        test_vals([(x, max(0, (pdbe_weights["resolution"]["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
+        pdbe_weights["resolution"]["weight_at_1"] = 0.9
+        test_vals([(x, max(0,(pdbe_weights["resolution"]["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
+        pdbe_weights["resolution"]["weight_at_1"] = 0.99
+        test_vals([(x, max(0,(pdbe_weights["resolution"]["weight_at_1"] - 1)*x +1)) for x in test_range]) # Value for any given x should be y=mx + 1, where m is the gradient, restricted to the value range 0-1
         
         # Test exponential weights scoring
-        PDBeEntry.RESOLUTION_WEIGHTS["interpolation"] = "exponential"
-        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.5
+        pdbe_weights["resolution"]["interpolation"] = "exponential"
+        pdbe_weights["resolution"]["weight_at_1"] = 0.5
         test_vals([(0,1), (0.25,0.841), (0.5,0.707), (1,0.5), (1.5, 0.354), (5, 0.031), (10, 0.001), (15, 0.000)], precision=3) # Value for x should follow exponential decay curve (test val is correct to within 3 d.p.)
-        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.9
-        test_vals([(x, max(0,math.e**(math.log(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
-        PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"] = 0.99
-        test_vals([(x, max(0,math.e**(math.log(PDBeEntry.RESOLUTION_WEIGHTS["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
+        pdbe_weights["resolution"]["weight_at_1"] = 0.9
+        test_vals([(x, max(0,math.e**(math.log(pdbe_weights["resolution"]["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
+        pdbe_weights["resolution"]["weight_at_1"] = 0.99
+        test_vals([(x, max(0,math.e**(math.log(pdbe_weights["resolution"]["weight_at_1"])*x))) for x in test_range]) # Value for any given x should follow an exponential decay curve based on weight at 1
         
     def test_method_score_calculation(self):
-        DEFAULT = METHOD_WEIGHTS["default_score"]
-        test_cases = [(method, weight, f"valid input") for method, weight in METHOD_WEIGHTS.items()]  # List of (input method, expected output, error message fragment) tuples
+        DEFAULT = pdbe_weights["method_multiplier"]["default"]
+        test_cases = [(method, weight, f"valid input") for method, weight in pdbe_weights["method_multiplier"].items()]  # List of (input method, expected output, error message fragment) tuples
         test_cases += [
-            ("x-ray", METHOD_WEIGHTS["x-ray"], "valid (lowercase) input"),
-            ("X-RAY", METHOD_WEIGHTS["x-ray"], "valid (uppercase) input"),
+            ("x-ray", pdbe_weights["method_multiplier"]["x-ray"], "valid (lowercase) input"),
+            ("X-RAY", pdbe_weights["method_multiplier"]["x-ray"], "valid (uppercase) input"),
 
             ("F12ioe", DEFAULT, "corrupted input"),
             ("X-rayz", DEFAULT, "corrupted input"),
@@ -135,7 +136,7 @@ class TestPDBeEntry(unittest.TestCase):
             self.assertEqual(output, test_case[1], f"Failed to extract chain length from {test_case[2]}: {test_case[0]}, expected {test_case[1]}, got {output}")
 
     def test_chain_length_score_calculation(self):
-        DEFAULT = CHAIN_LENGTH_WEIGHTS["default_score"]
+        DEFAULT = pdbe_weights["default_chain_length_score"]
         test_cases = [ # List of (record chain length, whole protein chain length, expected score) tuples
             (0, 762, 0.0),
             (0, 1, 0.0),

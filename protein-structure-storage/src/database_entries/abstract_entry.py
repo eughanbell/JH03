@@ -1,5 +1,8 @@
 class ExternalDatabaseEntry:
-    """ Represents an entry in an external database. """
+    """ Represents an entry in an external database.
+    Override this class and provide implementations of fetch and score,
+    then add this new database entry object to the dict at the top of uniprot.py
+    to use as source for protein files."""
 
     master_weight = 1
 
