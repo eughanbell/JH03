@@ -21,3 +21,5 @@
 *.pyc
 *.xml
 **__pycache__
+example_scripts/*.pdb
+example_scripts/dbids.txt
