@@ -35,6 +35,7 @@ def upload_pdb_file(text, source_db, uniprot_id="", sequence=""):
         logger.error(f"Failed to store protein file in cache: {r.text}")
     return r.text
 
+
 def get_pdb_file(uniprot_id, override_cache=False, use_dbs={}):
     protein_file = ""
     if not override_cache:

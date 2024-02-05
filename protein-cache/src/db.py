@@ -44,15 +44,24 @@ def get_by_db_id(obj_id, field="pdb_file"):
 def store_cache(uniprot_id, pdb_file, sequence, source_db):
     "stores the given id and file in the cache"
     pdb_hash = blake2b(pdb_file.encode()).hexdigest()
+    uniprot_id = uniprot_id.upper()
+    source_db = source_db.upper()
+    obj_info = {"uniprot_id": uniprot_id,
+                "hash": pdb_hash,
+                "pdb_file": pdb_file,
+                "sequence": sequence.upper(),
+                "source_db": source_db}
     e = None
     if uniprot_id != "":
-        e = db.cache.find_one({"uniprot_id": uniprot_id.upper(),
-                               "hash": pdb_hash})
+        e = db.cache.find_one(
+            {"uniprot_id": uniprot_id, "source_db": source_db})
+        if e is not None and e.get("hash") != pdb_hash:
+            print("Replaced cache entry")
+            result = db.cache.replace_one(e, obj_info)
+            return str(e.get("_id"))
     if e is None:
-        result = db.cache.insert_one({"uniprot_id": uniprot_id.upper(),
-                                      "hash": pdb_hash,
-                                      "pdb_file": pdb_file,
-                                      "sequence": sequence.upper(),
-                                      "source_db": source_db})
+        print("Inserted into cache")
+        result = db.cache.insert_one(obj_info)
         return str(result.inserted_id)
+    print("Already in cache")
     return ""
