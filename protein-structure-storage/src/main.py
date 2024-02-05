@@ -13,7 +13,8 @@ PORT = 5000
 
 
 @app.get("/retrieve_by_uniprot_id/{id}", response_class=PlainTextResponse)
-def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
+def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False,
+                           override_cache: bool = False):
     """If optional parameter alphafold_only == True then returns
     only the alphafold predicted entry"""
     if alphafold_only:
@@ -23,7 +24,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
         except Exception:
             return ""
     else:
-        return get_pdb_file(id)
+        return get_pdb_file(id, override_cache)
 
 
 @app.get("/retrieve_by_sequence/{seq}", response_class=PlainTextResponse)
