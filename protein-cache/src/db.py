@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson import ObjectId
+from hashlib import blake2b
 
 # connect to running database
 client = MongoClient(host="mongo:27017", # the internal docker address
@@ -42,14 +43,16 @@ def get_by_db_id(obj_id, field="pdb_file"):
 
 def store_cache(uniprot_id, pdb_file, sequence, source_db):
     "stores the given id and file in the cache"
-    if uniprot_id == "" or get_cache(uniprot_id) is None:
+    pdb_hash = blake2b(pdb_file.encode()).hexdigest()
+    e = None
+    if uniprot_id != "":
+        e = db.cache.find_one({"uniprot_id": uniprot_id.upper(),
+                               "hash": pdb_hash})
+    if e is None:
         result = db.cache.insert_one({"uniprot_id": uniprot_id.upper(),
+                                      "hash": pdb_hash,
                                       "pdb_file": pdb_file,
                                       "sequence": sequence.upper(),
                                       "source_db": source_db})
         return str(result.inserted_id)
-    else:
-        print("WARNING: tried to store pdb file into database"
-              + " That already contains an element with the same"
-              + " uniprot id")
-        return ""
+    return ""
