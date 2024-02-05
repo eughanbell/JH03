@@ -9,28 +9,24 @@ from .weight_importer import import_weights
 logger = logging.getLogger(__name__)
 
 pdbe_weights = {
-    "final_score_multiplier" : 1,
+    "final_score_multiplier": 1,
     "chain_length_multiplier": 1,
     "method_score_multiplier": 1,
     "resolution_multipler": 0.02,
     "default_chain_length_score": 0.1,
-    "method_multiplier" : {"default": 0.1},
+    "method_multiplier": {"default": 0.1},
     "resolution": {"interpolation": "exponential",
                    "weight_at_0": 1,
                    "weight_at_1": 0.9,
                    "default": 0.1},
-    
 }
 pdbe_weights = import_weights(pdbe_weights, "/src/config/pdbe-weights.yaml")
-
-logger.info(f"PDBe Weight Dict: { pdbe_weights }")
 
 
 class PDBeEntry(ExternalDatabaseEntry):
 
     def fetch(self) -> bytes:
         """ Fetch a .pdb file from PDBe database and return in string format. """
-        print(pdbe_weights)
         pdb_id = self.extract_id()
         pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id}.ent")
         return pdb_file.decode()
@@ -42,15 +38,20 @@ class PDBeEntry(ExternalDatabaseEntry):
         resolution = self.extract_resolution()
         method = self.extract_method()
         file_chain_length = self.extract_chain_length()
-        full_protein_chain_length = self.extract_full_chain_length()
+        full_chain_length = self.extract_full_chain_length()
         
         # Calculate individual scores for each category, based on protein metadata
-        resolution_score = pdbe_weights["resolution_multipler"] * self.calculate_resolution_score(resolution)
-        method_score = self.calculate_method_score(method) * pdbe_weights["method_score_multiplier"]
-        chain_length_score = self.calculate_chain_length_score(file_chain_length, full_protein_chain_length) * pdbe_weights["chain_length_multiplier"]
+        resolution_score = self.calculate_resolution_score(resolution)
+        resolution_score *= pdbe_weights["resolution_multipler"]
+        method_score = self.calculate_method_score(method)
+        method_score *= pdbe_weights["method_score_multiplier"]
+        chain_length_score = self.calculate_chain_length_score(
+            file_chain_length, full_chain_length)
+        chain_length_score *= pdbe_weights["chain_length_multiplier"]
 
         # Weight and combine all scores into a single quality score
-        return pdbe_weights["final_score_multiplier"] * (( resolution_score +  method_score + chain_length_score) / 3)
+        avg_score = (resolution_score + method_score + chain_length_score) / 3
+        return pdbe_weights["final_score_multiplier"] * avg_score
 
     def extract_id(self) -> str:
         id = self.entry_data.get("id", "") #Will be empty string if id metadata unavailable

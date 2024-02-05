@@ -3,21 +3,23 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def read_weights(filepath):
     try:
         with open(filepath) as f:
             weights = yaml.safe_load(f)
             return weights
-    except Exception as e:
+    except Exception:
         return {}
+
 
 def combine_dicts(default, override):
     for k, v in override.items():
         k = k.lower()
         if isinstance(v, dict):
-            if default.get(k) == None:
+            if default.get(k) is None:
                 default[k] = {}
-            if isinstance(default.get(k), dict):       
+            if isinstance(default.get(k), dict):
                 default[k] = combine_dicts(default[k], v)
             else:
                 # ie we expected 'entry: value'
@@ -27,7 +29,8 @@ def combine_dicts(default, override):
                                 + "with a dictionary")
         else:
             default[k] = v
-    return default            
+    return default
+
 
 def import_weights(default, filepath):
     combine_dicts(default, read_weights(filepath))
