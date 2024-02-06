@@ -1,15 +1,32 @@
 from pymongo import MongoClient
 from bson import ObjectId
+import time
 
-# connect to running database
+def wait_for_mongo(host="mongo:27017", retries=5, delay=5):
+
+    # Create a temporary client with a short serverSelectionTimeout
+    temp_client = MongoClient(host=host, serverSelectionTimeoutMS=1000)  # Short timeout for initial connection attempts
+    for attempt in range(retries):
+        try:
+            # Attempt to ping the MongoDB server
+            temp_client.admin.command('ping')
+            print("MongoDB is ready!")
+            return True  # MongoDB is ready
+        except Exception as e:
+            print(f"Waiting for MongoDB... Attempt {attempt + 1}/{retries}")
+            time.sleep(delay)
+    raise Exception("MongoDB not ready after max retries. Exiting.")
+
+# Wait for MongoDB to be ready before establishing a permanent connection
+wait_for_mongo()
+
+# Connect to running database with a longer timeout now that we know MongoDB is ready
 client = MongoClient(host="mongo:27017", serverSelectionTimeoutMS=30000)
 
-# deletes database - for development
+# Deletes database - for development
 client.drop_database("cache")
 
-# get an object representing the cache db
-# will be implicitly created upon first inserting
-# some data into the db
+# Get an object representing the cache db
 db = client["cache"]
 
 
