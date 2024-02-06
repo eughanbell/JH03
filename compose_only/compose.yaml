@@ -9,6 +9,7 @@ services:
       - "6000:6000"
     depends_on:
       - mongo
+    command: ["/wait-for-it.sh", "mongo:27017", "--", "python main.py"]
   mongo:
     image: mongo
     restart: always

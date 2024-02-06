@@ -2,8 +2,7 @@ from pymongo import MongoClient
 from bson import ObjectId
 
 # connect to running database
-client = MongoClient(host="mongo:27017", # the internal docker address
-                     serverSelectionTimeoutMS=3000)
+client = MongoClient(host="mongo:27017", serverSelectionTimeoutMS=30000)
 
 # deletes database - for development
 client.drop_database("cache")
