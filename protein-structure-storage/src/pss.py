@@ -35,13 +35,18 @@ def upload_pdb_file(text, source_db, uniprot_id="", sequence=""):
         logger.error(f"Failed to store protein file in cache: {r.text}")
     return r.text
 
-def get_pdb_file(uniprot_id):
-    protein_file = request_from_cache(uniprot_id, "/retrieve_by_uniprot_id/")
+
+def get_pdb_file(uniprot_id, override_cache=False, use_dbs={}):
+    protein_file = ""
+    if not override_cache:
+        protein_file = request_from_cache(
+            uniprot_id, "/retrieve_by_uniprot_id/")
     if protein_file == "":
         # check uniprot if file not in cache
         entries = uniprot_get_entries(uniprot_id)
         if len(entries) == 0:
-            logger.warning(f"No proteins found in UniProt database, id: {uniprot_id}")
+            logger.warning(
+                f"No proteins found in UniProt database, id: {uniprot_id}")
             return ""
         else:
             entries.sort(reverse=True)
@@ -68,10 +73,10 @@ def get_pdb_file_by_db_id(db_id):
 # return the database id of the pdb file with the matching uniprot id
 # if that uniprot id is not in the local cache, then first add it to cache
 def get_db_id_by_uniprot_id(uniprot_id):
-    db_id = request_from_cache(uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
+    db_id = request_from_cache(
+        uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
     if db_id == "":
         if get_pdb_file(uniprot_id) != "":
-            db_id = request_from_cache(uniprot_id,
-                                       "/retrieve_db_id_by_uniprot_id/",
-                                       field="db_id")
+            db_id = request_from_cache(
+                uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
     return db_id

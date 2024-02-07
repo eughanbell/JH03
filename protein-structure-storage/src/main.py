@@ -26,7 +26,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
         except Exception:
             return ""
     else:
-        return get_pdb_file(id)
+        return get_pdb_file(id, override_cache)
 
 
 @app.get("/retrieve_by_sequence/{seq}", response_class=PlainTextResponse)
@@ -52,3 +52,8 @@ def retrieve_key_by_uniprot_id(id: str):
 async def upload_pdb(file: UploadFile):
     """Allows user to upload a pdb file into the cache"""
     return upload_pdb_file(file.file.read().decode('utf-8'), "User Upload")
+
+
+@app.post("/upload_test/{id}/{db}", response_class=PlainTextResponse)
+async def upload_test(id: str, db: str, file: UploadFile):
+    return upload_pdb_file(file.file.read().decode('utf-8'), db, id)
