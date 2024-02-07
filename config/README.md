@@ -16,7 +16,7 @@ my_method_weights:
   x-ray: 0.7
   my_method: 0.8
 ```
-Which would set `my_weight` to `10`, and `my_method_weights` to `{ 'default': 1, `x-ray`: 0.7, ... }`.
+Which would set `my_weight` to `10`, and `my_method_weights` to `{ 'default': 1, 'x-ray': 0.7, ... }`.
 Note that we put in 2 spaces for each layer of depth. 
 For more info on the yaml format check out: [yaml.org](https://yaml.org/)
 
