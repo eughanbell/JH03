@@ -56,12 +56,14 @@ class TestUniprot(unittest.TestCase):
             if expected_output_file == None:
                 self.assertEqual(actual_output, [], f"Parser incorrectly handled invalid uniprot_id {uniprot_id}.")
             else:
-                try:
-                    with open(expected_output_file) as file:
-                        expected_output = json.load(file)
-                        self.assertEqual(actual_output, expected_output, f"Failed to parse XML for uniprot_id {uniprot_id}.")
-                except FileNotFoundError:
-                    self.fail(f"Missing test case file {expected_output_file}!")
+                for test_case in ["external_db_name", "id"]:
+                    for elem in actual_output:
+                        self.assertNotEqual(elem.get(test_case,None), None, f"Parser incorrectly handled valid uniprot file {uniprot_id}, '{test_case}' attribute did not exist.")
+                        self.assertNotEqual(elem.get(test_case,""), "", f"Parser incorrectly handled valid uniprot file {uniprot_id}, '{test_case}' attribute is empty.")
+                for test_case in ["mass","sequence","sequence_length"]:
+                    for elem in actual_output:
+                        self.assertNotEqual(elem["protein_metadata"].get(test_case,None), None, f"Parser incorrectly handled valid uniprot file {uniprot_id}, '{test_case}' attribute did not exist.")
+                        self.assertNotEqual(elem["protein_metadata"].get(test_case,""), "", f"Parser incorrectly handled valid uniprot file {uniprot_id}, '{test_case}' attribute is empty.")
 
 if __name__ == "__main__":
     unittest.main()

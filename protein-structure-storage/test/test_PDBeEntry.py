@@ -13,14 +13,15 @@ test_entry = PDBeEntry({'id': '6II1', 'method': 'X-ray', 'resolution': '1.34 A',
 
 class TestPDBeEntry(unittest.TestCase):    
     def test_resolution_extraction(self):
+        DEFAULT_RESOLUTION_SCORE = 0.1
         test_cases = [ # List of (input, expected_output, error message fragment) tuples
             ("1.34 A", 1.34, "valid float"),
             ("7 A", 7, "valid int"),
-            ("1.34a A", None, "corrupted input"),
-            ("1.34", None, "corrupted input"),
-            ("1.34A", None, "corrupted input"),
-            (".7 A", None, "corrupted input"),
-            ("", None, "empty input"),
+            ("1.34a A", DEFAULT_RESOLUTION_SCORE, "corrupted input"),
+            ("1.34", DEFAULT_RESOLUTION_SCORE, "corrupted input"),
+            ("1.34A", DEFAULT_RESOLUTION_SCORE, "corrupted input"),
+            (".7 A", DEFAULT_RESOLUTION_SCORE, "corrupted input"),
+            ("", DEFAULT_RESOLUTION_SCORE, "empty input"),
         ]
         for test_case in test_cases:
             test_entry.entry_data["resolution"] = test_case[0]
@@ -28,6 +29,7 @@ class TestPDBeEntry(unittest.TestCase):
             self.assertEqual(val, test_case[1], f"Failed to parse {test_case[2]} correctly, expected {test_case[1]}, got {val}")
 
     def test_method_extraction(self):
+        DEFAULT_METHOD_SCORE = 0.1
         test_cases = [ # List of (input, expected_output, error message fragment) tuples
             ("X-ray", "X-ray", "valid input"),
             ("othermethod", "othermethod", "valid input not in weights dictionary"),
@@ -41,6 +43,7 @@ class TestPDBeEntry(unittest.TestCase):
         logger.warning("Partially implemented: need to implement more tests for extracting valid methods")
 
     def test_chain_length_extraction(self):
+        DEFAULT_CHAIN_LENGTH_SCORE = 0.1
         test_cases = [ # List of (input, expected_output) tuples
             ("B/D=1-145", 145),
             ("B/D=73-100", 28),
@@ -54,10 +57,10 @@ class TestPDBeEntry(unittest.TestCase):
             ("A=1-23, C/D=50-79", 53),
             ("A/B=1-23, D=50-79", 53),
             # Invalid / partially cases
-            ("", None),
-            ("B/D73-100", None),
-            ("A=1, B=3", None),
-            ("B/D=73100", None),
+            ("", DEFAULT_CHAIN_LENGTH_SCORE),
+            ("B/D73-100", DEFAULT_CHAIN_LENGTH_SCORE),
+            ("A=1, B=3", DEFAULT_CHAIN_LENGTH_SCORE),
+            ("B/D=73100", DEFAULT_CHAIN_LENGTH_SCORE),
             ("A=1-28, B=3", 28),
         ] 
         for test_case in test_cases:

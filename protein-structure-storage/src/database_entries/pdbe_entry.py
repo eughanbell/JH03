@@ -41,16 +41,15 @@ class PDBeEntry(ExternalDatabaseEntry):
         full_chain_length = self.extract_full_chain_length()
         
         # Calculate individual scores for each category, based on protein metadata
-        resolution_score = self.calculate_resolution_score(resolution)
-        resolution_score *= pdbe_weights["resolution_multipler"]
-        method_score = self.calculate_method_score(method)
-        method_score *= pdbe_weights["method_score_multiplier"]
-        chain_length_score = self.calculate_chain_length_score(
-            file_chain_length, full_chain_length)
-        chain_length_score *= pdbe_weights["chain_length_multiplier"]
+        resolution_scores = [
+            pdbe_weights["resolution_multipler"] * self.calculate_resolution_score(resolution),
+            pdbe_weights["method_score_multiplier"] *  self.calculate_method_score(method),
+            pdbe_weights["chain_length_multiplier"] * self.calculate_chain_length_score(file_chain_length, full_chain_length)
+        ]
+        # All resolution scores will be valid values (or defaults)
 
         # Weight and combine all scores into a single quality score
-        avg_score = (resolution_score + method_score + chain_length_score) / 3
+        avg_score = sum(resolution_scores) / len(resolution_scores)
         return pdbe_weights["final_score_multiplier"] * avg_score
 
     def extract_id(self) -> str:
@@ -70,7 +69,7 @@ class PDBeEntry(ExternalDatabaseEntry):
         if not resolution_float_string:
             # Received corrupt or unusually formatted metadata.
             logger.warning(f"PDBe: Failed to calculate resolution score: could not determine resolution from Uniprot metadata. Found resolution of invalid format '{resolution_string}' (expected '[integer] A' or '[float] A). Returning a resolution score of 0")
-            return 0
+            return pdbe_weights["resolution"]["default"]
         
         resolution = float(resolution_float_string[0]) # This line is safe because regex always extracts a string which can yield either an integer or float
         return resolution
@@ -89,7 +88,7 @@ class PDBeEntry(ExternalDatabaseEntry):
             return chain_length
         else:
             logger.warning(f"Failed to calculate chain length: could not determine chain length from Uniprot metadata. Found chains data of invalid format '{chains_string}'")
-            return 0
+            return pdbe_weights["default_chain_length_score"]
     
     def extract_method(self) -> str:
         """ Extract the method of data acquisition from chains self.entry_data """
