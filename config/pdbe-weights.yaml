@@ -1,0 +1,17 @@
+final_score_multiplier: 1
+
+chain_length_multiplier: 0.8
+
+method_score_multiplier: 0.1
+
+resolution_multiplier: 0.02
+
+method_multiplier:
+  default: 0.2
+  x-ray: 0.8
+
+resolution:
+  interpolation: linear
+  weight_at_0: 0.9
+  weight_at_1: 0.2
+  default: 0.5

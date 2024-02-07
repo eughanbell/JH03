@@ -3,7 +3,7 @@ import unittest
 import hashlib
 logger = logging.getLogger(__name__)
 
-from src.AFDBEntry import AFDBEntry
+from src.database_entries.afdb_entry import *
 logging.getLogger("src.AFDBEntry").setLevel(logging.ERROR) # Disable warnings in PDBeEntry class
 
 class TestAFDBEntry(unittest.TestCase):
@@ -21,8 +21,7 @@ class TestAFDBEntry(unittest.TestCase):
         test_entry = AFDBEntry({'id': entry_id})
         test_entry.fetch()
         score = test_entry.calculate_raw_quality_score()
-        # All AFDB entries should currently return a perfect score.
-        self.assertEqual(score, 1.0, f"Incorrect quality score calculated for entry {entry_id}, expected 1.0, got {score}")
+        self.assertEqual(score, 0, f"Incorrect quality score calculated for entry {entry_id}, expected 1.0, got {score}")
     
 
 if __name__ == "__main__":

@@ -20,5 +20,6 @@
 *.sdf
 *.pyc
 *.xml
+example_scripts/dbids.txt
 *.pdb
 **__pycache__

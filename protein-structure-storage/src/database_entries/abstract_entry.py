@@ -1,7 +1,8 @@
 class ExternalDatabaseEntry:
-    """ Represents an entry in an external database. """
-
-    master_weight = 1
+    """ Represents an entry in an external database.
+    Override this class and provide implementations of fetch and score,
+    then add this new database entry object to the dict at the top of uniprot.py
+    to use as source for protein files."""
 
     def __init__(self, entry_data:dict):
         self.entry_data = entry_data # Each subclass will have logic for processing it's own entry_data dict
@@ -18,7 +19,7 @@ class ExternalDatabaseEntry:
         if recalculate == True or self.quality_score == None:
             self.quality_score = self.calculate_raw_quality_score()
         
-        return self.quality_score * self.master_weight
+        return self.quality_score
 
     def calculate_raw_quality_score(self) -> float:
         """ Calculate quality score for this entry """

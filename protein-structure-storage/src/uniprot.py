@@ -1,7 +1,7 @@
 import logging
 from xml.etree import ElementTree
 from .helpers import get_from_url
-from . import PDBeEntry, AFDBEntry
+from .database_entries import pdbe_entry, afdb_entry
 
 logger = logging.getLogger(__name__)
 
@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 # entries in that database.
 
 EXTERNAL_DATABASES = {
-    "PDB": PDBeEntry.PDBeEntry,
-    "AlphaFoldDB": AFDBEntry.AFDBEntry
+    "PDB": pdbe_entry.PDBeEntry,
+    "AlphaFoldDB": afdb_entry.AFDBEntry
 }
 
 
