@@ -19,14 +19,6 @@ build-and-deploy-job:
     - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
     - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
   environment: production
-
-# deploy-prod:
-#   stage: deploy
-#   image: docker
-#   services:
-#     - "docker:dind"
-#   script:
-#     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
-#     - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
-#     - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
-#   environment: production
+  only:
+    refs:
+      - main
