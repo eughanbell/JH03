@@ -33,5 +33,4 @@ def combine_dicts(default, override):
 
 
 def import_weights(default, filepath):
-    combine_dicts(default, read_weights(filepath))
-    return default
+    return combine_dicts(default, read_weights(filepath))
