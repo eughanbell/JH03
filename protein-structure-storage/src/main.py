@@ -13,7 +13,10 @@ PORT = 5000
 
 @app.get("/retrieve_by_uniprot_id/{id}", response_class=PlainTextResponse)
 def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
-    """If optional parameter alphafold_only == True then returns
+    """Retrieves pdb file given the uniprot id for that protein structure.
+    Tries to retrieve from cache first; If not present, finds the highest scoring file
+    from uniprot and adds it to the cache before returning it.
+    If the optional parameter alphafold_only == True then returns
     only the alphafold predicted entry"""
     if alphafold_only:
         try:
@@ -27,19 +30,24 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
 
 @app.get("/retrieve_by_sequence/{seq}", response_class=PlainTextResponse)
 def retrieve_by_sequence(seq: str):
+    """Retrieves pdb file given a part of the sequence for a protein structure.
+    Pulls only from cache"""
     return get_pdb_file_by_sequence(seq)
 
 
 @app.get("/retrieve_by_key/{key}", response_class=PlainTextResponse)
 def retrieve_by_key(key: str):
+    """Retrieves pdb file from cache using its unique key in the cache."""
     return get_pdb_file_by_db_id(key)
 
 
 @app.get("/retrieve_key_by_uniprot_id/{id}", response_class=PlainTextResponse)
 def retrieve_key_by_uniprot_id(id: str):
+    """Retrieve unique cache key using the uniprot id for a protein structure."""
     return get_db_id_by_uniprot_id(id)
 
 
 @app.post("/upload_pdb/", response_class=PlainTextResponse)
 async def upload_pdb(file: UploadFile):
+    """Allows user to upload a pdb file into the cache"""
     return upload_pdb_file(file.file.read().decode('utf-8'), "User Upload")
