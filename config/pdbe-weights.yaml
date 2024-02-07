@@ -2,6 +2,8 @@ final_score_multiplier: 1
 
 chain_length_multiplier: 0.8
 
+default_chain_length_score: 0.1
+
 method_score_multiplier: 0.1
 
 resolution_multiplier: 0.02
