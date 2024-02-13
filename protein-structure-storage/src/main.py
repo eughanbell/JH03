@@ -46,11 +46,7 @@ def retrieve_key_by_uniprot_id(id: str):
 
 
 @app.post("/upload_pdb/", response_class=PlainTextResponse)
-async def upload_pdb(file: UploadFile):
+async def upload_pdb(file: UploadFile, id: str = "", db: str = "User Upload",
+                     sequence: str = "", score: float = 0):
     """Allows user to upload a pdb file into the cache"""
-    return upload_pdb_file(file.file.read().decode('utf-8'), "User Upload")
-
-
-@app.post("/upload_test/{id}/{db}", response_class=PlainTextResponse)
-async def upload_test(id: str, db: str, file: UploadFile):
-    return upload_pdb_file(file.file.read().decode('utf-8'), db, id)
+    return upload_pdb_file(file.file.read().decode('utf-8'), db, id, sequence, score)
