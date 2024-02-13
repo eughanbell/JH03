@@ -13,7 +13,7 @@ PORT = 5000
 
 
 @app.get("/retrieve_by_uniprot_id/{id}", response_class=PlainTextResponse)
-def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
+def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False, override_cache: bool = False):
     """Retrieves pdb file given the uniprot id for that protein structure.
     Tries to retrieve from cache first; If not present, finds the highest scoring file
     from uniprot and adds it to the cache before returning it.
