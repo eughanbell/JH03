@@ -10,11 +10,12 @@ logger = logging.getLogger(__name__)
 CACHE_CONTAINER_URL = "http://pc:6000"
 
 
-def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
+def request_from_cache(search_value, cache_endpoint, field="pdb_file", query=""):
     logger.info(f"Attempting fetch from cache {cache_endpoint} - looking for {search_value}.")
     f = get_from_url(CACHE_CONTAINER_URL
                      + cache_endpoint
-                     + search_value)
+                     + search_value
+                     + query)
     if f is None:
         logger.error("Network issue while fetching protein file from cache.")
         return ""
@@ -25,22 +26,33 @@ def request_from_cache(search_value, cache_endpoint, field="pdb_file"):
     logger.info(f"Cache hit, returning requested field {field}.")
     return response[field]
 
-def upload_pdb_file(text, source_db, uniprot_id="", sequence=""):
+def upload_pdb_file(text, source_db, uniprot_id="", sequence="", score=0):
     r = requests.post(CACHE_CONTAINER_URL + "/protein_file",
                       json={"uniprot_id": uniprot_id,
                             "pdb_file": text,
                             "sequence": sequence,
-                            "source_db": source_db})
+                            "source_db": source_db,
+                            "score": score})
     if r.status_code != 200:
         logger.error(f"Failed to store protein file in cache: {r.text}")
     return r.text
 
+def query_list_path(key, items):
+    if len(items) == 0:
+        return ""
+    query = "?"
+    for x in items:
+        query += key + "=" + x + "&"
+    return query[0:-1]
+    
 
-def get_pdb_file(uniprot_id, override_cache=False, use_dbs={}):
+def get_pdb_file(uniprot_id, override_cache=False, use_dbs=[]):
     protein_file = ""
     if not override_cache:
         protein_file = request_from_cache(
-            uniprot_id, "/retrieve_by_uniprot_id/")
+            uniprot_id, "/retrieve_by_uniprot_id/",
+            query=query_list_path("source_dbs", use_dbs)
+        )
     if protein_file == "":
         # check uniprot if file not in cache
         entries = uniprot_get_entries(uniprot_id)
@@ -58,7 +70,8 @@ def get_pdb_file(uniprot_id, override_cache=False, use_dbs={}):
                 protein_file,
                 entries[0].get_entry_data("external_db_name"),
                 uniprot_id,
-                entries[0].get_protein_metadata()["sequence"])
+                entries[0].get_protein_metadata()["sequence"],
+                entries[0].get_quality_score())
     return protein_file
 
 

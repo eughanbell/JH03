@@ -4,6 +4,7 @@ from typing import Annotated
 import logging
 from .database_entries import afdb_entry
 from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id, upload_pdb_file
+from .uniprot import ALPHAFOLD_DB_NAME
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -20,11 +21,7 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False, override_cache
     If the optional parameter alphafold_only == True then returns
     only the alphafold predicted entry"""
     if alphafold_only:
-        try:
-            request = afdb_entry.AFDBEntry({"id": id.upper()})
-            return request.fetch()
-        except Exception:
-            return ""
+        return get_pdb_file(id, override_cache, use_dbs=[ALPHAFOLD_DB_NAME])
     else:
         return get_pdb_file(id, override_cache)
 

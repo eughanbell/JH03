@@ -9,9 +9,12 @@ logger = logging.getLogger(__name__)
 # ExternalDatabaseEntry objects, which are used to represent
 # entries in that database.
 
+PDB_DB_NAME = "PDB"
+ALPHAFOLD_DB_NAME = "AlphaFoldDB"
+
 EXTERNAL_DATABASES = {
-    "PDB": pdbe_entry.PDBeEntry,
-    "AlphaFoldDB": afdb_entry.AFDBEntry
+    PDB_DB_NAME: pdbe_entry.PDBeEntry,
+    ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry
 }
 
 
