@@ -18,6 +18,18 @@ EXTERNAL_DATABASES = {
 }
 
 
+def select_external_dbs(source_dbs):
+    """Return a subset of EXTERNAL_DATABASES
+    that match the names supplied in the source_dbs list.
+    Can be passed to uniprot_get_entries.
+    """
+    dbs = {}
+    for s in source_dbs:
+        if EXTERNAL_DATABASES.get(s) is not None:
+            dbs[s] = EXTERNAL_DATABASES.get(s)
+    return dbs
+
+
 def request_uniprot_file(uniprot_id, filetype):
     """ Given UniProt id and file type strings, return the text contents of
     the UniProt entry. """
@@ -70,13 +82,20 @@ def parse_uniprot_xml(uniprot_id):
     return entries
 
 
-def uniprot_get_entries(uniprot_id, uniprot_retrieval_function=parse_uniprot_xml):
+def uniprot_get_entries(uniprot_id,
+                        uniprot_retrieval_function=parse_uniprot_xml,
+                        source_dbs=EXTERNAL_DATABASES):
     """ Get list of ExternalDatabaseEntry objects for the supported databases
-    using a uniprot id. """
+    using a uniprot id. 
+    source_dbs can be a list of databases to consider.
+    By default use all implemented databases
+    """
+    if source_dbs is None or len(source_dbs) == 0:
+        source_dbs = EXTERNAL_DATABASES
     uniprot_entries_data = uniprot_retrieval_function(uniprot_id)
     entries = list()
     for entry_data in uniprot_entries_data:
-        database_object = EXTERNAL_DATABASES.get(entry_data["external_db_name"])
+        database_object = source_dbs.get(entry_data["external_db_name"])
         if database_object:
             entries.append(database_object(entry_data))
     return entries
