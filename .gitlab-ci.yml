@@ -1,3 +1,7 @@
+stages:
+  - test
+  - build
+
 test-protein-structure-storage:
   stage: test
   image: python:3
