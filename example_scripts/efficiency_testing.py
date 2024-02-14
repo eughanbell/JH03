@@ -169,7 +169,7 @@ def manualScript(script,vals=[]):
 
 if __name__ == "__main__":
     # valid_eps={"af_random":alphafoldRandomDownloadTime,"af":alphafoldDownloadTime,"key_uniprot":keyUniprotDownloadTime,"key":keyDownloadTime,"sequence":sequenceDownloadTime,"uniprot_random_cache":uniprotRandomDownloadCacheTime,"uniprot_random":uniprotRandomDownloadTime,"uniprot_cache":uniprotSimpleDownloadCacheTime,"uniprot":uniprotSimpleDownloadTime,"upload":pdbUploadTime}
-    repeated_calls={"af_random":"download_alphafold_random","af":"download_alphafold","uniprot_random_cache":"download_cache_random","uniprot_random":"download_pdb_random","uniprot_cache":"download_cache","uniprot":"download_pdb","upload":"upload_pdb"}
+    repeated_calls={"af_random":"download_alphafold_random","af":"download_alphafold","uniprot_random_cache":"download_cache_random","uniprot_random":"download_pdb_random","uniprot_cache":"download_cache","uniprot":"download_pdbs","upload":"upload_pdb"}
     manual_calls={"key_uniprot":"download_key_uniprot","key":"download_key","sequence":"download_sequence"}
     if len(sys.argv)==1:
         print("Please select an endpoint to test!")
