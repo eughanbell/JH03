@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from .CalculationManager import CalculationManager
 from typing import Annotated
 import logging
@@ -8,6 +8,14 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 HOST = "0.0.0.0"
 PORT = 7000
+
+@app.get("/")
+def redirect_to_docs():
+    return RedirectResponse(url="/docs")
+
+@app.exception_handler(404)
+def handle_404():
+    return redirect_to_docs()
 
 @app.get("/list_calculations", response_class=PlainTextResponse)
 def list_calculations():
