@@ -13,7 +13,7 @@ def repeatedScript(script, n=99):
     end=time.time()
     change=len(glob.glob(".pdb"))
 
-    print(f"took {start-end} seconds to complete testing, where {change} PDB files were returned, each successful API call took on average {(start-end)/n} seconds")
+    print(f"took {end-start} seconds to complete testing, where {change} PDB files were returned, each successful API call took on average {(start-end)/n} seconds")
     return 
 
 def manualScript(script,vals=[]):
@@ -28,7 +28,7 @@ def manualScript(script,vals=[]):
     end = time.time()   
     change=len(glob.glob(".pdb"))
 
-    print(f"took {start-end} seconds to complete testing, where {change} PDB files were returned, each API call took on average {(start-end)/len(sequences)} seconds")
+    print(f"took {end-start} seconds to complete testing, where {change} PDB files were returned, each API call took on average {(start-end)/len(sequences)} seconds")
     return 
 
 
