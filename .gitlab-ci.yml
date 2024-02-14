@@ -11,6 +11,15 @@ test-protein-structure-storage:
   script:
     - python -m unittest
 
+test-protein-structure-prediction:
+  stage: test
+  image: python:3
+  before_script:
+    - cd protein-structure-prediction
+    - pip install -r requirements.txt
+  script:
+    - python -m unittest
+
 build-and-deploy-job:
   stage: build
   image: docker
