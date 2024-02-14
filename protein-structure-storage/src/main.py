@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse
 from typing import Annotated
 import logging
 from .database_entries import afdb_entry
@@ -11,9 +11,12 @@ app = FastAPI()
 HOST = "0.0.0.0"
 PORT = 5000
 
+@app.get("/")
+def redirect_to_docs():
+    return RedirectResponse(url="/docs")
 
 @app.get("/retrieve_by_uniprot_id/{id}", response_class=PlainTextResponse)
-def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False):
+def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False,  override_cache: bool = False):
     """Retrieves pdb file given the uniprot id for that protein structure.
     Tries to retrieve from cache first; If not present, finds the highest scoring file
     from uniprot and adds it to the cache before returning it.
