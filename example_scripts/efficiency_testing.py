@@ -1,6 +1,7 @@
 import subprocess
 from subprocess import call
 import time
+import sys
 
 def uniprotSimpleDownloadTime(n=99):
     #n = no of curl requests to make, must be greater than 10
@@ -90,3 +91,12 @@ def alphafoldRandomDownloadTime(n=99):
     print(f"took {start-end} seconds to complete")
     return
 
+if __name__ == "__main__":
+    valid_eps={"af_random":alphafoldRandomDownloadTime,"af":alphafoldDownloadTime,"key_uniprot":keyUniprotDownloadTime,"key":keyDownloadTime,"sequence":sequenceDownloadTime,"uniprot_random_cache":uniprotRandomDownloadCacheTime,"uniprot_random":uniprotRandomDownloadTime,"uniprot_cache":uniprotSimpleDownloadCacheTime,"uniprot":uniprotSimpleDownloadTime,"upload":pdbUploadTime}
+    if len(sys.argv)==1:
+        print("Please select an endpoint to test!")
+    else:
+        eps=sys.argv[1:]
+        for ep in eps:
+            if ep in valid_eps:
+                valid_eps[ep]()
