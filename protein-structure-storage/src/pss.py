@@ -1,5 +1,5 @@
 from .helpers import get_from_url, query_list_path
-from .uniprot import uniprot_get_entries, select_external_dbs
+from .uniprot import uniprot_get_entries, resolve_aliases
 import json
 import logging
 import requests
@@ -39,13 +39,17 @@ def upload_pdb_file(text, source_db, uniprot_id="", sequence="", score=0):
     return r.text
 
 
-def get_pdb_file(uniprot_id, override_cache=False, use_dbs=[]):
+def get_pdb_file(uniprot_id, override_cache=False, use_dbs=None):
     """
     return a pdb_file from cache or from an external database
     matching the uniprot id.
-    use_dbs is a list of databases to check.
+    use_dbs can be a list of databases to check.
     By default it will use all implemented databases.
     """
+    if use_dbs is None:
+        use_dbs = []
+    else:
+        use_dbs = resolve_aliases(use_dbs)
     protein_file = ""
     if not override_cache:
         protein_file = request_from_cache(
@@ -55,7 +59,7 @@ def get_pdb_file(uniprot_id, override_cache=False, use_dbs=[]):
     if protein_file == "":
         # check uniprot if file not in cache
         entries = uniprot_get_entries(
-            uniprot_id, source_dbs=select_external_dbs(use_dbs))
+            uniprot_id, source_dbs=use_dbs)
         
         if len(entries) == 0:
             logger.warning(
