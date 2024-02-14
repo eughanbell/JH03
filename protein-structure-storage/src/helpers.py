@@ -32,3 +32,20 @@ def get_from_url(url):
         except Exception as e:
             print_except(url, "unknown exeption", e)
     return None
+
+
+def query_list_path(key, items, initial="?"):
+    """
+    Take a key string and items a list of strings.
+    Return the query parameter of a url matching
+    all items to the key. An example is
+    ?key=item1&key=item2&key=item3
+
+    This is useful for sending a list to a fastAPI enpoint
+    """
+    if len(items) == 0:
+        return ""
+    query = initial
+    for x in items:
+        query += key + "=" + x + "&"
+    return query[0:-1]

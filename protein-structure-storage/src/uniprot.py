@@ -5,14 +5,35 @@ from .database_entries import pdbe_entry, afdb_entry
 
 logger = logging.getLogger(__name__)
 
-# Mappings of external database names to their corresponding
+# Mappings of external database names (in all uppercase, as written in uniprot db)
+# to their corresponding
 # ExternalDatabaseEntry objects, which are used to represent
 # entries in that database.
 
+PDBE_DB_NAME = "PDB".upper()
+ALPHAFOLD_DB_NAME = "AlphaFoldDB".upper()
+
 EXTERNAL_DATABASES = {
-    "PDB": pdbe_entry.PDBeEntry,
-    "AlphaFoldDB": afdb_entry.AFDBEntry
+    PDBE_DB_NAME: pdbe_entry.PDBeEntry,
+    ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry
 }
+
+# Alternate names for supported databases
+ALIASES = {
+    "AFDB": ALPHAFOLD_DB_NAME,
+    "ALPHAFOLD": ALPHAFOLD_DB_NAME,
+    "PDBE": PDBE_DB_NAME,
+}
+
+def resolve_aliases(source_dbs):
+    dbs = []
+    for s in source_dbs:
+        alias = ALIASES.get(s.upper())
+        if alias is None:
+            dbs.append(s)
+        else:
+            dbs.append(alias)
+    return dbs
 
 
 def request_uniprot_file(uniprot_id, filetype):
@@ -67,13 +88,30 @@ def parse_uniprot_xml(uniprot_id):
     return entries
 
 
-def uniprot_get_entries(uniprot_id, uniprot_retrieval_function=parse_uniprot_xml):
+def select_external_dbs(source_dbs):
+    "Return a subset of EXTERNAL_DATABASES that match the names supplied in the source_dbs list."
+    dbs = {}
+    for s in source_dbs:
+        if EXTERNAL_DATABASES.get(s) is not None:
+            dbs[s] = EXTERNAL_DATABASES.get(s)
+    return dbs
+
+
+def uniprot_get_entries(uniprot_id,
+                        uniprot_retrieval_function=parse_uniprot_xml,
+                        source_dbs=None):
     """ Get list of ExternalDatabaseEntry objects for the supported databases
-    using a uniprot id. """
+    using a uniprot id. 
+    source_dbs can be a list of database names to consider.
+    By default use all implemented databases
+    """
+    sources = select_external_dbs(source_dbs)
+    if source_dbs is None or len(source_dbs) == 0:
+        sources = EXTERNAL_DATABASES
     uniprot_entries_data = uniprot_retrieval_function(uniprot_id)
     entries = list()
     for entry_data in uniprot_entries_data:
-        database_object = EXTERNAL_DATABASES.get(entry_data["external_db_name"])
+        database_object = sources.get(entry_data["external_db_name"].upper())
         if database_object:
             entries.append(database_object(entry_data))
     return entries
