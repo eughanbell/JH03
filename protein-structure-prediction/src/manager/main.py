@@ -21,6 +21,11 @@ def calculate_protein_structure_from_sequence(sequence: str):
     """ Enqueue another protein sequence to have its structure predicted.  """
     return CalculationManager.add_calculation(sequence)
 
+@app.get("/terminate_calculation/{sequence}", response_class=PlainTextResponse)
+def terminate_calculation(sequence: str):
+    """ Remove / terminate calculation for a protein sequence from the queue. """
+    return CalculationManager.remove_calculation(sequence)
+
 @app.get("/download_structure/{sequence}", response_class=PlainTextResponse)
 def download_structure(sequence: str):
     """ Download the structure of a sequence whose structure has been
