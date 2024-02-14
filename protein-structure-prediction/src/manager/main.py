@@ -9,7 +9,7 @@ app = FastAPI()
 HOST = "0.0.0.0"
 PORT = 7000
 
-@app.get("/list_calculations/", response_class=PlainTextResponse)
+@app.get("/list_calculations", response_class=PlainTextResponse)
 def list_calculations():
     """ Returns a list of all sequences which have been or are being processed,
      elapsed processing time and completion status.  """
@@ -21,10 +21,10 @@ def calculate_protein_structure_from_sequence(sequence: str):
     """ Enqueue another protein sequence to have its structure predicted.  """
     return CalculationManager.add_calculation(sequence)
 
-@app.get("/terminate_calculation/{sequence}", response_class=PlainTextResponse)
-def terminate_calculation(sequence: str):
-    """ Remove / terminate calculation for a protein sequence from the queue. """
-    return CalculationManager.remove_calculation(sequence)
+@app.get("/cancel_calculation/{sequence}", response_class=PlainTextResponse)
+def cancel_calculation(sequence: str):
+    """ Cancel calculation for a protein sequence currently in the queue. """
+    return CalculationManager.cancel_calculation(sequence)
 
 @app.get("/download_structure/{sequence}", response_class=PlainTextResponse)
 def download_structure(sequence: str):

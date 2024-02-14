@@ -26,22 +26,22 @@ class CalculationManager:
     @classmethod
     def add_calculation(cls, sequence: str):
         for calculation in cls.calculations_list:
-            if calculation["sequence"] == sequence:
+            if calculation.sequence == sequence:
                 err = f"Cannot enqueue calculation: protein sequence already in calculations list. Sequence: '{sequence}'."
                 logger.warning(err)
                 return json.dumps({"detail":err})
         cls.calculations_list.append( CalculationManager(sequence=sequence) )
     
     @classmethod
-    def remove_calculation(cls, sequence: str):
+    def cancel_calculation(cls, sequence: str):
         for idx, calculation in enumerate(cls.calculations_list):
-            if calculation["sequence"] == sequence:
-                if calculation["status"] == CalculationState.CALCULATING:
+            if calculation.sequence == sequence:
+                if calculation.status == CalculationState.CALCULATING:
                     logger.warning("CODE FOR KILLING ONGOING CALCULATION NONEXISTENT!")
                 logger.info(f"Removing enqueued protein calculation for protein sequence: '{sequence}'.")
                 cls.calculations_list.pop(idx)
                 return
-        err = f"Could not remove protein sequence: sequence not currently in queue. Sequence: '{sequence}'."
+        err = f"Could not cancel protein sequence calculation: sequence not currently in queue. Sequence: '{sequence}'."
         logger.warning(err)
         return json.dumps({"detail":err})
     
