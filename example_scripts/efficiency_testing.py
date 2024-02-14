@@ -11,7 +11,7 @@ def repeatedScript(script, n=99):
     start=time.time()
     subprocess.call(f"./{script}.sh {n}",shell=True)
     end=time.time()
-    change=len(glob.glob(".pdb"))
+    change=len(glob.glob("*.pdb"))
 
     print(f"took {end-start} seconds to complete testing, where {change} PDB files were returned, each successful API call took on average {(start-end)/n} seconds")
     return 
@@ -26,7 +26,7 @@ def manualScript(script,vals=[]):
     for val in vals:
         subprocess.call(f"./{script}.sh {val}", shell=True)
     end = time.time()   
-    change=len(glob.glob(".pdb"))
+    change=len(glob.glob("*.pdb"))
 
     print(f"took {end-start} seconds to complete testing, where {change} PDB files were returned, each API call took on average {(start-end)/len(sequences)} seconds")
     return 
