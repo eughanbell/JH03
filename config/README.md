@@ -1,5 +1,7 @@
 # Example Config Folder
 
+* When you run the containers, the current weight dict settings should be printed on startup by the `pss` container
+
 If this folder is present beside the compose.yaml file for running this project, it will be avaliable from within the running docker container for using user specified protein database weights (ie you would need a folder called `config/` in the same place as compose.yaml).
 
 In this folder we have two example yaml config files for scoring the afdb and pdbe databases.
