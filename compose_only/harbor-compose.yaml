@@ -1,16 +1,16 @@
 services:
   pss:
-    image: noamzeise/protein-structure-storage
+    image: harbor.peak.scot/jh03/protein-structure-storage
     ports:
       - "8000:5000"
     volumes:
       - ./config:/src/config/
   psp:
-    image: noamzeise/protein-structure-prediction
+    image: harbor.peak.scot/jh03/protein-structure-prediction
     ports:
       - "7000:7000"
   pc:
-    image: noamzeise/protein-cache
+    image: harbor.peak.scot/jh03/protein-cache
     ports:
       - "6000:6000"
     depends_on:
