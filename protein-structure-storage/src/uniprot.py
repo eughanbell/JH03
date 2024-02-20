@@ -1,7 +1,7 @@
 import logging
 from xml.etree import ElementTree
 from .helpers import get_from_url
-from .database_entries import pdbe_entry, afdb_entry
+from .database_entries import pdbe_entry, afdb_entry, embl_entry
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ ALPHAFOLD_DB_NAME = "AlphaFoldDB".upper()
 
 EXTERNAL_DATABASES = {
     PDBE_DB_NAME: pdbe_entry.PDBeEntry,
-    ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry
+    ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry,
 }
 
 # Alternate names for supported databases
@@ -28,7 +28,8 @@ ALIASES = {
 def resolve_aliases(source_dbs):
     dbs = []
     for s in source_dbs:
-        alias = ALIASES.get(s.upper())
+        s = s.upper()
+        alias = ALIASES.get(s)
         if alias is None:
             dbs.append(s)
         else:
