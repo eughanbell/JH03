@@ -9,25 +9,36 @@ their properties, and picks the best scoring one.
 The selected protein is sent to the cache, so next time we can return it
 immediately without checking uniprot. Finally it is returned to the user.
 
-
 Uniprot stores many sources of information for a given protein.
 By default we look at structure files (given by `pdb` and `alphafold` databases).
 But Uniprot also stores sources for nucleotide/protein sequences,
 go annotations, family/domain, etc.
 
 By creating a new database entry classes, one can extend the code to work with those
-different sources of information that uniprot supports. 
+different sources of information that uniprot supports.
 
 
-## Learning by Example: A Walkthough to Support EMBL Sequence files
+## Learning by Example: A Walkthough to Support Sequence files
 
-We will use [P06213](https://www.uniprot.org/uniprotkb/P06213/entry).
+To find out how this system works, we imagine that you want the system to support Sequence files instead of structure files.
+
+The steps we need to follow are:
+
+1. Check which databases uniprot links to for sequences
+2. Find out how we can fetch sequence files from these databases
+3. Write a file in `src/database_entries/` for each database to score and fetch the files
+4. Reference it in `src/uniprot.py`
+
+
+### Which databases to support
+
+We inspect a protein as an exmple [P06213](https://www.uniprot.org/uniprotkb/P06213/entry).
 Our parser takes in an xml file from uniprot that stores all of the
 relevant information about a protein.
 
 Take a look at the file [P06213.xml](https://rest.uniprot.org/uniprotkb/P06213.xml).
-In the xml dom, db entries are at `uniprot->entry->dbReference`, here are some examples
-of `dbReference` objects from the linked file.
+In the xml dom, external databases are at `<uniprot><entry><dbReference>...`, 
+here are some examples of `dbReference` objects from the linked file.
 
 ```xml
 <dbReference type="EMBL" id="M27195">
@@ -38,13 +49,6 @@ of `dbReference` objects from the linked file.
 <dbReference type="CCDS" id="CCDS12176.1">
 	<molecule id="P06213-1"/>
 </dbReference>
-<dbReference type="PIR" id="A37348">
-	<property type="entry name" value="INHUR"/>
-</dbReference>
-<dbReference type="RefSeq" id="NP_001073285.1">
-	<molecule id="P06213-2"/>
-	<property type="nucleotide sequence ID" value="NM_001079817.2"/>
-</dbReference>
 <dbReference type="PDB" id="1GAG">
 	<property type="method" value="X-ray"/>
 	<property type="resolution" value="2.70 A"/>
@@ -53,12 +57,16 @@ of `dbReference` objects from the linked file.
 <dbReference type="AlphaFoldDB" id="P06213"/>
 ```
 
-Each `dbReference` is an entry in an external database, 
-and will be pointing to different files depending on what the database is for.
+Each `dbReference` node is an entry in an external database, 
+and will be referring to different file types depending on what type of information 
+the database stores.
 
-Our uniprot parser will iterate over all of the `dbReference` objects,
-and select the ones that are supported.
+When a protein is requested, and it isn't in the cache, `src/pss.py` will 
+ask for a list of potential databases.
+`src/uniprot.py` iterates over all of the `dbReference` nodes,
+creating `ExternalDatabaseEntry` objects (when the db is supported).
+It returns that list to `src/pss.py`.
 
 Protein Structures are `pdb` files, this is what we support by default,
-and the sources are `PDB` (there are a few databases, ie PDBe, RSCB) 
+and the sources are `PDB` (there are a few databases, ie PDBe, RSCB)
 or `AlphafoldDB`, which give
