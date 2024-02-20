@@ -9,8 +9,8 @@ class ExternalDatabaseEntry:
         self.quality_score = None # Quality score from 0 to 1
         self.type = self.__class__.__name__
     
-    def fetch(self) -> bytes:
-        """ Fetch a .pdb file from external database and return in bytes format. """
+    def fetch(self):
+        """ Fetch a .pdb file from external database and return it. """
         raise NotImplementedError("External database fetch not implemented.")
     
     def get_quality_score(self, recalculate=False) -> float:
