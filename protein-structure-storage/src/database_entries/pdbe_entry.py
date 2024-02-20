@@ -22,14 +22,25 @@ pdbe_weights = {
 }
 pdbe_weights = import_weights(pdbe_weights, "/src/config/pdbe-weights.yaml")
 
+# Options for pdb file sources
+
+def PDBe_link(id):
+    return f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{id}.ent"
+
+def RCSB_link(id):
+    return f"https://files.rcsb.org/download/{id}.pdb"
 
 class PDBeEntry(ExternalDatabaseEntry):
 
-    def fetch(self) -> bytes:
+    def fetch(self, backend_link=RCSB_link) -> str:
         """ Fetch a .pdb file from PDBe database and return in string format. """
         pdb_id = self.extract_id()
-        pdb_file = get_from_url(f"https://www.ebi.ac.uk/pdbe/entry-files/download/pdb{pdb_id}.ent")
-        return pdb_file.decode()
+        pdb_file = get_from_url(backend_link(pdb_id))
+        if pdb_file is None:
+            logger.error("Failed to fetch pdb file, id: " + pdb_id)
+            return ""
+        else:
+            return pdb_file.decode()
         
     def calculate_raw_quality_score(self) -> float:
         """ Calculate unweighted quality score for this entry """
