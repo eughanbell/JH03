@@ -15,7 +15,7 @@ ALPHAFOLD_DB_NAME = "AlphaFoldDB".upper()
 
 EXTERNAL_DATABASES = {
     PDBE_DB_NAME: pdbe_entry.PDBeEntry,
-    ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry
+    ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry,
 }
 
 # Alternate names for supported databases
@@ -28,7 +28,8 @@ ALIASES = {
 def resolve_aliases(source_dbs):
     dbs = []
     for s in source_dbs:
-        alias = ALIASES.get(s.upper())
+        s = s.upper()
+        alias = ALIASES.get(s)
         if alias is None:
             dbs.append(s)
         else:
@@ -47,8 +48,9 @@ def request_uniprot_file(uniprot_id, filetype):
         return None
     result = get_from_url("https://rest.uniprot.org/uniprotkb/" +
                           uniprot_id + "." + filetype)
-    if result is None:
+    if result == bytearray():
         logger.error("Failed to fetch UniProt entry, id may be invalid or there may be a network issue.")
+        return None
     logger.info(f"Successfully fetched UniProt entry for {uniprot_id}.")
     return result
 

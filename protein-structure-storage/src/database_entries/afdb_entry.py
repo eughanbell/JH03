@@ -1,8 +1,4 @@
 import logging
-from urllib.request import urlopen
-from urllib.error import HTTPError
-from http.client import InvalidURL
-
 from .abstract_entry import ExternalDatabaseEntry
 from .weight_importer import import_weights
 from ..helpers import get_from_url
@@ -14,7 +10,7 @@ afdb_weights = import_weights(afdb_weights, "/src/config/afdb-weights.yaml")
 
 class AFDBEntry(ExternalDatabaseEntry):
 
-    def fetch(self) -> bytes:
+    def fetch(self) -> str:
         """ Fetch a .pdb file from AFDB database and return in string format. """
         # """Sends html request for all alphafold pdb file with the given id."""
         alphafold_id = "AF-" + self.entry_data["id"] + "-F1"
