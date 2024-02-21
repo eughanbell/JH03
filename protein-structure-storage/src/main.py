@@ -17,7 +17,7 @@ def redirect_to_docs():
     return RedirectResponse(url="/docs")
 
 @app.exception_handler(404)
-def handle_404():
+def handle_404(_, __):
     return redirect_to_docs()
 
 @app.get("/retrieve_by_uniprot_id/{id}", response_class=PlainTextResponse)
