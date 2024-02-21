@@ -48,8 +48,9 @@ def request_uniprot_file(uniprot_id, filetype):
         return None
     result = get_from_url("https://rest.uniprot.org/uniprotkb/" +
                           uniprot_id + "." + filetype)
-    if result is None:
+    if result == bytearray():
         logger.error("Failed to fetch UniProt entry, id may be invalid or there may be a network issue.")
+        return None
     logger.info(f"Successfully fetched UniProt entry for {uniprot_id}.")
     return result
 
