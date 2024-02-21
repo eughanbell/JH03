@@ -1,7 +1,7 @@
 import logging
 from xml.etree import ElementTree
 from .helpers import get_from_url
-from .database_entries import pdbe_entry, afdb_entry, embl_entry
+from .database_entries import pdbe_entry, afdb_entry
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +12,10 @@ logger = logging.getLogger(__name__)
 
 PDBE_DB_NAME = "PDB".upper()
 ALPHAFOLD_DB_NAME = "AlphaFoldDB".upper()
-EMBL_DB_NAME = "EMBL";
 
 EXTERNAL_DATABASES = {
     PDBE_DB_NAME: pdbe_entry.PDBeEntry,
     ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry,
-    EMBL_DB_NAME: embl_entry.EMBLEntry
 }
 
 # Alternate names for supported databases
