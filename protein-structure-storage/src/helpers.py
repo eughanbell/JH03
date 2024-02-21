@@ -5,7 +5,7 @@ from http.client import InvalidURL
 
 def print_except(url, info, e):
     "Helper for get_from_url. prints out exception and url"
-    print(f"ERROR: get_from_url error, returning None. url: {url} info: {info}" +
+    print(f"ERROR: get_from_url error, returning blank file. url: {url} info: {info}" +
           " --- Exception: ", e)
 
     
@@ -31,7 +31,7 @@ def get_from_url(url):
             print_except(url, "invalid character in url", e)
         except Exception as e:
             print_except(url, "unknown exeption", e)
-    return None
+    return bytearray()
 
 
 def query_list_path(key, items, initial="?"):
