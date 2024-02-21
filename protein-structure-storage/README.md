@@ -199,7 +199,7 @@ Finally we add our new database entry object to `src/uniprot.py`.
 # ...
 from .database_entries import embl_entry
 # ...
-EMBL_DB_NAME = "EMBL".upper()
+EMBL_DB_NAME = "EMBL"
 EXTERNAL_DATABASES = {
     EMBL_DB_NAME: embl_entry.EMBLEntry,
 }
@@ -210,3 +210,46 @@ you will get an `EMBL` file returned to you.
 
 
 ## Extra: Using a yaml File for Scoring Weights
+
+Lets say we want to customise our scoring function by specifying values in a yaml file
+in a docker volume (can be changes without rebuilding containers). 
+First we import the weight importer function and specify a dictionary of modifiable weights.
+We override this with a file called `embl_weights.yaml` that the user can put in a `config/`
+directory when docker composing the project.
+
+```python
+from .weight_importer import import_weights
+
+embl_weights  = {
+    'types': {
+        'default': 0.1,
+        'Genomic DNA': 0.2,
+        'mRNA': 0.4,
+    },
+}
+embl_weights = import_weights(embl_weights, "/src/config/embl_weights.yaml")
+```
+
+Now we can update the `calculate_score` function to use this dictionary. 
+We use the default type score when we don't recognise the molecule type.
+
+```python
+def calculate_raw_quality_score(self):
+	molecule_type = self.entry_data["molecule type"]
+	score = embl_weights['types'].get(molecule_type, embl_weights['types']['default'])
+	return score
+```
+
+Now we can put a file called `embl_weights.yaml` in a `config/` folder that is beside the docker compose. To override the python dict it would need a structure like the following.
+
+```yaml
+types:
+	mRNA: 0.8
+	default: 0
+```
+
+It will override the dictionary with these values, allowing the user to customise the scoring function without building the containers.
+
+
+Now we have an externally customisable entry class for the _EMBL_ database.
+The next step would be to write similar entries for other sequence databases that uniprot may return.

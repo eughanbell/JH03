@@ -12,10 +12,12 @@ logger = logging.getLogger(__name__)
 
 PDBE_DB_NAME = "PDB".upper()
 ALPHAFOLD_DB_NAME = "AlphaFoldDB".upper()
+EMBL_DB_NAME = "EMBL";
 
 EXTERNAL_DATABASES = {
     PDBE_DB_NAME: pdbe_entry.PDBeEntry,
     ALPHAFOLD_DB_NAME: afdb_entry.AFDBEntry,
+    EMBL_DB_NAME: embl_entry.EMBLEntry
 }
 
 # Alternate names for supported databases
