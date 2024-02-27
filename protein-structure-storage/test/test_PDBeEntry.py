@@ -164,8 +164,12 @@ class TestPDBeEntry(unittest.TestCase):
             self.assertEqual(output, test_case[2], f"Failed to extract chain length from chain-length={test_case[0]}, whole-protein-length={test_case[1]}, expected {test_case[2]}, got {output}")
 
     def test_fetch(self):
-        logger.warning("NotImplemented: no tests for PDBeFetch.")
-    
+        def get_output(metadata_dict):
+            test_entry = PDBeEntry(metadata_dict)
+            return test_entry.fetch()
+        self.assertEqual(len(get_output({'id': '1fsx'})), 440235, "Mismatching pdb file lengths for pdb-id 1sfx")
+        
+
     def test_overall_score_calculation(self):
         logger.warning("Not Implemented: Overall scoring tests.")
 
