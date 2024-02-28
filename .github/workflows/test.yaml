@@ -15,8 +15,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Test
-        run: cd protein-structure-storage
-        run: python -m unittest
+        run: |
+          cd protein-structure-storage
+          python -m unittest
         
   test-psp:
     runs-on: ubuntu-latest
@@ -32,5 +33,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Test
-        run: cd protein-structure-prediction
-        run: python -m unittest
+        run: |
+          cd protein-structure-prediction
+          python -m unittest
