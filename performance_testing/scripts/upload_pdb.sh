@@ -1,4 +1,5 @@
 # assumes 10.pdb -> 20.pdb files in current dir
+# usr/bin/bash
 for i in $(seq 10 20);
 do
     if [ -f $i.pdb ]; then

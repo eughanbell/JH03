@@ -1,3 +1,5 @@
+# usr/bin/bash
+
 for n in {1..2} 
 do
     for i in $(seq 10 $1)

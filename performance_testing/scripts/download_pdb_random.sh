@@ -1,3 +1,4 @@
+# usr/bin/bash
 for i in $(seq 10 $1)
 do
     rand_str=$(printf "p%05d" $((RANDOM % 100000)))
