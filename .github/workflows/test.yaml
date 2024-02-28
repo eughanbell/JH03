@@ -1,10 +1,5 @@
 name: test
-
-on:
-  push:
-    branches:
-      - "main"
-
+on: [push]
 jobs:
   test-pss:
     runs-on: ubuntu-latest
@@ -23,7 +18,7 @@ jobs:
         run: python -m unittest
         
   test-psp:
-        runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - run: cd protein-structure-prediction
