@@ -44,12 +44,12 @@ if __name__ == "__main__":
             print(f"endpoint {sys.argv[1]} is not valid, Please refer to the list of valid inputs if you are confused")
     else:
         #list of sys args that correspond to endpoints
-        endpoints = [sys.argv[1:]]
+        endpoints = sys.argv[1:]
         for endpoint in endpoints:
             if endpoint in increment_calls:
                 mainIncrementScript(increment_calls[endpoint])
             elif endpoint in random_calls:
                 mainRandomScript(random_calls[endpoint])
             else:
-                print(f"endpoint {sys.argv[1]} is not valid, Please refer to the list of valid inputs if you are confused")
+                print(f"endpoint {endpoint} is not valid, Please refer to the list of valid inputs if you are confused")
 
