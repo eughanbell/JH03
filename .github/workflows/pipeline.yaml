@@ -14,17 +14,17 @@ jobs:
       - run: docker build -t pss protein-structure-storage 
       - run: docker build -t pc protein-cache
       - run: docker build -t psp protein-structure-prediction
-      - run: docker image tag pss $DOCKERHUB_USERNAME/protein-structure-storage:latest
-      - run: docker image tag pc $DOCKERHUB_USERNAME/protein-cache:latest
-      - run: docker image tag psp $DOCKERHUB_USERNAME/protein-structure-prediction:latest
-      - run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
-      - run: docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
-      - run: docker image push $DOCKERHUB_USERNAME/protein-cache:latest
-      - run: docker image push $DOCKERHUB_USERNAME/protein-structure-prediction:latest
-      - run: docker image tag pss harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-storage:latest
-      - run: docker image tag pc harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-cache:latest
-      - run: docker image tag psp harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-prediction:latest
-      - run: docker login harbor.peak.scot -u $PEAK_HARBOR_USERNAME -p $PEAK_HARBOR_AUTHCODE
-      - run: docker image push harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-storage:latest
-      - run: docker image push harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-cache:latest
-      - run: docker image push harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-prediction:latest
+      - run: docker image tag pss ${{ secrets.DOCKERHUB_USERNAME }}/protein-structure-storage:latest
+      - run: docker image tag pc ${{ secrets.DOCKERHUB_USERNAME }}/protein-cache:latest
+      - run: docker image tag psp ${{ secrets.DOCKERHUB_USERNAME }}/protein-structure-prediction:latest
+      - run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_AUTHCODE }}
+      - run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/protein-structure-storage:latest
+      - run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/protein-cache:latest
+      - run: docker image push ${{ secrets.DOCKERHUB_USERNAME }}/protein-structure-prediction:latest
+      - run: docker image tag pss harbor.peak.scot/${{ secrets.PEAK_HARBOR_USERNAME }}/protein-structure-storage:latest
+      - run: docker image tag pc harbor.peak.scot/${{ secrets.PEAK_HARBOR_USERNAME }}/protein-cache:latest
+      - run: docker image tag psp harbor.peak.scot/${{ secrets.PEAK_HARBOR_USERNAME }}/protein-structure-prediction:latest
+      - run: docker login harbor.peak.scot -u ${{ secrets.PEAK_HARBOR_USERNAME }} -p ${{ secrets.PEAK_HARBOR_AUTHCODE }}
+      - run: docker image push harbor.peak.scot/${{ secrets.PEAK_HARBOR_USERNAME }}/protein-structure-storage:latest
+      - run: docker image push harbor.peak.scot/${{ secrets.PEAK_HARBOR_USERNAME }}/protein-cache:latest
+      - run: docker image push harbor.peak.scot/${{ secrets.PEAK_HARBOR_USERNAME }}/protein-structure-prediction:latest
