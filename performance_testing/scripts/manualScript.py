@@ -1,6 +1,6 @@
 import os, requests,glob,time
 
-def manualScript(file,endpoint="Retrieve_by_uniprot_id",cache=False,alphafold=False):
+def manualScript(file,endpoint="retrieve_by_uniprot_id",cache=False,alphafold=False):
         pdbs_to_delete =glob.glob("pdb_files/*.pdb")
         print("Clearing existing pdb files")
         for file_path in pdbs_to_delete:
