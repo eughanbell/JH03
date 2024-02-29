@@ -30,6 +30,16 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 
 * see `example_scripts/` for more usage examples.
 
+### Changing Scoring Weights
+
+The container picks which structure to return based on it's properties.
+
+The weights used to score proteins can be changed by the user without rebuilding containers.
+See the `config` folder README for details. 
+
+In brief, adding a folder called `config` next to `compose.yaml`, one can put yaml files into
+this folder and they will change the weights when the containers are run with docker compose.
+
 ## Protein Structure Prediction
 
 * Add new protein sequence to predict structure of. Will add to calculations queue.
