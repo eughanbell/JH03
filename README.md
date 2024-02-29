@@ -1,20 +1,22 @@
 # Protein Database Requests And Cache 
 
-## Quickstart with single docker compose file
+Fetch protein structure files in the pdb format using a uniprot id.
+Any requested proteins will be cached for quicker retrieval if requested again.
 
-copy the compose file from `compose_only/compose.yaml` into your files and run 
+# Quickstart
+
+You will need docker compose.
+
+Save the file `compose_only/compose.yaml` into your files as `compose.yaml` and run 
 ```docker compose up```
-which should automatically start the webapp.
+in the same folder.
 
 You can now access the webapp and check the docs by going to
-`0.0.0.0:8000/docs`. If this doesn't work, try `127.0.0.1:8000/docs`
+`127.0.0.1:8000/docs`.
 
-## Usage
+# Usage
 
-Protein files can be requested using uniprot ids. Any requested proteins
-will be cached locally.
-
-### Example Usage
+## Protein Structure Storage
 
 * Get by uniprot ID
 ```
@@ -28,9 +30,7 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 
 * see `example_scripts/` for more usage examples.
 
-# Protein Structure Prediction
-
-## Example Usage
+## Protein Structure Prediction
 
 * Add new protein sequence to predict structure of. Will add to calculations queue.
 ```
@@ -47,9 +47,10 @@ curl 'http://0.0.0.0:7000/list_calculations/'
 curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}'
 ```
 
-### Accessing MongoDB express web service
-To inspect the cache database manually, if the containers are running, go to
-`0.0.0.0:8082` or `127.0.0.1:8082`.
+# Inspecting the Cache
+
+Ensure the containers are running, go to `127.0.0.1:8082` 
+in your browser.
 You will need to login, the credentials are 
 ```
 username: admin
@@ -58,7 +59,16 @@ password: pass
 
 The cache database will only be present if at least one pdb file has been requested.
 
-## Building Docker Containers Locally
+
+# Running on Kubernetes
+
+See the `kubernetes` folder README for info on running on kubernetes
+
+
+
+# Development
+
+## Building Locally
 
 ### With Docker Compose
 
@@ -100,25 +110,17 @@ to run, we will map to 7000 instead of 8000 to not conflict with pss.
 docker run --publish 7000:6000 pc
 ```
 
-## Testing
-`protein-structure-storage` unittests can be run by executing `python -m unittest` in the `protein-structure-storage/` folder.
+# Testing
 
-## Running on Kubernetes
+There are tests for `pss` and `psp`. To run, navigate to the `protein-structure-storage` or 
+`protein-structure-prediction` folders. Make sure you have the nessecary python libraries installed (by running `pip install -r requirements.txt`).
+```python
+python -m unittest
+```
 
-Using [minikube](https://minikube.sigs.k8s.io/docs/start/), you can simulate a kubernetes cluster locally by doing
-```minikube start```
+# Pushing Built Containers to Docker Hub
 
-You can then add workloads and services for the cluster by using [kubectl](https://kubernetes.io/docs/tasks/tools/). Run the script at `compose_only/k8s/kubectl-apply.sh`, to start them.
-You may have to wait a while for the mongo database to start.
-
-Get the url for the protein structure storage service by using 
-```minikube service pss --url```
-
-To clear the cluster you can use the script at `compose_only/k8s/kubectl-delete.sh`.
-
-## Pushing Built Containers to Docker Hub
-
-This is done automaically by a gitlab pipeline.
+This is done automaically by a gitlab or github pipeline.
 
 ```
 docker build -t noamzeise/protein-structure-storage:latest protein-structure-storage
