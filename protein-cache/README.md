@@ -73,3 +73,17 @@ POST '/protein_file/'
 - Accepts JSON payload with 'uniprot_id', 'pdb_file', 'sequence', 'source_db', and 'source'.
 
 ---
+
+
+**Inspecting the Cache**
+
+Ensure the containers are running, go to `127.0.0.1:8082` in your browser. You will need to login, the credentials are
+
+```
+username: admin
+password: pass
+```
+
+The cache database will only be present if at least one pdb file has been requested.
+
+---
