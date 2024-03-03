@@ -41,3 +41,35 @@ obj_info = {
 
 ---
 This service exposes the following endpoints for interacting with the cache.
+
+**Retrieval Endpoints:**
+
+ ```
+ GET '/retrieve_by_uniprot_id/{id}'
+ ```
+- Retrieves a protein structure by UniProtID
+- Optional query parameter 'source_dbs' to specify databases to search
+
+```
+GET /retrieve_by_sequence/{sequence}'
+```
+- Retrieves a protein structure by sequence
+
+```
+GET '/retrieve_by_db_id/{db_id}'
+```
+- Retrieves a protein structure by its MongoDB '_id'
+ 
+```
+GET '/retrieve_db_id_by_uniprot_id/{id}
+```
+- Retrieves the MongoDB '_id' of a caches entry using a UniProtID
+
+**Storage Endpoint:**
+```
+POST '/protein_file/'
+```
+- Stores a new protein structure in the cache
+- Accepts JSON payload with 'uniprot_id', 'pdb_file', 'sequence', 'source_db', and 'source'.
+
+---
