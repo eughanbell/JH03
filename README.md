@@ -123,7 +123,7 @@ docker run --publish 7000:6000 pc
 # Testing
 
 There are tests for `pss` and `psp`. To run, navigate to the `protein-structure-storage` or 
-`protein-structure-prediction` folders. Make sure you have the nessecary python libraries installed (by running `pip install -r requirements.txt`).
+`protein-structure-prediction` folders. Make sure you have the necessary python libraries installed (by running `pip install -r requirements.txt`).
 ```python
 python -m unittest
 ```
