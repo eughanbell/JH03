@@ -5,41 +5,41 @@ logger = logging.getLogger(__name__)
 
 from urllib.request import urlopen
 
-from src.uniprot import request_uniprot_file
-from src.uniprot import parse_uniprot_xml
+from src.uniprot import _request_uniprot_file
+from src.uniprot import _parse_uniprot_xml
 from src.uniprot import uniprot_get_entries
 
 class TestUniprot(unittest.TestCase):
-    def test_request_uniprot_file(self):
+    def test__request_uniprot_file(self):
         #Valid A
-        validTest = request_uniprot_file("p02070","xml")
+        validTest = _request_uniprot_file("p02070","xml")
         comparison = urlopen("https://rest.uniprot.org/uniprotkb/p02070.xml")
         self.assertEqual(validTest, comparison.read())
         
         #Valid B
-        validTest = request_uniprot_file("p06213","xml")
+        validTest = _request_uniprot_file("p06213","xml")
         comparison = urlopen("https://rest.uniprot.org/uniprotkb/p06213.xml")
         self.assertEqual(validTest, comparison.read())
 
         #Valid C
-        validTest = request_uniprot_file("a0pk11","xml")
+        validTest = _request_uniprot_file("a0pk11","xml")
         comparison = urlopen("https://rest.uniprot.org/uniprotkb/a0pk11.xml")
         self.assertEqual(validTest, comparison.read())
 
         #Invalid uniprot_id
-        self.assertEqual(request_uniprot_file("ImNotAnId", "xml"), None)
+        self.assertEqual(_request_uniprot_file("ImNotAnId", "xml"), None)
 
         #Invalid filetype
-        self.assertEqual(request_uniprot_file("p02070", "ImNotAFiletype"), None)
+        self.assertEqual(_request_uniprot_file("p02070", "ImNotAFiletype"), None)
 
         #Invalid filetype
-        self.assertEqual(request_uniprot_file("p02070", None), None)
+        self.assertEqual(_request_uniprot_file("p02070", None), None)
 
         #Non-string uniprot_id
-        self.assertEqual(request_uniprot_file(2070, "xml"), None)
+        self.assertEqual(_request_uniprot_file(2070, "xml"), None)
 
         #Non-xml filetype
-        self.assertEqual(request_uniprot_file("p02070", "html"), None)
+        self.assertEqual(_request_uniprot_file("p02070", "html"), None)
 
     def test_parse_uniprot_xml(self):
         path = "test/testdata/uniprot"
@@ -52,7 +52,7 @@ class TestUniprot(unittest.TestCase):
         ]
 
         for uniprot_id, expected_output_file in test_cases:
-            actual_output = parse_uniprot_xml(uniprot_id)
+            actual_output = _parse_uniprot_xml(uniprot_id)
             if expected_output_file == None:
                 self.assertEqual(actual_output, [], f"Parser incorrectly handled invalid uniprot_id {uniprot_id}.")
             else:
