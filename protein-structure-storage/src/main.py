@@ -35,10 +35,10 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False, override_cache
 
 
 @app.get("/retrieve_by_sequence/{seq}", response_class=PlainTextResponse)
-def retrieve_by_sequence(seq: str):
+def retrieve_by_sequence(seq: str, db: Annotated[list[str] | None, Query()] = None):
     """Retrieves pdb file given a part of the sequence for a protein structure.
     Pulls only from cache"""
-    return get_pdb_file_by_sequence(seq)
+    return get_pdb_file_by_sequence(seq, db)
 
 
 @app.get("/retrieve_by_key/{key}", response_class=PlainTextResponse)
@@ -48,9 +48,9 @@ def retrieve_by_key(key: str):
 
 
 @app.get("/retrieve_key_by_uniprot_id/{id}", response_class=PlainTextResponse)
-def retrieve_key_by_uniprot_id(id: str):
+def retrieve_key_by_uniprot_id(id: str, db: Annotated[list[str] | None, Query()] = None):
     """Retrieve unique cache key using the uniprot id for a protein structure."""
-    return get_db_id_by_uniprot_id(id)
+    return get_db_id_by_uniprot_id(id, db)
 
 
 @app.post("/upload_pdb/", response_class=PlainTextResponse)

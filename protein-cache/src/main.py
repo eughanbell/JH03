@@ -2,8 +2,9 @@ from fastapi import FastAPI, Query
 from fastapi.responses import PlainTextResponse
 import uvicorn
 from pydantic import BaseModel
-from db import get_cache, store_cache, get_by_sequence, get_by_db_id
+from db import store_cache, get_cache
 from typing import Annotated
+from bson import ObjectId
 
 app = FastAPI()
 HOST = "0.0.0.0"
@@ -18,22 +19,26 @@ def json_response(data, field="pdb_file"):
 
 @app.get("/retrieve_by_uniprot_id/{id}")
 def retrieve_by_uniprot_id(id: str, source_dbs: Annotated[list[str] | None, Query()] = None):
-    return json_response(get_cache(id, source_dbs=source_dbs))
+    return json_response(
+        get_cache({"uniprot_id": id.upper()}, source_dbs))
 
 
 @app.get("/retrieve_by_sequence/{sequence}")
-def retrieve_by_sequence(sequence: str):
-    return json_response(get_by_sequence(sequence))
+def retrieve_by_sequence(sequence: str, source_dbs: Annotated[list[str] | None, Query()] = None):
+    return json_response(
+        get_cache({"sequence": {"$regex": sequence.upper()}}, source_dbs))
 
 
 @app.get("/retrieve_by_db_id/{db_id}")
 def retrieve_by_db_id(db_id: str):
-    return json_response(get_by_db_id(db_id))
+    return json_response(
+        get_cache({"_id": ObjectId(db_id)}))
 
 
 @app.get("/retrieve_db_id_by_uniprot_id/{id}")
-def retrieve_db_id_by_uniprot_id(id: str):
-    return json_response(str(get_cache(id, field="_id")), field="db_id")
+def retrieve_db_id_by_uniprot_id(id: str, source_dbs: Annotated[list[str] | None, Query()] = None):
+    return json_response(
+        str(get_cache({"uniprot_id": uniprot_id.upper()}, field="_id")), field="db_id")
 
 
 class ProteinFile(BaseModel):

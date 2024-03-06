@@ -20,15 +20,23 @@ You can now access the webapp and check the docs by going to
 
 * Get by uniprot ID
 ```
-curl 'http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070'
+curl "http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070"
+
+# or get from a specific database
+
+curl "http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070?db=pdb"
 ```
 
-* Upload file and get database key as response
+* Upload file and get database key as response (the @ before the file is important)
 ```
-curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
+curl -w "\n" -X POST -F file=@path/to/my/file.pdb "0.0.0.0:8000/upload_pdb/"
+
+# or, give the uploaded file some properties
+
+curl -w "\n" -X POST -F file=@path/to/my/file.pdb "0.0.0.0:8000/upload_pdb/?db=mydb&score=0.4"
 ```
 
-* see `example_scripts/` for more usage examples.
+* see `example_scripts/` or the fastapi docs at `0.0.0.0:8000/docs` for more info/examples.
 
 ### Changing Scoring Weights
 
