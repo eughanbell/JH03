@@ -7,7 +7,7 @@ client = MongoClient(host="mongo:27017", # the internal docker address
                      serverSelectionTimeoutMS=3000)
 
 # deletes database - for development
-client.drop_database("cache")
+#client.drop_database("cache")
 
 # get an object representing the cache db
 # will be implicitly created upon first inserting

@@ -29,9 +29,9 @@ def retrieve_by_uniprot_id(id: str, alphafold_only: bool = False, override_cache
     If the optional parameter alphafold_only == True then returns
     only the alphafold predicted entry"""
     if alphafold_only:
-        return get_pdb_file(id, override_cache, use_dbs=[ALPHAFOLD_DB_NAME])
+        return get_pdb_file(id, override_cache, source_dbs=[ALPHAFOLD_DB_NAME])
     else:
-        return get_pdb_file(id, override_cache, use_dbs=db)
+        return get_pdb_file(id, override_cache, source_dbs=db)
 
 
 @app.get("/retrieve_by_sequence/{seq}", response_class=PlainTextResponse)
