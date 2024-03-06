@@ -170,8 +170,8 @@ class TestPDBeEntry(unittest.TestCase):
         self.assertEqual(len(get_output({'id': '1fsx'})), 440235, "Mismatching pdb file lengths for pdb-id 1sfx")
         
 
-    def test_overall_score_calculation(self):
-        logger.warning("Not Implemented: Overall scoring tests.")
+    # def test_overall_score_calculation(self):
+    #     #pass
 
 if __name__ == "__main__":
     unittest.main()
