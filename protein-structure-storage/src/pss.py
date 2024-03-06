@@ -3,6 +3,7 @@ from .uniprot import uniprot_get_entries, resolve_aliases
 import json
 import logging
 import requests
+from requests.exceptions import ConnectionError
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +54,17 @@ def get_pdb_file(uniprot_id, override_cache=False, source_dbs=None):
             logger.info(f"Considered {len(entries)} entries, "
                         + f"choosing best. id: {uniprot_id} - db: "
                         + f"{entries[0].get_entry_data('external_db_name')}")
+            print(entries[0])
             protein_file = entries[0].fetch()
-            upload_pdb_file(
-                protein_file,
-                entries[0].get_entry_data("external_db_name"),
-                uniprot_id,
-                entries[0].get_protein_metadata()["sequence"],
-                entries[0].get_quality_score())
+            try:
+                upload_pdb_file(
+                    protein_file,
+                    entries[0].get_entry_data("external_db_name"),
+                    uniprot_id,
+                    entries[0].get_protein_metadata()["sequence"],
+                    entries[0].get_quality_score())
+            except ConnectionError as e:
+                print(e)
     return protein_file
 
 
