@@ -57,7 +57,7 @@ curl 'http://0.0.0.0:7000/list_calculations/'
 curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}'
 ```
 
-# Inspecting the Cache
+# Inspecting/Clearing the Cache
 
 Ensure the containers are running, go to `127.0.0.1:8082` 
 in your browser.
@@ -69,6 +69,9 @@ password: pass
 
 The cache database will only be present if at least one pdb file has been requested.
 
+
+The cache will be persistent between container restarts. To clear it from inside mongo-express,
+press the delete button next to the cache database.
 
 # Running on Kubernetes
 
