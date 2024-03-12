@@ -37,12 +37,29 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 curl 'http://0.0.0.0:7000/calculate_protein_structure_from_sequence/{protein-sequence}'
 ```
 
-* List all calculations (pending, processing and complete) in the calculations queue.
+* Remove a protein sequence from the calculations queue, terminating the AlphaFold calculation if the calculation is ongoing.
+```
+curl 'http://0.0.0.0:7000/cancel_calculation/{protein-sequence}'
+```
+
+* List all calculations (pending, processing, complete and failed) in the calculations queue. Returns a JSON list of objects representing every calculation in the queue.
 ```
 curl 'http://0.0.0.0:7000/list_calculations/'
 ```
 
-* Download the .pdb protein structure file from a completed prediction (giving protein sequence to identify the result file).
+Returned objects have the following attributes:
+- sequence: *str*
+- calculation_state: *str*
+- waiting_since_timestamp: *float*
+- calculation_start_timestamp: *float*
+
+`calculation_state` can take the following values:
+- PENDING: waiting to begin AlphaFold prediction calculation
+- PROCESSING: an AlphaFold prediction calculation is currently ongoing for this protein
+- COMPLETE: the AlphaFold prediction for this protein is complete, and the `.pdb` file ready to download.
+- FAILED: the AlphaFold prediction for this protein failed, and the error message file is ready to download.
+
+* Download the `.pdb` protein structure file from a completed prediction (giving protein sequence to identify the result file).
 ```
 curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}'
 ```
