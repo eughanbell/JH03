@@ -35,7 +35,7 @@ def cancel_calculation(sequence: str):
     return CalculationManager.cancel_calculation(sequence)
 
 @app.get("/download_structure/{sequence}", response_class=PlainTextResponse)
-def download_structure(sequence: str):
+def download_structure(sequence: str, download: str = "all_data"):
     """ Download the structure of a sequence whose structure has been
      predicted, will return nothing if prediction not yet complete. """
-    return CalculationManager.download_calculation_result(search_sequence = sequence)
+    return CalculationManager.download_calculation_result(search_sequence = sequence, download_type=download)
