@@ -1,3 +1,5 @@
+from Calculation import Calculation
+
 from enum import Enum
 from io import StringIO
 import json
@@ -24,7 +26,7 @@ class CalculationManager:
                 err = f"Cannot enqueue calculation: protein sequence already in calculations list. Sequence: '{sequence}'."
                 main_logger.warning(err)
                 return json.dumps({"detail":err})
-        cls.calculations_list.append( CalculationManager(sequence=sequence) )
+        cls.calculations_list.append( Calculation(sequence=sequence, logger=main_logger) )
     
     @classmethod
     def cancel_calculation(cls, sequence: str):
