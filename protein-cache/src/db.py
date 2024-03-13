@@ -1,13 +1,27 @@
 from pymongo import MongoClient
+import time
 from hashlib import blake2b
 
-# connect to running database
-client = MongoClient(host="mongo:27017", # the internal docker address
-                     serverSelectionTimeoutMS=3000)
+def wait_for_mongo(host="mongo:27017", retries=5, delay=5):
+    # Create a temporary client with a short serverSelectionTimeout
+    temp_client = MongoClient(host=host, serverSelectionTimeoutMS=1000)  # Short timeout for initial connection attempts
+    for attempt in range(retries):
+        try:
+            # Attempt to ping the MongoDB server
+            temp_client.admin.command('ping')
+            print("MongoDB is ready!")
+            return True  # MongoDB is ready
+        except Exception as e:
+            print(f"Waiting for MongoDB... Attempt {attempt + 1}/{retries}")
+            time.sleep(delay)
+    raise Exception("MongoDB not ready after max retries. Exiting.")
 
-# get an object representing the cache db
-# will be implicitly created upon first inserting
-# some data into the db
+# Wait for MongoDB to be ready before establishing a permanent connection
+wait_for_mongo()
+
+# Connect to running database with a longer timeout now that we know MongoDB is ready
+client = MongoClient(host="mongo:27017", serverSelectionTimeoutMS=30000)
+
 db = client["cache"]
 
 def get_cache(search_dict, source_dbs=None, field="pdb_file"):
