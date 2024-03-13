@@ -1,8 +1,21 @@
+stages:
+  - test
+  - build
+
 test-protein-structure-storage:
   stage: test
   image: python:3
   before_script:
     - cd protein-structure-storage
+    - pip install -r requirements.txt
+  script:
+    - python -m unittest
+
+test-protein-structure-prediction:
+  stage: test
+  image: python:3
+  before_script:
+    - cd protein-structure-prediction
     - pip install -r requirements.txt
   script:
     - python -m unittest
@@ -13,20 +26,24 @@ build-and-deploy-job:
   services:
     - "docker:dind"
   script:
-    - docker build -t $DOCKERHUB_USERNAME/protein-structure-storage:latest protein-structure-storage
-    - docker build -t $DOCKERHUB_USERNAME/protein-cache:latest protein-cache
+    - docker build -t pss protein-structure-storage 
+    - docker build -t pc protein-cache
+    - docker build -t psp protein-structure-prediction
+    - docker image tag pss $DOCKERHUB_USERNAME/protein-structure-storage:latest
+    - docker image tag pc $DOCKERHUB_USERNAME/protein-cache:latest
+    - docker image tag psp $DOCKERHUB_USERNAME/protein-structure-prediction:latest
     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
     - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
     - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
+    - docker image push $DOCKERHUB_USERNAME/protein-structure-prediction:latest
+    - docker image tag pss harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-storage:latest
+    - docker image tag pc harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-cache:latest
+    - docker image tag psp harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-prediction:latest
+    - docker login harbor.peak.scot -u $PEAK_HARBOR_USERNAME -p $PEAK_HARBOR_AUTHCODE
+    - docker image push harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-storage:latest
+    - docker image push harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-cache:latest
+    - docker image push harbor.peak.scot/$PEAK_HARBOR_USERNAME/protein-structure-prediction:latest
   environment: production
-
-# deploy-prod:
-#   stage: deploy
-#   image: docker
-#   services:
-#     - "docker:dind"
-#   script:
-#     - docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_AUTHCODE
-#     - docker image push $DOCKERHUB_USERNAME/protein-structure-storage:latest
-#     - docker image push $DOCKERHUB_USERNAME/protein-cache:latest
-#   environment: production
+  only:
+    refs:
+      - main

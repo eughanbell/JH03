@@ -1,9 +1,8 @@
 from pymongo import MongoClient
-from bson import ObjectId
 import time
+from hashlib import blake2b
 
 def wait_for_mongo(host="mongo:27017", retries=5, delay=5):
-
     # Create a temporary client with a short serverSelectionTimeout
     temp_client = MongoClient(host=host, serverSelectionTimeoutMS=1000)  # Short timeout for initial connection attempts
     for attempt in range(retries):
@@ -23,49 +22,59 @@ wait_for_mongo()
 # Connect to running database with a longer timeout now that we know MongoDB is ready
 client = MongoClient(host="mongo:27017", serverSelectionTimeoutMS=30000)
 
-# Deletes database - for development
-client.drop_database("cache")
-
-# Get an object representing the cache db
 db = client["cache"]
 
-
-def get_cache(uniprot_id, field="pdb_file"):
-    "return pdb file if in cache"
-    "otherwise returns None"
-    e = db.cache.find_one({"uniprot_id": uniprot_id.upper()})
+def get_cache(search_dict, source_dbs=None, field="pdb_file"):
+    """Return field if in cache, otherwise returns None.
+       source_dbs is list of pdb dbs to search (use all by default).
+       If there are multiple matching entries, return the heighest scoring.
+    """
+    if isinstance(source_dbs, list):
+        source_dbs = [x.upper() for x in source_dbs]
+        search_dict["source_db"] = {"$in":source_dbs};
+    e = db.cache.find(search_dict)
     if e is None:
         return None
-    return e.get(field)
-
-
-def get_by_sequence(sequence, field="pdb_file"):
-    e = db.cache.find_one({"sequence": {"$regex": sequence.upper()}})
-    if e is None:
-        return None
-    return e.get(field)
-
-
-def get_by_db_id(obj_id, field="pdb_file"):
+    e = e.sort({"score": -1}).limit(1)
     try:
-        e = db.cache.find_one({"_id": ObjectId(obj_id)})
-        if e is None:
-            return None
-        return e.get(field)
+        return e.next().get(field)
     except Exception:
         return None
 
 
-def store_cache(uniprot_id, pdb_file, sequence, source_db):
-    "stores the given id and file in the cache"
-    if uniprot_id == "" or get_cache(uniprot_id) is None:
-        result = db.cache.insert_one({"uniprot_id": uniprot_id.upper(),
-                                      "pdb_file": pdb_file,
-                                      "sequence": sequence.upper(),
-                                      "source_db": source_db})
+def store_cache(uniprot_id, pdb_file, sequence, source_db, score):
+    """stores the given id and file in the cache.
+
+    If uniprot id is blank, the file will always be added.
+    If the uniprot id is already present, then:
+     - if the source_db is new the file is added
+     - if there is already an entry from that source_db
+       it will be replaced if the pdb_file is different
+    """
+    pdb_hash = blake2b(pdb_file.encode()).hexdigest()
+    uniprot_id = uniprot_id.upper()
+    source_db = source_db.upper()
+    obj_info = {"uniprot_id": uniprot_id,
+                "source_db": source_db,
+                "score": score,
+                "sequence": sequence.upper(),
+                "pdb_file": pdb_file,
+                "hash": pdb_hash,}
+    e = None
+    if uniprot_id != "":
+        e = db.cache.find_one(
+            {"uniprot_id": uniprot_id, "source_db": source_db})
+        if e is not None and e.get("hash") != pdb_hash:
+            print("Updated existing entry")
+            result = db.cache.replace_one(e, obj_info)
+            return str(e.get("_id"))
+    if e is None:
+        print("Inserted into cache")
+        result = db.cache.insert_one(obj_info)
         return str(result.inserted_id)
-    else:
-        print("WARNING: tried to store pdb file into database"
-              + " That already contains an element with the same"
-              + " uniprot id")
-        return ""
+    print("Already in cache")
+    return ""
+
+
+def clear_cache():
+    client.drop_database("cache")
