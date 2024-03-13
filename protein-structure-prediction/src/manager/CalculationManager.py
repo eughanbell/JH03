@@ -89,7 +89,7 @@ class CalculationManager:
                 if elem.status == CalculationState.COMPLETE:
                     # Select files to return
                     download_type_pattern = DownloadTypes.get(download_type, "$.") # If type not found, use pattern that will never match (e.g., return no files)
-                    result_filenames = [filename for filename in os.listdir(elem.result_directory) if re.match(download_type_pattern, filename)]
+                    result_filenames = [filename for filename in os.listdir(elem.output_directory) if re.match(download_type_pattern, filename)]
                     main_logger.info(f"Preparing files for download: {','.join(result_filenames)}.")
 
                     # Return files
@@ -99,13 +99,13 @@ class CalculationManager:
                         main_logger.warning(err)
                         result = json.dumps({"detail":err})
                     elif len(result_filenames) == 1: # One file selected, return as is
-                        with open(f"{elem.result_directory}/{result_filenames[0]}") as f:
+                        with open(f"{elem.output_directory}/{result_filenames[0]}") as f:
                             result = f.read()
                     else: # Multiple files selected, zip and return zipfile
                         result = StringIO.StringIO()
                         with zipfile.ZipFile(result, "w") as zf:
                             for filename in result_filenames:
-                                zf.write(f"{elem.result_directory}/{filename}", filename)
+                                zf.write(f"{elem.output_directory}/{filename}", filename)
                     
                     return result
 
@@ -126,26 +126,43 @@ class CalculationManager:
         self.start_time = None
 
         self.process = None
-        self.stdout = StringIO()
-        self.stderr = StringIO()
+        self.log = open(f"{ALPHAFOLD_PATH}/_{id(self)}.log", "a")
+        
+        self.output_directory = f"{ALPHAFOLD_PATH}/_{id(self)}"
+        os.mkdir(self.output_directory)
     
     def begin_calculation(self):
+        # Check if calculation can be started
         if self.status != CalculationState.WAITING:
             main_logger.error("Cannot start calculation for sequence not in WAITING state.")
             return 1
-        self.start_time = time.time()
 
+        # Create fasta sequence file
+        with open(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta", "w") as f:
+            f.write(f">Temporary sequence file for {id(self)}|\n{self.sequence}")
+
+        # Create command
         command = f"""python3
             {ALPHAFOLD_PATH}/docker/run_docker.py
-            --fasta_paths={ALPHAFOLD_PATH}/_{self.sequence}.fasta
+            --fasta_paths={ALPHAFOLD_PATH}/_{id(self)}.fasta
             --max_template_date=9999-12-31
             --data_dir=/mnt/data/
             --use_gpu=false"
             --output_dir={ALPHAFOLD_PATH}/_tmp
         """
 
-        self.process = subprocess.Popen(f"mamba run -n alphafold --no-capture-output {command}", shell=True, stdout = self.stdout, stderr = self.stderr)
-    
+        # Set calculation start timestamp
+        self.start_time = time.time()
+
+        # Begin execution
+        self.process = subprocess.Popen(f"mamba run -n alphafold --no-capture-output {command}", shell=True, stdout = self.log, stderr = self.log)
+
+    def get_logs(self):
+        logs = ""
+        with open(f"{ALPHAFOLD_PATH}/_{id(self)}.log") as f:
+            logs = f.read()
+        return logs
+
     def __str__(self):
         return json.dumps({
             "sequence": self.sequence,
