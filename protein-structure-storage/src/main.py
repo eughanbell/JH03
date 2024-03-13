@@ -3,8 +3,9 @@ from fastapi.responses import PlainTextResponse, RedirectResponse
 from typing import Annotated
 import logging
 from .database_entries import afdb_entry
-from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id, upload_pdb_file
+from .pss import get_pdb_file, get_pdb_file_by_sequence, get_pdb_file_by_db_id, get_db_id_by_uniprot_id, upload_pdb_file, CACHE_CONTAINER_URL
 from .uniprot import ALPHAFOLD_DB_NAME
+from .helpers import get_from_url
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -58,3 +59,9 @@ async def upload_pdb(file: UploadFile, id: str = "", db: str = "User Upload",
                      sequence: str = "", score: float = 0):
     """Allows user to upload a pdb file into the cache"""
     return upload_pdb_file(file.file.read().decode('utf-8'), db, id, sequence, score)
+
+
+@app.get("/clear_cache/")
+def clear_cache_database():
+    get_from_url(CACHE_CONTAINER_URL + "/clear_cache/")
+    return

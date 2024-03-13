@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query
 from fastapi.responses import PlainTextResponse
 import uvicorn
 from pydantic import BaseModel
-from db import store_cache, get_cache
+from db import store_cache, get_cache, clear_cache
 from typing import Annotated
 from bson import ObjectId
 
@@ -59,6 +59,10 @@ def store_protein_in_cache(protein_file: ProteinFile):
                 protein_file.source_db,
                 protein_file.score)
 
+@app.get("/clear_cache/")
+def clear_cache_database():
+    clear_cache()
+    return
 
 if __name__ == "__main__":
     uvicorn.run(app, host=HOST, port=PORT)

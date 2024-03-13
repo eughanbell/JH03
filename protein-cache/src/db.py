@@ -5,9 +5,6 @@ from hashlib import blake2b
 client = MongoClient(host="mongo:27017", # the internal docker address
                      serverSelectionTimeoutMS=3000)
 
-# deletes database - for development
-#client.drop_database("cache")
-
 # get an object representing the cache db
 # will be implicitly created upon first inserting
 # some data into the db
@@ -63,3 +60,7 @@ def store_cache(uniprot_id, pdb_file, sequence, source_db, score):
         return str(result.inserted_id)
     print("Already in cache")
     return ""
+
+
+def clear_cache():
+    client.drop_database("cache")
