@@ -1,4 +1,5 @@
 from .Calculation import Calculation
+from .CalculationState import CalculationState
 
 from enum import Enum
 from io import StringIO
@@ -85,12 +86,3 @@ class CalculationManager:
             if calculation.is_alive():
                 count += 1
         return count
-
-class CalculationState(Enum):
-    WAITING = 0
-    CALCULATING = 1
-    COMPLETE = 2
-    FAILED = 3
-
-    def __str__(self):
-        return self.name

@@ -1,4 +1,5 @@
-from .CalculationManager import CalculationState, ALPHAFOLD_PATH
+from .CalculationManager import ALPHAFOLD_PATH
+from .CalculationState import CalculationState
 from .DownloadOptions import DownloadOptions
 
 from io import StringIO
