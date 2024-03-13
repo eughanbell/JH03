@@ -5,10 +5,13 @@ from io import StringIO
 import json
 import os
 import re
+import shlex
 import subprocess
 import time
 import threading
 import zipfile
+
+TERMINATION_TIMEOUT = 5 # How long Calculation.stop() should wait before assuming termination has failed and attempts to kill thread.
 
 class Calculation(threading.Thread):
     def __init__(self, sequence: str, logger):
@@ -19,12 +22,15 @@ class Calculation(threading.Thread):
         self.start_time = None
 
         self.process = None
+        self.process_exit_code = None
         self.log = open(f"{ALPHAFOLD_PATH}/_{id(self)}.log", "a")
         
         self.output_directory = f"{ALPHAFOLD_PATH}/_{id(self)}"
         os.mkdir(self.output_directory)
     
     def run(self):
+        self.status = CalculationState.CALCULATING
+
         # Create fasta sequence file
         with open(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta", "w") as f:
             f.write(f">Temporary sequence file for {id(self)}|\n{self.sequence}")
@@ -44,13 +50,34 @@ class Calculation(threading.Thread):
 
         # Begin execution
         self.process = subprocess.Popen(
-            f"mamba run -n alphafold --no-capture-output {command}",
-            shell = True, 
+            shlex.split(f"mamba run -n alphafold --no-capture-output {command}"),
             stdout = self.log,
             stderr = self.log
         )
 
-        return self.process.wait()
+        # Wait for completion
+        self.process_exit_code = self.process.wait()
+
+        # Complete
+        if self.process_exit_code == 0:
+            self.status = CalculationState.COMPLETE
+        else:
+            self.status = CalculationState.FAILED
+    
+    def stop(self):
+        self.status = CalculationState.FAILED
+        # Attempt termination of process (run will end thread once process terminated)
+        self.process.terminate()
+        self.join(TERMINATION_TIMEOUT)
+        if not self.is_alive():
+            return
+        # Termination of process failed, attempt kill (run will end thread once process killed)
+        self.process.kill()
+        self.join(TERMINATION_TIMEOUT)
+        if not self.is_alive():
+            return
+        # Process kill failed, attempt to stop thread directly
+        self._stop_event.set()
 
     def get_logs(self):
         logs = ""
@@ -83,6 +110,16 @@ class Calculation(threading.Thread):
                     zf.write(f"{self.output_directory}/{filename}", filename)
         
         return result
+
+    def cleanup(self):
+        """ Remove all files associated with this file from filesystem. """
+        if self.is_alive():
+            return False # Do not attempt to clean up if thread still running!
+        
+        self.log.close()
+        os.remove(f"{ALPHAFOLD_PATH}/_{id(self)}.log")
+        os.remove(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta")
+        os.rmdir(self.output_directory)
 
     def __str__(self):
         return json.dumps({
