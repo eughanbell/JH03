@@ -5,8 +5,6 @@ from hashlib import blake2b
 client = MongoClient(host="mongo:27017", # the internal docker address
                      serverSelectionTimeoutMS=3000)
 
-# deletes database - for development
-
 # get an object representing the cache db
 # will be implicitly created upon first inserting
 # some data into the db
