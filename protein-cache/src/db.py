@@ -20,7 +20,7 @@ def get_cache(search_dict, source_dbs=None, field="pdb_file"):
     """
     if isinstance(source_dbs, list):
         source_dbs = [x.upper() for x in source_dbs]
-        search_dict["source_dbs"] = {"$in":source_dbs};
+        search_dict["source_db"] = {"$in":source_dbs};
     e = db.cache.find(search_dict)
     if e is None:
         return None

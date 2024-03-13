@@ -51,7 +51,6 @@ def get_pdb_file(uniprot_id, override_cache=False, source_dbs=None):
             logger.info(f"Considered {len(entries)} entries, "
                         + f"choosing best. id: {uniprot_id} - db: "
                         + f"{entries[0].get_entry_data('external_db_name')}")
-            print(entries[0])
             protein_file = entries[0].fetch()
             try:
                 upload_pdb_file(

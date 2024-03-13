@@ -38,7 +38,7 @@ def retrieve_by_db_id(db_id: str):
 @app.get("/retrieve_db_id_by_uniprot_id/{id}")
 def retrieve_db_id_by_uniprot_id(id: str, source_dbs: Annotated[list[str] | None, Query()] = None):
     return json_response(
-        str(get_cache({"uniprot_id": uniprot_id.upper()}, field="_id")), field="db_id")
+        str(get_cache({"uniprot_id": id.upper()}, field="_id", source_dbs=source_dbs)), field="db_id")
 
 
 class ProteinFile(BaseModel):
