@@ -1,4 +1,4 @@
-from Calculation import Calculation
+from .Calculation import Calculation
 
 from enum import Enum
 from io import StringIO

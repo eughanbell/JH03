@@ -1,5 +1,5 @@
-from CalculationManager import CalculationState, ALPHAFOLD_PATH
-from DownloadOptions import DownloadOptions
+from .CalculationManager import CalculationState, ALPHAFOLD_PATH
+from .DownloadOptions import DownloadOptions
 
 from io import StringIO
 import json
