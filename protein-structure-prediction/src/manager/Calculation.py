@@ -28,7 +28,7 @@ class Calculation(threading.Thread):
         self.output_directory = f"{ALPHAFOLD_PATH}/_{id(self)}"
         os.mkdir(self.output_directory)
     
-    def run(self):
+    def run(self, callback):
         self.status = CalculationState.CALCULATING
 
         # Create fasta sequence file
@@ -63,6 +63,8 @@ class Calculation(threading.Thread):
             self.status = CalculationState.COMPLETE
         else:
             self.status = CalculationState.FAILED
+
+        callback()
     
     def stop(self):
         self.status = CalculationState.FAILED

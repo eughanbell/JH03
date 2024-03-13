@@ -29,7 +29,7 @@ class CalculationManager:
                 return json.dumps({"detail":err})
         cls.calculations_list.append( Calculation(sequence=sequence, logger=main_logger) )
 
-        cls.attempt_start_calculation()
+        cls.attempt_start_calculation() # Attempt to start this calculation process (will otherwise wait until available)
     
     @classmethod
     def cancel_calculation(cls, sequence: str):
@@ -40,6 +40,7 @@ class CalculationManager:
                 calculation.cleanup()
                 main_logger.info(f"Removing enqueued protein calculation for protein sequence: '{sequence}'.")
                 cls.calculations_list.pop(idx)
+                cls.attempt_start_calculation() # Now calculation is terminated, attempt to start a new calculation process
                 return
         err = f"Could not cancel protein sequence calculation: sequence not currently in queue. Sequence: '{sequence}'."
         main_logger.warning(err)
@@ -66,7 +67,7 @@ class CalculationManager:
         if cls.concurrent_calculations_count < MAX_CONCURRENT_CALCULATIONS:
             for calculation in cls.calculations_list:
                 if calculation.status == CalculationState.WAITING:
-                    calculation.start()
+                    calculation.start(callback = cls.attempt_start_calculation) # Once the calculation is complete, it should as a callback attempt  to start another calculation, now a space is free
                     return
 
     @classmethod
@@ -75,6 +76,7 @@ class CalculationManager:
         for calculation in cls.calculations_list:
             if calculation.is_alive():
                 count += 1
+        return count
 
 class CalculationState(Enum):
     WAITING = 0
