@@ -1,4 +1,5 @@
 import os, requests,glob,time,random
+from .helper import write_non_empty
 
 def randomScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_uniprot_id"):
 
@@ -11,7 +12,8 @@ def randomScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_uniprot_
                 print(f"Error deleting {file_path}: {e}")
 
                 
-        r_ids = ["p" + ''.join([str(random.randint(0, 9)) for _ in range(5)])*n]
+        r_ids = ["p" + ''.join([str(random.randint(0, 9)) for _ in range(5)]) for _ in range(n)]
+        print(r_ids)
         start=time.time()
 
         if cache==True:
@@ -19,34 +21,22 @@ def randomScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_uniprot_
                 if alphafold==True:
                         for r_id in r_ids:
                             r = requests.get(f"http://0.0.0.0:8000/{endpoint}/{r_id}?db=alphafold")
-                            with open(f"pdb_files/{i}.pdb","wb") as f:
-                                f.write(r.contents)
-                            if os.path.exists(f) and os.path.getsize(f) == 0:
-                                os.remove(f) 
+                            write_non_empty(r_id, r.content)
                 else:
                         for r_id in r_ids:
                             r = requests.get(f"http://0.0.0.0:8000/{endpoint}/{r_id}")
-                            with open(f"pdb_files/{i}.pdb","wb") as f:
-                                f.write(r.contents)
-                            if os.path.exists(f) and os.path.getsize(f) == 0:
-                                os.remove(f) 
+                            write_non_empty(r_id, r.content)
 
         else: 
             if alphafold==True:
                 for r_id in r_ids:
                     r = requests.get(f"http://0.0.0.0:8000/{endpoint}/{r_id}?db=alphafold")
-                    with open(f"pdb_files/{i}.pdb","wb") as f:
-                        f.write(r.contents)
-                    if os.path.exists(f) and os.path.getsize(f) == 0:
-                        os.remove(f) 
+                    write_non_empty(r_id, r.content)
             else:
                 for r_id in r_ids:
                     r = requests.get(f"http://0.0.0.0:8000/{endpoint}/{r_id}")
-                    with open(f"pdb_files/{i}.pdb","wb") as f:
-                        f.write(r.contents)
-                    if os.path.exists(f) and os.path.getsize(f) == 0:
-                        os.remove(f) 
+                    write_non_empty(r_id, r.content)
 
         end=time.time()
 
-        return (start-end)
+        return (end-start)

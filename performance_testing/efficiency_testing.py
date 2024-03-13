@@ -1,9 +1,12 @@
 import subprocess
 from subprocess import call
 import time,sys,glob,json,requests,os
-from .scripts.incrementScript import incrementScript
-from .scripts.randomScript import randomScript
-from .scripts.manualScript import manualScript
+from scripts.incrementScript import incrementScript
+from scripts.randomScript import randomScript
+from scripts.manualScript import manualScript
+
+if not os.path.isdir("pdb_files"):
+   os.makedirs("pdb_files")
 
 
 def mainManualScript(s,f):
@@ -36,7 +39,7 @@ if __name__ == "__main__":
 
     if len(sys.argv)==1:
         print("Please select an endpoint to test!")
-    elif len(sys.argv)==3 and str.string(sys.argv[2]).endswith(".txt"): #check if they pass a text file of uniprot ids
+    elif len(sys.argv)==3 and str(sys.argv[2]).endswith(".txt"): #check if they pass a text file of uniprot ids
         choice=sys.argv[1]
         if choice in manual_calls:
             mainManualScript(manual_calls[choice],sys.argv[2])

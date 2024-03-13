@@ -1,4 +1,5 @@
 import os, requests, glob,time
+from .helper import write_non_empty
 
 def incrementScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_uniprot_id"):
         pdbs_to_delete =glob.glob("pdb_files/*.pdb")
@@ -15,32 +16,20 @@ def incrementScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_unipr
 
                     for i in range(10,n):
                         r = requests.get(f"http://0.0.0.0:8000/{endpoint}/p020{i}?db=alphafold")
-                        with open(f"pdb_files/{i}.pdb","wb") as f:
-                            f.write(r.contents)
-                        if os.path.exists(f) and os.path.getsize(f) == 0:
-                            os.remove(f) 
+                        write_non_empty(i, r.content)
                 else:
                     for i in range(10,n):
                         r = requests.get(f"http://0.0.0.0:8000/{endpoint}/p020{i}")
-                        with open(f"pdb_files/{i}.pdb","wb") as f:
-                            f.write(r.contents)
-                        if os.path.exists(f) and os.path.getsize(f) == 0:
-                            os.remove(f) 
+                        write_non_empty(i, r.content)
         else:
             if alphafold==True: 
 
                 for i in range(10,n):
                     r = requests.get(f"http://0.0.0.0:8000/{endpoint}/p020{i}?db=alphafold")
-                    with open(f"pdb_files/{i}.pdb","wb") as f:
-                        f.write(r.contents)
-                    if os.path.exists(f) and os.path.getsize(f) == 0:
-                        os.remove(f) 
+                    write_non_empty(i, r.content)
             else:
                 for i in range(10,n):
                     r = requests.get(f"http://0.0.0.0:8000/{endpoint}/p020{i}")
-                    with open(f"pdb_files/{i}.pdb","wb") as f:
-                        f.write(r.contents)
-                    if os.path.exists(f) and os.path.getsize(f) == 0:
-                        os.remove(f) 
+                    write_non_empty(i, r.content)
         end=time.time()
-        return (start-end)
+        return (end-start)
