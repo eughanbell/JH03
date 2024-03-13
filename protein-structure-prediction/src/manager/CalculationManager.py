@@ -5,8 +5,11 @@ import logging
 import os
 import re
 import StringIO
+import subprocess
 import time
 import zipfile
+
+ALPHAFOLD_PATH = "/home/ubuntu/alphafold"
 
 main_logger = logging.getLogger(__name__)
 
@@ -121,16 +124,27 @@ class CalculationManager:
         self.status = CalculationState.WAITING
         self.waiting_since = time.time()
         self.start_time = None
-        self.result_directory = None
-        self.logger = logging.getLogger(__name__)
-        self.log_stringbuffer = StringIO()
+
+        self.process = None
+        self.stdout = StringIO()
+        self.stderr = StringIO()
     
     def begin_calculation(self):
         if self.status != CalculationState.WAITING:
             main_logger.error("Cannot start calculation for sequence not in WAITING state.")
             return 1
         self.start_time = time.time()
-        # Actually begin PSP calculations
+
+        command = f"""python3
+            {ALPHAFOLD_PATH}/docker/run_docker.py
+            --fasta_paths={ALPHAFOLD_PATH}/_{self.sequence}.fasta
+            --max_template_date=9999-12-31
+            --data_dir=/mnt/data/
+            --use_gpu=false"
+            --output_dir={ALPHAFOLD_PATH}/_tmp
+        """
+
+        self.process = subprocess.Popen(f"mamba run -n alphafold --no-capture-output {command}", shell=True, stdout = self.stdout, stderr = self.stderr)
     
     def __str__(self):
         return json.dumps({
