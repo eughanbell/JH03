@@ -3,53 +3,11 @@ from io import StringIO
 import json
 import logging
 import os
-import re
-import StringIO
-import subprocess
 import time
-import zipfile
 
 ALPHAFOLD_PATH = "/home/ubuntu/alphafold"
 
 main_logger = logging.getLogger(__name__)
-
-class CalculationState(Enum):
-    WAITING = 0
-    CALCULATING = 1
-    COMPLETE = 2
-    FAILED = 3
-
-    def __str__(self):
-        return self.name
-
-# Explanation of Alphafold outputs
-# https://blog.biostrand.ai/explained-how-to-plot-the-prediction-quality-metrics-with-alphafold2
-
-DownloadTypes = {
-    # Download predicted structure files
-    "ranked_pdb": "^ranked_\d+\.pdb$",
-    "ranked_cif": "^ranked_\d+\.cif$",
-    "unrelaxed_pdb": "^unrelaxed_model_\d+.*\.pdb$",
-    "unrelaxed_cif": "^unrelaxed_model_\d+.*\.cif$",
-    
-    # Download single file with ordering and confidence of rankings
-    "ranking_debug": "^ranking_debug\.json",
-
-    # Download confidence model files
-    "confidence_model": "^confidence_model_\d+.*\.json$",
-    
-    # Download structure model pkl files
-    "model_pkl": "^result_model_\d+.*\.pkl$",
-
-    # Download misc metadata single files
-    "features": "^features\.pkl$",
-    "msas": "^msas$",
-    "timings": "^timings.json$",
-    "relax_metrics": "^relax_metrics.json$",
-
-    # Download all files
-    "all_data": "^$",
-}
 
 class CalculationManager:
 
@@ -83,31 +41,11 @@ class CalculationManager:
         return json.dumps({"detail":err})
     
     @classmethod
-    def download_calculation_result(cls, search_sequence: str, download_type: str):
+    def download_calculation_result(cls, search_sequence: str, download_options: str):
         for elem in cls.calculations_list:
             if elem.sequence == search_sequence:
                 if elem.status == CalculationState.COMPLETE:
-                    # Select files to return
-                    download_type_pattern = DownloadTypes.get(download_type, "$.") # If type not found, use pattern that will never match (e.g., return no files)
-                    result_filenames = [filename for filename in os.listdir(elem.output_directory) if re.match(download_type_pattern, filename)]
-                    main_logger.info(f"Preparing files for download: {','.join(result_filenames)}.")
-
-                    # Return files
-                    result = ""
-                    if len(result_filenames) == 0: # No files selected, return error
-                        err = f"No files match specified type '{download_type}'. Valid download requests are: '{','.join(DownloadTypes.keys())}'"
-                        main_logger.warning(err)
-                        result = json.dumps({"detail":err})
-                    elif len(result_filenames) == 1: # One file selected, return as is
-                        with open(f"{elem.output_directory}/{result_filenames[0]}") as f:
-                            result = f.read()
-                    else: # Multiple files selected, zip and return zipfile
-                        result = StringIO.StringIO()
-                        with zipfile.ZipFile(result, "w") as zf:
-                            for filename in result_filenames:
-                                zf.write(f"{elem.output_directory}/{filename}", filename)
-                    
-                    return result
+                    return elem.getResults(download_options)
 
                 if elem.status == CalculationState.FAILED:
                     return elem.logs
@@ -119,54 +57,11 @@ class CalculationManager:
         main_logger.warning(err)
         return json.dumps({"detail":err})
 
-    def __init__(self, sequence: str):
-        self.sequence = sequence
-        self.status = CalculationState.WAITING
-        self.waiting_since = time.time()
-        self.start_time = None
-
-        self.process = None
-        self.log = open(f"{ALPHAFOLD_PATH}/_{id(self)}.log", "a")
-        
-        self.output_directory = f"{ALPHAFOLD_PATH}/_{id(self)}"
-        os.mkdir(self.output_directory)
-    
-    def begin_calculation(self):
-        # Check if calculation can be started
-        if self.status != CalculationState.WAITING:
-            main_logger.error("Cannot start calculation for sequence not in WAITING state.")
-            return 1
-
-        # Create fasta sequence file
-        with open(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta", "w") as f:
-            f.write(f">Temporary sequence file for {id(self)}|\n{self.sequence}")
-
-        # Create command
-        command = f"""python3
-            {ALPHAFOLD_PATH}/docker/run_docker.py
-            --fasta_paths={ALPHAFOLD_PATH}/_{id(self)}.fasta
-            --max_template_date=9999-12-31
-            --data_dir=/mnt/data/
-            --use_gpu=false"
-            --output_dir={ALPHAFOLD_PATH}/_tmp
-        """
-
-        # Set calculation start timestamp
-        self.start_time = time.time()
-
-        # Begin execution
-        self.process = subprocess.Popen(f"mamba run -n alphafold --no-capture-output {command}", shell=True, stdout = self.log, stderr = self.log)
-
-    def get_logs(self):
-        logs = ""
-        with open(f"{ALPHAFOLD_PATH}/_{id(self)}.log") as f:
-            logs = f.read()
-        return logs
+class CalculationState(Enum):
+    WAITING = 0
+    CALCULATING = 1
+    COMPLETE = 2
+    FAILED = 3
 
     def __str__(self):
-        return json.dumps({
-            "sequence": self.sequence,
-            "calculation_state": str(self.status),
-            "waiting_since_timestamp": self.waiting_since,
-            "calculation_start_timestamp": self.start_time,
-        })
+        return self.name
