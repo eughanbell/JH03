@@ -97,7 +97,7 @@ class Calculation(threading.Thread):
         # Return files
         result = ""
         if len(result_filenames) == 0: # No files selected, return error
-            err = f"No files match specified type '{download_type}'. Valid download requests are: '{','.join(DownloadTypes.keys())}'"
+            err = f"No files match specified type '{download_type}'. Valid download requests are: '{','.join(DownloadOptions.keys())}'"
             self.logger.warning(err)
             result = json.dumps({"detail":err})
         elif len(result_filenames) == 1: # One file selected, return as is
@@ -105,9 +105,10 @@ class Calculation(threading.Thread):
                 result = f.read()
         else: # Multiple files selected, zip and return zipfile
             result = StringIO.StringIO()
-            with zipfile.ZipFile(result, "w") as zf:
+            with zipfile.ZipFile(result, "w") as zip_file: # Open result buffer
                 for filename in result_filenames:
-                    zf.write(f"{self.output_directory}/{filename}", filename)
+                    zip_file.write(f"{self.output_directory}/{filename}", filename)
+            result = result.getvalue()
         
         return result
 
