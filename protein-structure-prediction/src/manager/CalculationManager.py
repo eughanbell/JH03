@@ -8,6 +8,7 @@ import os
 import time
 
 ALPHAFOLD_PATH = "/home/ubuntu/alphafold"
+MAX_CONCURRENT_CALCULATIONS = 1
 
 main_logger = logging.getLogger(__name__)
 
@@ -27,14 +28,16 @@ class CalculationManager:
                 main_logger.warning(err)
                 return json.dumps({"detail":err})
         cls.calculations_list.append( Calculation(sequence=sequence, logger=main_logger) )
+
+        cls.attempt_start_calculation()
     
     @classmethod
     def cancel_calculation(cls, sequence: str):
         for idx, calculation in enumerate(cls.calculations_list):
             if calculation.sequence == sequence:
                 if calculation.status == CalculationState.CALCULATING:
-                    main_logger.warning("CODE FOR KILLING ONGOING CALCULATION NONEXISTENT!")
-                    return json.dumps({"detail":"Could not cancel protein sequence calculation: code for killing ongoing calculation nonexistent."})
+                    calculation.stop()
+                calculation.cleanup()
                 main_logger.info(f"Removing enqueued protein calculation for protein sequence: '{sequence}'.")
                 cls.calculations_list.pop(idx)
                 return
@@ -44,20 +47,34 @@ class CalculationManager:
     
     @classmethod
     def download_calculation_result(cls, search_sequence: str, download_options: str):
-        for elem in cls.calculations_list:
-            if elem.sequence == search_sequence:
-                if elem.status == CalculationState.COMPLETE:
-                    return elem.getResults(download_options)
-
-                if elem.status == CalculationState.FAILED:
-                    return elem.logs
+        for calculation in cls.calculations_list:
+            if calculation.sequence == search_sequence:
+                if calculation.status == CalculationState.COMPLETE:
+                    return calculation.getResults(download_options)
+                if calculation.status == CalculationState.FAILED:
+                    return calculation.log
                 else:
-                    err = f"Cannot download result: calculation is still in the {elem.status} state."
+                    err = f"Cannot download result: calculation is still in the {calculation.status} state."
                     main_logger.warning(err)
                     return json.dumps({"detail":err})
         err = f"Cannot download result: not currently processing protein sequence'{search_sequence}'."
         main_logger.warning(err)
         return json.dumps({"detail":err})
+    
+    @classmethod
+    def attempt_start_calculation(cls):
+        if cls.concurrent_calculations_count < MAX_CONCURRENT_CALCULATIONS:
+            for calculation in cls.calculations_list:
+                if calculation.status == CalculationState.WAITING:
+                    calculation.start()
+                    return
+
+    @classmethod
+    def concurrent_calculations_count(cls):
+        count = 0
+        for calculation in cls.calculations_list:
+            if calculation.is_alive():
+                count += 1
 
 class CalculationState(Enum):
     WAITING = 0
