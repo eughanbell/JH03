@@ -66,7 +66,8 @@ class CalculationManager:
             for calculation in cls.calculations_list:
                 if calculation.status == CalculationState.WAITING:
                     main_logger.info(f"Starting calculation for protein sequence: '{calculation.sequence}'.")
-                    calculation.start(callback = cls.attempt_start_calculation) # Once the calculation is complete, it should as a callback attempt  to start another calculation, now a space is free
+                    calculation.set_on_complete_callback(cls.attempt_start_calculation)
+                    calculation.start() # Once the calculation is complete, it should as a callback attempt  to start another calculation, now a space is free
                     return
             main_logger.info("Cannot start new calculation at this time: no waiting calculations to start.")
         else:

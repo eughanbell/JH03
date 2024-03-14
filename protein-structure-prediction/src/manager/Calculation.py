@@ -20,6 +20,7 @@ class Calculation(threading.Thread):
         self.status = CalculationState.WAITING
         self.waiting_since = time.time()
         self.start_time = None
+        self.on_complete_callback = lambda:None # Function to call when calculation complete
 
         self.process = None
         self.process_exit_code = None
@@ -27,8 +28,10 @@ class Calculation(threading.Thread):
         
         self.output_directory = f"{ALPHAFOLD_PATH}/_{id(self)}"
         os.mkdir(self.output_directory)
+
+        super().__init__()
     
-    def run(self, callback):
+    def run(self):
         self.status = CalculationState.CALCULATING
 
         # Create fasta sequence file
@@ -65,7 +68,7 @@ class Calculation(threading.Thread):
         else:
             self.status = CalculationState.FAILED
 
-        callback()
+        self.on_complete_callback()
     
     def stop(self):
         self.status = CalculationState.FAILED
@@ -124,6 +127,9 @@ class Calculation(threading.Thread):
         os.remove(f"{ALPHAFOLD_PATH}/_{id(self)}.log")
         os.remove(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta")
         os.rmdir(self.output_directory)
+    
+    def set_on_complete_callback(self, callback_fn):
+        self.on_complete_callback = callback_fn
 
     def __str__(self):
         return json.dumps({
