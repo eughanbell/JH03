@@ -7,26 +7,26 @@ MAX_CONCURRENT_CALCULATIONS = 1
 
 DownloadOptions = {
     # Download predicted structure files
-    "ranked_pdb": "^ranked_\d+\.pdb$",
-    "ranked_cif": "^ranked_\d+\.cif$",
-    "unrelaxed_pdb": "^unrelaxed_model_\d+.*\.pdb$",
-    "unrelaxed_cif": "^unrelaxed_model_\d+.*\.cif$",
+    "ranked_pdb": r"^ranked_\d+\.pdb$",
+    "ranked_cif": r"^ranked_\d+\.cif$",
+    "unrelaxed_pdb": r"^unrelaxed_model_\d+.*\.pdb$",
+    "unrelaxed_cif": r"^unrelaxed_model_\d+.*\.cif$",
     
     # Download single file with ordering and confidence of rankings
-    "ranking_debug": "^ranking_debug\.json",
+    "ranking_debug": r"^ranking_debug\.json",
 
     # Download confidence model files
-    "confidence_model": "^confidence_model_\d+.*\.json$",
+    "confidence_model": r"^confidence_model_\d+.*\.json$",
     
     # Download structure model pkl files
-    "model_pkl": "^result_model_\d+.*\.pkl$",
+    "model_pkl": r"^result_model_\d+.*\.pkl$",
 
     # Download misc metadata single files
-    "features": "^features\.pkl$",
-    "msas": "^msas$",
-    "timings": "^timings.json$",
-    "relax_metrics": "^relax_metrics.json$",
+    "features": r"^features\.pkl$",
+    "msas": r"^msas$",
+    "timings": r"^timings.json$",
+    "relax_metrics": r"^relax_metrics.json$",
 
     # Download all files
-    "all_data": "^$",
+    "all_data": r"^$",
 }
