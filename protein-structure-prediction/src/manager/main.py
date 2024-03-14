@@ -21,7 +21,6 @@ def handle_404(_, __):
 def list_calculations():
     """ Returns a list of all sequences which have been or are being processed,
      elapsed processing time and completion status.  """
-    print("There are no ongoing calculations, returning empty list.")
     return CalculationManager.list_calculations()
 
 @app.get("/calculate_protein_structure_from_sequence/{sequence}", response_class=PlainTextResponse)
