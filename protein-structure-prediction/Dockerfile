@@ -11,7 +11,9 @@ RUN pip install typing-extensions --upgrade
 
 
 EXPOSE 7000
-VOLUME /home/ubuntu/alphafold
-VOLUME /mnt/data/
+
+VOLUME /mnt/alphafold
+VOLUME /mnt/data
+VOLUME /calculations-cache
 
 ENTRYPOINT [ "python", "-m", "protein-structure-prediction"]

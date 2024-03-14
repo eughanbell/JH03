@@ -1,6 +1,7 @@
 
-ALPHAFOLD_PATH = "/home/ubuntu/alphafold"
-DATA_DIR = "/mnt/data/"
+ALPHAFOLD_PATH = "/mnt/alphafold"
+ALPHAFOLD_DATA_DIR = "/mnt/data"
+CALCULATIONS_CACHE = "/calculations-cache"
 MAX_CONCURRENT_CALCULATIONS = 1
 
 # Explanation of Alphafold outputs

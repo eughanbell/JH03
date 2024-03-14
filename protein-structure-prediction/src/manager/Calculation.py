@@ -1,5 +1,5 @@
 from .CalculationState import CalculationState
-from .settings import DownloadOptions, ALPHAFOLD_PATH, DATA_DIR
+from .settings import DownloadOptions, ALPHAFOLD_PATH, ALPHAFOLD_DATA_DIR, CALCULATIONS_CACHE
 
 from io import StringIO
 import json
@@ -24,29 +24,30 @@ class Calculation(threading.Thread):
 
         self.process = None
         self.process_exit_code = None
-        self.log = open(f"{ALPHAFOLD_PATH}/_{id(self)}.log", "a")
+        self.log = open(f"{CALCULATIONS_CACHE}/{id(self)}.log", "a")
         
-        self.output_directory = f"{ALPHAFOLD_PATH}/_{id(self)}"
+        self.output_directory = f"{CALCULATIONS_CACHE}/{id(self)}"
         os.mkdir(self.output_directory)
 
         super().__init__()
+
+        self.logger.info("Created calculation, instantiated")
     
     def run(self):
         self.status = CalculationState.CALCULATING
 
         # Create fasta sequence file
-        with open(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta", "w") as f:
+        with open(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta", "w") as f:
             f.write(f">Temporary sequence file for {id(self)}|\n{self.sequence}")
 
         # Create command
         command = f"""python3
             {ALPHAFOLD_PATH}/docker/run_docker.py
-            -v {ALPHAFOLD_PATH}:{ALPHAFOLD_PATH}
-            --fasta_paths={ALPHAFOLD_PATH}/_{id(self)}.fasta
+            --fasta_paths={CALCULATIONS_CACHE}/_{id(self)}.fasta
             --max_template_date=9999-12-31
-            --data_dir={DATA_DIR}
+            --data_dir={ALPHAFOLD_DATA_DIR}
             --use_gpu=false
-            --output_dir={ALPHAFOLD_PATH}/_tmp
+            --output_dir={CALCULATIONS_CACHE}/_tmp
         """
 
         # Set calculation start timestamp
@@ -90,8 +91,8 @@ class Calculation(threading.Thread):
 
     def get_logs(self):
         logs = ""
-        with open(f"{ALPHAFOLD_PATH}/_{id(self)}.log") as f:
-            logs = f.read()
+        with open(f"{CALCULATIONS_CACHE}/{id(self)}.log") as f:
+            logs += f.read()
         return logs
     
     def get_results(self, download_type):
@@ -127,8 +128,8 @@ class Calculation(threading.Thread):
             return False # Do not attempt to clean up if thread still running!
         
         self.log.close()
-        os.remove(f"{ALPHAFOLD_PATH}/_{id(self)}.log")
-        os.remove(f"{ALPHAFOLD_PATH}/_{id(self)}.fasta")
+        os.remove(f"{CALCULATIONS_CACHE}/{id(self)}.log")
+        os.remove(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta")
         os.rmdir(self.output_directory)
     
     def set_on_complete_callback(self, callback_fn):

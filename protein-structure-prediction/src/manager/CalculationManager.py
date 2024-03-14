@@ -6,11 +6,11 @@ import json
 import logging
 import sys
 
+log_handler = logging.StreamHandler(sys.stdout)
+log_handler.setLevel(logging.DEBUG)
 main_logger = logging.getLogger(__name__)
 main_logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.DEBUG)
-main_logger.addHandler(handler)
+main_logger.addHandler(log_handler)
 
 class CalculationManager:
 
