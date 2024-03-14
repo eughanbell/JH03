@@ -1,5 +1,5 @@
 from .CalculationState import CalculationState
-from .settings import DownloadOptions, ALPHAFOLD_PATH
+from .settings import DownloadOptions, ALPHAFOLD_PATH, DATA_DIR
 
 from io import StringIO
 import json
@@ -44,7 +44,7 @@ class Calculation(threading.Thread):
             -v {ALPHAFOLD_PATH}:{ALPHAFOLD_PATH}
             --fasta_paths={ALPHAFOLD_PATH}/_{id(self)}.fasta
             --max_template_date=9999-12-31
-            --data_dir=/mnt/data/
+            --data_dir={DATA_DIR}
             --use_gpu=false
             --output_dir={ALPHAFOLD_PATH}/_tmp
         """
@@ -53,10 +53,9 @@ class Calculation(threading.Thread):
         self.start_time = time.time()
 
         # Begin execution
-        command_parts = shlex.split(f"mamba run -n alphafold --no-capture-output {command}")
-        self.logger.info(f"Beginnning protein prediction calculation: executing: '{command_parts}'")
+        self.logger.info(f"Beginnning protein prediction calculation: executing: '{command}'")
         self.process = subprocess.Popen(
-            command_parts,
+            command,
             stdout = self.log,
             stderr = self.log
         )
