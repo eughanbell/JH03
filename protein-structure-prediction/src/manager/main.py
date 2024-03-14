@@ -33,6 +33,11 @@ def cancel_calculation(sequence: str):
     """ Cancel calculation for a protein sequence currently in the queue. """
     return CalculationManager.cancel_calculation(sequence)
 
+@app.get("/get_calculation_logs/{sequence}", response_class=PlainTextResponse)
+def get_calculation_logs(sequence: str):
+    """ Get calculation logs for a calculation currently in the queue. """
+    return CalculationManager.get_calculation_logs(sequence)
+
 @app.get("/download_structure/{sequence}", response_class=PlainTextResponse)
 def download_structure(sequence: str, download: str = "all_data"):
     """ Download the structure of a sequence whose structure has been

@@ -48,6 +48,15 @@ class CalculationManager:
         err = f"Could not cancel protein sequence calculation: sequence not currently in queue. Sequence: '{sequence}'."
         main_logger.warning(err)
         return json.dumps({"detail":err})
+
+    @classmethod
+    def get_calculation_logs(cls, sequence: str):
+        for idx, calculation in enumerate(cls.calculations_list):
+            if calculation.sequence == sequence:
+                return calculation.get_logs()
+        err = f"Cannot return logs: no calculation exists for sequence '{sequence}'."
+        main_logger.warning(err)
+        return json.dumps({"detail":err})
     
     @classmethod
     def download_calculation_result(cls, search_sequence: str, download_options: str):
