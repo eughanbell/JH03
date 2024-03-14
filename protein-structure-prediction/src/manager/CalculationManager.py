@@ -1,5 +1,6 @@
 from .Calculation import Calculation
 from .CalculationState import CalculationState
+from .settings import MAX_CONCURRENT_CALCULATIONS
 
 from enum import Enum
 from io import StringIO
@@ -7,9 +8,6 @@ import json
 import logging
 import os
 import time
-
-ALPHAFOLD_PATH = "/home/ubuntu/alphafold"
-MAX_CONCURRENT_CALCULATIONS = 1
 
 main_logger = logging.getLogger(__name__)
 

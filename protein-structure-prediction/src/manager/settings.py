@@ -1,3 +1,7 @@
+
+ALPHAFOLD_PATH = "/home/ubuntu/alphafold"
+MAX_CONCURRENT_CALCULATIONS = 1
+
 # Explanation of Alphafold outputs
 # https://blog.biostrand.ai/explained-how-to-plot-the-prediction-quality-metrics-with-alphafold2
 
@@ -26,4 +30,3 @@ DownloadOptions = {
     # Download all files
     "all_data": "^$",
 }
-
