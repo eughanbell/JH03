@@ -45,7 +45,7 @@ class Calculation(threading.Thread):
             --fasta_paths={ALPHAFOLD_PATH}/_{id(self)}.fasta
             --max_template_date=9999-12-31
             --data_dir=/mnt/data/
-            --use_gpu=false"
+            --use_gpu=false
             --output_dir={ALPHAFOLD_PATH}/_tmp
         """
 
