@@ -53,9 +53,10 @@ class Calculation(threading.Thread):
         self.start_time = time.time()
 
         # Begin execution
-        self.logger.info(f"Beginnning protein prediction calculation: executing: '{command}'")
+        command_parts = shlex.split(command)
+        self.logger.info(f"Beginnning protein prediction calculation: executing: '{command_parts}'")
         self.process = subprocess.Popen(
-            command,
+            command_parts,
             stdout = self.log,
             stderr = self.log
         )
