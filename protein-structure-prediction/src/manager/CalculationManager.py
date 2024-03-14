@@ -61,7 +61,7 @@ class CalculationManager:
     
     @classmethod
     def attempt_start_calculation(cls):
-        if cls.concurrent_calculations_count < MAX_CONCURRENT_CALCULATIONS:
+        if cls.concurrent_calculations_count() < MAX_CONCURRENT_CALCULATIONS:
             main_logger.info("Attempting to start new calculation.")
             for calculation in cls.calculations_list:
                 if calculation.status == CalculationState.WAITING:
