@@ -1,3 +1,5 @@
+from enum import Enum
+
 class CalculationState(Enum):
     WAITING = 0
     CALCULATING = 1
