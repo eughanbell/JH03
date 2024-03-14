@@ -53,11 +53,14 @@ class Calculation(threading.Thread):
         self.start_time = time.time()
 
         # Begin execution
+        command_parts = shlex.split(f"mamba run -n alphafold --no-capture-output {command}")
+        self.logger.info(f"Beginnning protein prediction calculation: executing: '{command_parts}'")
         self.process = subprocess.Popen(
-            shlex.split(f"mamba run -n alphafold --no-capture-output {command}"),
+            command_parts,
             stdout = self.log,
             stderr = self.log
         )
+        self.logger.info(f"Process started.")
 
         # Wait for completion
         self.process_exit_code = self.process.wait()
