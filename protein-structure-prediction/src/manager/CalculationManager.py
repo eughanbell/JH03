@@ -7,6 +7,7 @@ import logging
 import sys
 
 main_logger = logging.getLogger(__name__)
+main_logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.DEBUG)
 main_logger.addHandler(handler)
@@ -17,6 +18,7 @@ class CalculationManager:
 
     @classmethod
     def list_calculations(cls):
+        main_logger.info("Serving calculations list.")
         return f"[{','.join([str(elem) for elem in cls.calculations_list])}]"
 
     @classmethod
@@ -54,7 +56,7 @@ class CalculationManager:
                 if calculation.status == CalculationState.COMPLETE:
                     return calculation.getResults(download_options)
                 if calculation.status == CalculationState.FAILED:
-                    return calculation.log
+                    return calculation.get_logs()
                 else:
                     err = f"Cannot download result: calculation is still in the {calculation.status} state."
                     main_logger.warning(err)
