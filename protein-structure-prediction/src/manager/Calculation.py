@@ -38,6 +38,7 @@ class Calculation(threading.Thread):
         # Create command
         command = f"""python3
             {ALPHAFOLD_PATH}/docker/run_docker.py
+            -v {ALPHAFOLD_PATH}:{ALPHAFOLD_PATH}
             --fasta_paths={ALPHAFOLD_PATH}/_{id(self)}.fasta
             --max_template_date=9999-12-31
             --data_dir=/mnt/data/
