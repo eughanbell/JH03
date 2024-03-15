@@ -1,3 +1,4 @@
+from fastapi.responses import StreamingResponse
 from .CalculationState import CalculationState
 from settings import DownloadOptions, ALPHAFOLD_PATH, ALPHAFOLD_DATA_DIR, CALCULATIONS_CACHE
 
@@ -125,7 +126,7 @@ class Calculation(threading.Thread):
                     zip_file.write(f"{self.output_directory}/{filename}", filename)
             result = result.getvalue()
         
-        return result
+        return StreamingResponse(result, media_type="application/zip")
 
     def cleanup(self):
         """ Remove all files associated with this file from filesystem. """
