@@ -111,7 +111,7 @@ class Calculation(threading.Thread):
         # Return files
         result = ""
         if len(result_filenames) == 0: # No files selected, return error
-            err = f"No files match specified type '{download_type}'. Files available are: '{",".join(os.listdir(self.output_directory))}'"
+            err = f"No files match specified type '{download_type}'. Files available are: {','.join(os.listdir(self.output_directory))}"
             self.logger.warning(err)
             result = json.dumps({"detail":err})
         elif len(result_filenames) == 1: # One file selected, return as is
