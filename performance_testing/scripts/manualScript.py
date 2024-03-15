@@ -9,9 +9,11 @@ def manualScript(file,endpoint="retrieve_by_uniprot_id",cache=False,alphafold=Fa
                 os.remove(file_path)
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
-
+        
         with open(file, "r") as f:
             ids = [line.strip() for line in f]
+            
+        print("Requesting protein files")
         start=time.time()
 
         if cache==True:

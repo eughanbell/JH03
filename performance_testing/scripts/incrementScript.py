@@ -9,6 +9,7 @@ def incrementScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_unipr
                 os.remove(file_path)
             except Exception as e:
                 print(f"Error deleting {file_path}: {e}")
+        print("Requesting protein files")
         start=time.time()
         if cache==True:
             for j in range(2):

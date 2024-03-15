@@ -14,6 +14,8 @@ def randomScript(cache=False,alphafold=False,n=99,endpoint="retrieve_by_uniprot_
                 
         r_ids = ["p" + ''.join([str(random.randint(0, 9)) for _ in range(5)]) for _ in range(n)]
         print(r_ids)
+
+        print("Requesting protein files")
         start=time.time()
 
         if cache==True:
