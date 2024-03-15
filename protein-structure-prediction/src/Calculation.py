@@ -74,7 +74,6 @@ class Calculation(threading.Thread):
             self.status = CalculationState.FAILED
 
         self.on_complete_callback()
-        self._stop_event.set() # Terminate thread
     
     def stop(self):
         """ Stop the ongoing process and terminate thread. """
