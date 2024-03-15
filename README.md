@@ -29,10 +29,9 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 * see `example_scripts/` for more usage examples.
 
 # Protein Structure Prediction
+_This container is a prototype, and is likely unstable. Use with caution._
 
 This service can be used to, given a raw protein sequence, use Google Deepmind's Alphafold algorithm to predict new strucutes. Multiple calculations can be enqueued concurrently, and their results downloaded upon completion.
-
-This container is a prototype, use with caution.
 
 ## Setup
 In `protein-structure-prediction/settings.py`, the following parameters can be specified:
