@@ -244,8 +244,8 @@ Now we can put a file called `embl_weights.yaml` in a `config/` folder that is b
 
 ```yaml
 types:
-	mRNA: 0.8
-	default: 0
+  mRNA: 0.8
+  default: 0
 ```
 
 It will override the dictionary with these values, allowing the user to customise the scoring function without building the containers.

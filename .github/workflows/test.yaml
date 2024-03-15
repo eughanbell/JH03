@@ -1,0 +1,38 @@
+name: test
+on: [push]
+jobs:
+  test-pss:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Dependancies
+        run: |
+          cd protein-structure-storage
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test
+        run: |
+          cd protein-structure-storage
+          python -m unittest
+        
+  test-psp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install Dependancies
+        run: |
+          cd protein-structure-prediction
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test
+        run: |
+          cd protein-structure-prediction
+          python -m unittest

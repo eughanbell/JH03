@@ -1,32 +1,52 @@
 # Protein Database Requests And Cache 
 
-## Quickstart with single docker compose file
+Fetch protein structure files in the pdb format using a uniprot id.
+Any requested proteins will be cached for quicker retrieval if requested again.
 
-copy the compose file from `compose_only/compose.yaml` into your files and run 
-```docker compose up```
-which should automatically start the webapp.
+# Quickstart
 
-You can now access the webapp and check the docs by going to
-`0.0.0.0:8000/docs`. If this doesn't work, try `127.0.0.1:8000/docs`
+You will need docker compose.
 
-## Usage
+Save the file `compose_only/compose.yaml` into your files as `compose.yaml` and run 
+```docker compose up``` in the same folder.
 
-Protein files can be requested using uniprot ids. Any requested proteins
-will be cached locally.
+You can now use the project. Check the docs by going to
+`127.0.0.1:8000/docs`.
 
-### Example Usage
+# Example Usage
+
+## Protein Structure Storage
 
 * Get by uniprot ID
 ```
-curl 'http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070'
+curl "http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070"
+
+# or get from a specific database
+
+curl "http://0.0.0.0:8000/retrieve_by_uniprot_id/p02070?db=pdb"
 ```
 
-* Upload file and get database key as response
+* Upload file and get database key as response (the @ before the file is important)
 ```
-curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
+curl -w "\n" -X POST -F file=@path/to/my/file.pdb "0.0.0.0:8000/upload_pdb/"
+
+# Can customise the uploaded protein properties
+
+curl -w "\n" -X POST -F file=@path/to/my/file.pdb "0.0.0.0:8000/upload_pdb/?db=mydb&score=0.4"
 ```
 
-* see `example_scripts/` for more usage examples.
+* see `example_scripts/` or the fastapi docs at `0.0.0.0:8000/docs` for more info/examples.
+
+#### Changing Scoring Weights
+
+Protein structures are selected based on their properties.
+
+The weights used to score proteins can be changed by the user without rebuilding containers.
+See the `config` folder README for details. 
+
+In brief, adding a folder called `config` next to the `compose.yaml`file , 
+one can put text files into this folder and they will change the weights 
+when the containers are run with docker compose.
 
 # Protein Structure Prediction
 _This container is a prototype, and is likely unstable. Use with caution._
@@ -86,9 +106,22 @@ curl 'http://0.0.0.0:7000/download/{protein-sequence}&download={args}'
 ```
 `args` can take several different values, specified in `settings.py` including `all_data` and `ranked_pdb` to get just the best `.pdb` files.
 
-### Accessing MongoDB express web service
-To inspect the cache database manually, if the containers are running, go to
-`0.0.0.0:8082` or `127.0.0.1:8082`.
+
+# Performance Testing / Cache Warming
+
+See the `performance_testing` folder README on instruction for testing api performance and warming the cache.
+
+In brief, with the project running, navigate to the `performace_testing` folder and run
+```
+python performance_testing.py uniprot my_list_of_uniprot_ids.txt
+```
+This warms the cache with a text file containing a uniprot id on each line.
+
+
+# Inspecting/Clearing the Cache
+
+With the project running, go to `127.0.0.1:8082` 
+in your browser.
 You will need to login, the credentials are 
 ```
 username: admin
@@ -97,71 +130,29 @@ password: pass
 
 The cache database will only be present if at least one pdb file has been requested.
 
-## Building Docker Containers Locally
 
-### With Docker Compose
+The cache will be persistent between container restarts. It can be cleared using the api with
+the `/clear_cache/` pss endpoint.
 
-If you have `docker` and `docker compose` installed you can do
+
+# Building Locally
+
+If you have `git`, `docker` and `docker compose` installed you can do
 ```
 git clone https://github.com/eughanbell/JH03.git
 cd JH03
-docker compose up
+docker compose up --build
 ```
 
-When you edit the code, you will need to run the following first to see your changes reflected
-```
-docker compose build
-```
+# Testing
 
-### Without Docker Compose
-
-#### Protein Structure Storage
-
-make sure you are in this project's root folder
-
-* build the docker image
-```
-docker build -t pss protein-structure-storage
-```
-* run the docker image
-```
-docker run --publish 8000:5000 pss
+There are tests for `pss` and `psp`. To run, navigate to the `protein-structure-storage` or 
+`protein-structure-prediction` folders. Make sure you have the necessary python libraries installed (by running `pip install -r requirements.txt`), then run the following.
+```python
+python -m unittest
 ```
 
-#### Protein Cache
-	
-build in similar way to pss, but make sure pss is still running.
-```
-docker build -t pc protein-cache
-```
-to run, we will map to 7000 instead of 8000 to not conflict with pss.
-```
-docker run --publish 7000:6000 pc
-```
 
-## Testing
-`protein-structure-storage` unittests can be run by executing `python -m unittest` in the `protein-structure-storage/` folder.
+# Running on Kubernetes
 
-## Running on Kubernetes
-
-Using [minikube](https://minikube.sigs.k8s.io/docs/start/), you can simulate a kubernetes cluster locally by doing
-```minikube start```
-
-You can then add workloads and services for the cluster by using [kubectl](https://kubernetes.io/docs/tasks/tools/). Run the script at `compose_only/k8s/kubectl-apply.sh`, to start them.
-You may have to wait a while for the mongo database to start.
-
-Get the url for the protein structure storage service by using 
-```minikube service pss --url```
-
-To clear the cluster you can use the script at `compose_only/k8s/kubectl-delete.sh`.
-
-## Pushing Built Containers to Docker Hub
-
-This is done automaically by a gitlab pipeline.
-
-```
-docker build -t noamzeise/protein-structure-storage:latest protein-structure-storage
-docker image push noamzeise/protein-structure-storage:latest
-docker build -t noamzeise/protein-cache:latest protein-cache
-docker image push noamzeise/protein-cache:latest
-```
+See the `kubernetes` folder README for info on running on kubernetes
