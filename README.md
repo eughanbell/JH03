@@ -60,6 +60,8 @@ In `protein-structure-prediction/settings.py`, the following parameters can be s
 
 The port used is specified in `compose.yaml` and in `protein-structure-prediction/Dockerfile`.
 
+Google Deepmind's Alphafold must be downloaded and built from [https://github.com/google-deepmind/alphafold](https://github.com/google-deepmind/alphafold) using the instructions provided there.
+
 The following host machine mappings must be set in `compose.yaml`:
 - `/path/to/alphafold/container/directory : /mnt/alphafold` - the path to the Alphafold container directory on the host machine, from where `{dir}/docker/run_docker.py` is called.
 - `/path/to/alphafold/data/directory : /mnt/data` - the path to the required Alphafold databases on the host machine.
