@@ -23,7 +23,7 @@ def list_calculations():
      elapsed processing time and completion status.  """
     return CalculationManager.list_calculations()
 
-@app.get("/calculate_protein_structure_from_sequence/{sequence}", response_class=PlainTextResponse)
+@app.get("/calculate_structure_from_sequence/{sequence}", response_class=PlainTextResponse)
 def calculate_protein_structure_from_sequence(sequence: str):
     """ Enqueue another protein sequence to have its structure predicted.  """
     return CalculationManager.add_calculation(sequence)
@@ -38,7 +38,7 @@ def get_calculation_logs(sequence: str):
     """ Get calculation logs for a calculation currently in the queue. """
     return CalculationManager.get_calculation_logs(sequence)
 
-@app.get("/download_structure/{sequence}", response_class=PlainTextResponse)
+@app.get("/download/{sequence}", response_class=PlainTextResponse)
 def download_structure(sequence: str, download: str = "all_data"):
     """ Download the structure of a sequence whose structure has been
      predicted, will return nothing if prediction not yet complete. """

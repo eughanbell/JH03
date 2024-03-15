@@ -34,7 +34,7 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 
 * Add new protein sequence to predict structure of. Will add to calculations queue.
 ```
-curl 'http://0.0.0.0:7000/calculate_protein_structure_from_sequence/{protein-sequence}'
+curl 'http://0.0.0.0:7000/calculate_structure_from_sequence/{protein-sequence}'
 ```
 
 * Remove a protein sequence from the calculations queue, terminating the AlphaFold calculation if the calculation is ongoing.
@@ -66,7 +66,7 @@ Returned objects have the following attributes:
 
 * Download the results of a completed prediction (giving protein sequence to identify the result file). Will return a raw file if one file requested, or will return a zipfile if multiple. By default returns all data. If calculation has failed, results will be returned instead.
 ```
-curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}&download={args}'
+curl 'http://0.0.0.0:7000/download/{protein-sequence}&download={args}'
 ```
 `args` can take several different values, specified in `settings.py` including `all_data` and `ranked_pdb` to get just the best `.pdb` files.
 

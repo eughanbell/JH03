@@ -14,6 +14,6 @@ EXPOSE 7000
 
 VOLUME /mnt/alphafold
 VOLUME /mnt/data
-VOLUME /calculations-cache
+VOLUME /tmp/alphafold
 
 ENTRYPOINT [ "python", "-m", "protein-structure-prediction"]
