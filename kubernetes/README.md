@@ -10,6 +10,8 @@ You may have to wait a while for the mongo database to start.
 
 Get the url for the protein structure storage service by using 
 ```minikube service pss --url```
+Or if you want to go stright to the docs, run
+```minikube service pss```
 If you get `SVC_UNREACHABLE` it might be that the containers haven't started yet.
 You can check their progress in a web page by running
 ```minikube dashboard```
