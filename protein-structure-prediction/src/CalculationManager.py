@@ -1,6 +1,6 @@
 from .Calculation import Calculation
 from .CalculationState import CalculationState
-from ..settings import MAX_CONCURRENT_CALCULATIONS
+from settings import MAX_CONCURRENT_CALCULATIONS
 
 import json
 import logging
@@ -73,7 +73,7 @@ class CalculationManager:
         err = f"Cannot download result: not currently processing protein sequence'{search_sequence}'."
         main_logger.warning(err)
         return json.dumps({"detail":err})
-    
+
     @classmethod
     def attempt_start_calculation(cls):
         if cls.concurrent_calculations_count() < MAX_CONCURRENT_CALCULATIONS:

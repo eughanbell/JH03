@@ -1,5 +1,5 @@
 from .CalculationState import CalculationState
-from ..settings import DownloadOptions, ALPHAFOLD_PATH, ALPHAFOLD_DATA_DIR, CALCULATIONS_CACHE
+from settings import DownloadOptions, ALPHAFOLD_PATH, ALPHAFOLD_DATA_DIR, CALCULATIONS_CACHE
 
 from io import StringIO
 import json
