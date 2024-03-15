@@ -74,7 +74,7 @@ In brief, with the project running, navigate to the `performace_testing` folder 
 ```
 python performance_testing.py uniprot my_list_of_uniprot_ids.txt
 ```
-To warm the cache with a text file containing a uniprot id on each line.
+This warms the cache with a text file containing a uniprot id on each line.
 
 
 # Inspecting/Clearing the Cache
@@ -96,7 +96,7 @@ the `/clear_cache/` pss endpoint.
 
 # Building Locally
 
-If you have `docker` and `docker compose` installed you can do
+If you have `git`, `docker` and `docker compose` installed you can do
 ```
 git clone https://github.com/eughanbell/JH03.git
 cd JH03
@@ -106,7 +106,7 @@ docker compose up --build
 # Testing
 
 There are tests for `pss` and `psp`. To run, navigate to the `protein-structure-storage` or 
-`protein-structure-prediction` folders. Make sure you have the necessary python libraries installed (by running `pip install -r requirements.txt`).
+`protein-structure-prediction` folders. Make sure you have the necessary python libraries installed (by running `pip install -r requirements.txt`), then run the following.
 ```python
 python -m unittest
 ```
