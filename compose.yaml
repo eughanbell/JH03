@@ -18,8 +18,8 @@ services:
     volumes:
       - /home/ubuntu/alphafold:/mnt/alphafold
       - /mnt/data:/mnt/data
-      - ./protein-structure-prediction/calculations-cache:/calculations-cache
-      
+      - /tmp/alphafold:/calculations-cache
+      - /var/run/docker.sock:/var/run/docker.sock
   mongo:
     image: mongo
     restart: always
