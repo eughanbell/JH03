@@ -99,14 +99,19 @@ class Calculation(threading.Thread):
             return False
 
         # Select files to return
-        download_type_pattern = DownloadOptions.get(download_type, "$.") # If type not found, use pattern that will never match (e.g., return no files)
+        download_type_pattern = DownloadOptions.get(download_type, None)
+        if download_type_pattern is None:
+            err = f"Invalid download request '{download_type}'. Valid download requests are: '{','.join(DownloadOptions.keys())}'"
+            self.logger.warning(err)
+            return json.dumps({"detail":err})
+               
         result_filenames = [filename for filename in os.listdir(self.output_directory) if re.match(download_type_pattern, filename)]
         self.logger.info(f"Preparing files for download: {','.join(result_filenames)}.")
 
         # Return files
         result = ""
         if len(result_filenames) == 0: # No files selected, return error
-            err = f"No files match specified type '{download_type}'. Valid download requests are: '{','.join(DownloadOptions.keys())}'"
+            err = f"No files match specified type '{download_type}'. Files available are: '{",".join(os.listdir(self.output_directory))}'"
             self.logger.warning(err)
             result = json.dumps({"detail":err})
         elif len(result_filenames) == 1: # One file selected, return as is
