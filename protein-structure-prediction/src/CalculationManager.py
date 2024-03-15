@@ -63,7 +63,7 @@ class CalculationManager:
         for calculation in cls.calculations_list:
             if calculation.sequence == search_sequence:
                 if calculation.status == CalculationState.COMPLETE:
-                    return calculation.getResults(download_options)
+                    return calculation.get_results(download_options)
                 if calculation.status == CalculationState.FAILED:
                     return calculation.get_logs()
                 else:
