@@ -129,7 +129,6 @@ class Calculation(threading.Thread):
             with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED, False) as zip_file: # Open result buffer
                 for filename in result_filenames:
                     zip_file.write(f"{self.output_directory}/{filename}", filename)
-            result = result.getvalue()
         
         return StreamingResponse(iter([result.getvalue()]), media_type="application/zip")
 
