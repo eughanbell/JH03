@@ -1,7 +1,7 @@
 from .CalculationState import CalculationState
 from settings import DownloadOptions, ALPHAFOLD_PATH, ALPHAFOLD_DATA_DIR, CALCULATIONS_CACHE
 
-from io import StringIO
+from io import BytesIO
 import json
 import os
 import re
@@ -118,7 +118,8 @@ class Calculation(threading.Thread):
             with open(f"{self.output_directory}/{result_filenames[0]}") as f:
                 result = f.read()
         else: # Multiple files selected, zip and return zipfile
-            result = StringIO()
+            result = BytesIO()
+
             with zipfile.ZipFile(result, "w") as zip_file: # Open result buffer
                 for filename in result_filenames:
                     zip_file.write(f"{self.output_directory}/{filename}", filename)
