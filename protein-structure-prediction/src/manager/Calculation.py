@@ -47,7 +47,6 @@ class Calculation(threading.Thread):
             --max_template_date=9999-12-31
             --data_dir={ALPHAFOLD_DATA_DIR}
             --use_gpu=false
-            --output_dir={CALCULATIONS_CACHE}/_tmp
         """
 
         # Set calculation start timestamp
