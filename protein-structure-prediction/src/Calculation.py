@@ -118,7 +118,7 @@ class Calculation(threading.Thread):
             with open(f"{self.output_directory}/{result_filenames[0]}") as f:
                 result = f.read()
         else: # Multiple files selected, zip and return zipfile
-            result = StringIO.StringIO()
+            result = StringIO()
             with zipfile.ZipFile(result, "w") as zip_file: # Open result buffer
                 for filename in result_filenames:
                     zip_file.write(f"{self.output_directory}/{filename}", filename)
