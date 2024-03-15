@@ -126,7 +126,11 @@ class Calculation(threading.Thread):
                     zip_file.write(f"{self.output_directory}/{filename}", filename)
             result = result.getvalue()
         
-        return StreamingResponse(result, media_type="application/zip")
+        def iterfile():
+            with result as f:
+                yield from f
+
+        return StreamingResponse(iterfile(), media_type="application/zip")
 
     def cleanup(self):
         """ Remove all files associated with this file from filesystem. """
