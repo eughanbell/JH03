@@ -18,7 +18,7 @@ services:
     volumes:
       - /home/ubuntu/alphafold:/mnt/alphafold
       - /mnt/data:/mnt/data
-      - /tmp/alphafold:/calculations-cache
+      - /tmp/alphafold:/tmp/alphafold
       - /var/run/docker.sock:/var/run/docker.sock
   mongo:
     image: mongo

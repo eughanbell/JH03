@@ -1,7 +1,7 @@
 
 ALPHAFOLD_PATH = "/mnt/alphafold"
 ALPHAFOLD_DATA_DIR = "/mnt/data"
-CALCULATIONS_CACHE = "/calculations-cache"
+CALCULATIONS_CACHE = "/tmp/alphafold"
 MAX_CONCURRENT_CALCULATIONS = 1
 
 # Explanation of Alphafold outputs
