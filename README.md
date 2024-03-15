@@ -42,6 +42,11 @@ curl 'http://0.0.0.0:7000/calculate_protein_structure_from_sequence/{protein-seq
 curl 'http://0.0.0.0:7000/cancel_calculation/{protein-sequence}'
 ```
 
+* Get the logs of an ongoing or completed calculation from the calculations queue.
+```
+curl 'http://0.0.0.0:7000/get_calculation_logs/{protein-sequence}'
+```
+
 * List all calculations (pending, processing, complete and failed) in the calculations queue. Returns a JSON list of objects representing every calculation in the queue.
 ```
 curl 'http://0.0.0.0:7000/list_calculations/'
@@ -59,10 +64,11 @@ Returned objects have the following attributes:
 - COMPLETE: the AlphaFold prediction for this protein is complete, and the `.pdb` file ready to download.
 - FAILED: the AlphaFold prediction for this protein failed, and the error message file is ready to download.
 
-* Download the `.pdb` protein structure file from a completed prediction (giving protein sequence to identify the result file).
+* Download the results of a completed prediction (giving protein sequence to identify the result file). Will return a raw file if one file requested, or will return a zipfile if multiple. By default returns all data. If calculation has failed, results will be returned instead.
 ```
-curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}'
+curl 'http://0.0.0.0:7000/download_structure/{protein-sequence}&download={args}'
 ```
+`args` can take several different values, specified in `settings.py` including `all_data` and `ranked_pdb` to get just the best `.pdb` files.
 
 ### Accessing MongoDB express web service
 To inspect the cache database manually, if the containers are running, go to
