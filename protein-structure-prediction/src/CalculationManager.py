@@ -76,17 +76,16 @@ class CalculationManager:
 
     @classmethod
     def attempt_start_calculation(cls):
-        if cls.concurrent_calculations_count() < MAX_CONCURRENT_CALCULATIONS:
-            main_logger.info("Attempting to start new calculation.")
-            for calculation in cls.calculations_list:
-                if calculation.status == CalculationState.WAITING:
-                    main_logger.info(f"Starting calculation for protein sequence: '{calculation.sequence}'.")
-                    calculation.set_on_complete_callback(cls.attempt_start_calculation)
-                    calculation.start() # Once the calculation is complete, it should as a callback attempt  to start another calculation, now a space is free
-                    return
-            main_logger.info("Cannot start new calculation at this time: no waiting calculations to start.")
-        else:
-            main_logger.info(f"Cannot start new calculation at this time: maximum concurrent calculations threshold {MAX_CONCURRENT_CALCULATIONS} reached.")
+        """ Attempt to start pending calculations if there is space to do so. """
+        main_logger.info("Attempting to start pending calculations.")
+        for calculation in cls.calculations_list:
+            if cls.concurrent_calculations_count() >= MAX_CONCURRENT_CALCULATIONS:
+                main_logger.info(f"Cannot start new calculation at this time: maximum concurrent calculations threshold {MAX_CONCURRENT_CALCULATIONS} reached.")
+                return
+            if calculation.status == CalculationState.WAITING:
+                main_logger.info(f"Starting calculation for protein sequence: '{calculation.sequence}'.")
+                calculation.set_on_complete_callback(cls.attempt_start_calculation)
+                calculation.start() # Once the calculation is complete, it should as a callback attempt  to start another calculation, now a space is free
 
     @classmethod
     def concurrent_calculations_count(cls):

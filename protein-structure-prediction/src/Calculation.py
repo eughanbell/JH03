@@ -35,6 +35,7 @@ class Calculation(threading.Thread):
         self.logger.info("Created calculation, instantiated")
     
     def run(self):
+        """ Run the process in this thread. Does not terminate until process is complete. """
         self.status = CalculationState.CALCULATING
 
         # Create fasta sequence file
@@ -73,8 +74,10 @@ class Calculation(threading.Thread):
             self.status = CalculationState.FAILED
 
         self.on_complete_callback()
+        self._stop_event.set() # Terminate thread
     
     def stop(self):
+        """ Stop the ongoing process and terminate thread. """
         self.status = CalculationState.FAILED
         # Attempt termination of process (run will end thread once process terminated)
         self.process.terminate()
@@ -90,12 +93,14 @@ class Calculation(threading.Thread):
         self._stop_event.set()
 
     def get_logs(self):
+        """ Returns the contents of the log file """
         logs = ""
         with open(f"{CALCULATIONS_CACHE}/{id(self)}.log") as f:
             logs += f.read()
         return logs
     
     def get_results(self, download_type):
+        """ Returns a FastAPI response object containing result files. """
         if self.status != CalculationState.COMPLETE:
             return False
 
