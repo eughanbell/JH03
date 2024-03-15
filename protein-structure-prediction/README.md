@@ -1,2 +1,6 @@
 # Protein Structure Prediction - Internal Architecture
+Class methods in `CalculationManager` are called by requests made to the endpoints which are handled by `main.py`. The CalculationManager maintains a calculation list which stores a series of `Calculation` objects. These are instantiated, deleted, and accessed by various functions within `CalculationManager`.
 
+Each `Calculation` object stores the metadata about each calculation needed to perform the calculation, and its state, `Calculation.status`, can be in the `WAITING`, `CALCULATING`, `FAILED` or `COMPLETE` state. `Calculation.run()` is used to begin a process within a thread, which runs Alphafold's `run_docker.py` script, which in turn instantiates a docker container within which to run an Alphafold prediction calculation. The results are stored to a temporary file on the filesystem, which `Calculation.get_results()` can access, once the process is complete, to serve the requested files. Other helper methods exist also.
+
+Protein Structure Prediction is a container which has all the necessary Python requirements for Alphafold to run preinstalled. `alphafold_requirements.txt` should be obtained directly and be unaltered from the `requirements.txt` file of Google Deepmind's Alphafold setup instructions.
