@@ -1,7 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from .CalculationManager import CalculationManager
-from typing import Annotated
 import logging
 
 logger = logging.getLogger(__name__)
