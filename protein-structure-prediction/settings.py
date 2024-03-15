@@ -31,5 +31,5 @@ DownloadOptions = {
     "relax_metrics": r"^relax_metrics.json$",
 
     # Download all files
-    "all_data": r"^$",
+    "all_data": r"^.*$",
 }
