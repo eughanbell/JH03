@@ -30,7 +30,24 @@ curl -w "\n" -X POST -F file=@path/to/my/file.pdb 0.0.0.0:8000/upload_pdb/
 
 # Protein Structure Prediction
 
+This service can be used to, given a raw protein sequence, use Google Deepmind's Alphafold algorithm to predict new strucutes. Multiple calculations can be enqueued concurrently, and their results downloaded upon completion.
+
+This container is a prototype, use with caution.
+
+## Setup
+In `protein-structure-prediction/settings.py`, the following parameters can be specified:
+`MAX_CONCURRENT_CALCULATIONS` - the maximum number of Alphafold calculations the calculation manager should attempt to run simultaneously. It is recommended to leave this set to 1.
+`DownloadOptions` - RegEx patterns for matching different subsets of the files Alphafold outputs for download.
+
+The port used is specified in `compose.yaml` and in `protein-structure-prediction/Dockerfile`.
+
+The following host machine mappings must be set in `compose.yaml`:
+- `/path/to/alphafold/container/directory : /mnt/alphafold` - the path to the Alphafold container directory on the host machine, from where `{dir}/docker/run_docker.py` is called.
+- `/path/to/alphafold/data/directory : /mnt/data` - the path to the required Alphafold databases on the host machine.
+- `/tmp/alphafold : /tmp/alphafold` - the path to where temporary processing files and Alphafold output should be stored on the host machine.
+
 ## Example Usage
+_In all the below cases, {protein-sequence} refers to a raw IUPAC format nucleotide sequence, not a .fasta file._
 
 * Add new protein sequence to predict structure of. Will add to calculations queue.
 ```

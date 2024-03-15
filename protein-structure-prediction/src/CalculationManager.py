@@ -1,6 +1,6 @@
 from .Calculation import Calculation
 from .CalculationState import CalculationState
-from .settings import MAX_CONCURRENT_CALCULATIONS
+from ..settings import MAX_CONCURRENT_CALCULATIONS
 
 import json
 import logging

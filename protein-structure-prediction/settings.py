@@ -1,12 +1,13 @@
-
+# Internal container paths
 ALPHAFOLD_PATH = "/mnt/alphafold"
 ALPHAFOLD_DATA_DIR = "/mnt/data"
 CALCULATIONS_CACHE = "/tmp/alphafold"
+
+# Calculation management parameters
 MAX_CONCURRENT_CALCULATIONS = 1
 
-# Explanation of Alphafold outputs
-# https://blog.biostrand.ai/explained-how-to-plot-the-prediction-quality-metrics-with-alphafold2
-
+# Download file structure options
+# maps URL options to the regex pattern of the desired file(s) in the Alphafold output.
 DownloadOptions = {
     # Download predicted structure files
     "ranked_pdb": r"^ranked_\d+\.pdb$",
