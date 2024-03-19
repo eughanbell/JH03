@@ -128,8 +128,9 @@ class Calculation(threading.Thread):
             with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED, False) as zip_file: # Open result buffer
                 for filename in result_filenames:
                     zip_file.write(f"{self.output_pathname}/{filename}", filename)
+            result = StreamingResponse(iter([result.getvalue()]), media_type="application/zip")
         
-        return StreamingResponse(iter([result.getvalue()]), media_type="application/zip")
+        return result
 
     def cleanup(self):
         """ Remove all files associated with this file from filesystem. """
@@ -137,9 +138,20 @@ class Calculation(threading.Thread):
             return False # Do not attempt to clean up if thread still running!
         
         self.log.close()
-        os.remove(f"{CALCULATIONS_CACHE}/{id(self)}.log")
-        os.remove(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta")
-        os.rmdir(self.output_directory)
+        try:
+            os.remove(f"{CALCULATIONS_CACHE}/{id(self)}.log")
+        except FileNotFoundError:
+            self.logger.debug("Couldn't clean log file, log file doesn't exist.")
+        
+        try:
+            os.remove(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta")
+        except FileNotFoundError:
+            self.logger.debug("Couldn't clean fasta file, fasta file doesn't exist.")
+        
+        try:
+            os.rmdir(self.output_directory)
+        except FileNotFoundError:
+            self.logger.debug("Couldn't clean output directory, directory doesn't exist.")
     
     def set_on_complete_callback(self, callback_fn):
         self.on_complete_callback = callback_fn
@@ -147,6 +159,7 @@ class Calculation(threading.Thread):
     def __str__(self):
         return json.dumps({
             "sequence": self.sequence,
+            "internal_id": id(self),
             "calculation_state": str(self.status),
             "waiting_since_timestamp": self.waiting_since,
             "calculation_start_timestamp": self.start_time,
