@@ -138,9 +138,20 @@ class Calculation(threading.Thread):
             return False # Do not attempt to clean up if thread still running!
         
         self.log.close()
-        os.remove(f"{CALCULATIONS_CACHE}/{id(self)}.log")
-        os.remove(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta")
-        os.rmdir(self.output_directory)
+        try:
+            os.remove(f"{CALCULATIONS_CACHE}/{id(self)}.log")
+        except FileNotFoundError:
+            self.logger.debug("Couldn't clean log file, log file doesn't exist.")
+        
+        try:
+            os.remove(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta")
+        except FileNotFoundError:
+            self.logger.debug("Couldn't clean fasta file, fasta file doesn't exist.")
+        
+        try:
+            os.rmdir(self.output_directory)
+        except FileNotFoundError:
+            self.logger.debug("Couldn't clean output directory, directory doesn't exist.")
     
     def set_on_complete_callback(self, callback_fn):
         self.on_complete_callback = callback_fn
