@@ -128,8 +128,9 @@ class Calculation(threading.Thread):
             with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED, False) as zip_file: # Open result buffer
                 for filename in result_filenames:
                     zip_file.write(f"{self.output_directory}/{filename}", filename)
+            result = StreamingResponse(iter([result.getvalue()]), media_type="application/zip")
         
-        return StreamingResponse(iter([result.getvalue()]), media_type="application/zip")
+        return result
 
     def cleanup(self):
         """ Remove all files associated with this file from filesystem. """
