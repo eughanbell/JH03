@@ -159,6 +159,7 @@ class Calculation(threading.Thread):
     def __str__(self):
         return json.dumps({
             "sequence": self.sequence,
+            "internal_id": id(self),
             "calculation_state": str(self.status),
             "waiting_since_timestamp": self.waiting_since,
             "calculation_start_timestamp": self.start_time,
