@@ -25,10 +25,10 @@ class Calculation(threading.Thread):
 
         self.process = None
         self.process_exit_code = None
-        self.log = open(f"{CALCULATIONS_CACHE}/{id(self)}.log", "a")
-        
-        self.output_directory = f"{CALCULATIONS_CACHE}/{id(self)}"
-        os.mkdir(self.output_directory)
+        self.output_pathname = f"{CALCULATIONS_CACHE}/{id(self)}"
+        self.log = open(f"{self.output_pathname}.log", "a")
+
+        os.mkdir(self.output_pathname)
 
         super().__init__()
 
@@ -39,13 +39,13 @@ class Calculation(threading.Thread):
         self.status = CalculationState.CALCULATING
 
         # Create fasta sequence file
-        with open(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta", "w") as f:
+        with open(f"{self.output_pathname}.fasta", "w") as f:
             f.write(f">Temporary sequence file for {id(self)}|\n{self.sequence}")
 
         # Create command
         command = f"""python3
             {ALPHAFOLD_PATH}/docker/run_docker.py
-            --fasta_paths={CALCULATIONS_CACHE}/_{id(self)}.fasta
+            --fasta_paths={self.output_pathname}.fasta
             --max_template_date=9999-12-31
             --data_dir={ALPHAFOLD_DATA_DIR}
             --use_gpu=false
@@ -94,7 +94,7 @@ class Calculation(threading.Thread):
     def get_logs(self):
         """ Returns the contents of the log file """
         logs = ""
-        with open(f"{CALCULATIONS_CACHE}/{id(self)}.log") as f:
+        with open(f"{self.output_pathname}.log") as f:
             logs += f.read()
         return logs
     
@@ -110,24 +110,24 @@ class Calculation(threading.Thread):
             self.logger.warning(err)
             return json.dumps({"detail":err})
                
-        result_filenames = [filename for filename in os.listdir(self.output_directory) if re.match(download_type_pattern, filename)]
+        result_filenames = [filename for filename in os.listdir(self.output_pathname) if re.match(download_type_pattern, filename)]
         self.logger.info(f"Preparing files for download: {','.join(result_filenames)}.")
 
         # Return files
         result = ""
         if len(result_filenames) == 0: # No files selected, return error
-            err = f"No files match specified type '{download_type}'. Files available are: {','.join(os.listdir(self.output_directory))}"
+            err = f"No files match specified type '{download_type}'. Files available are: {','.join(os.listdir(self.output_pathname))}"
             self.logger.warning(err)
             result = json.dumps({"detail":err})
         elif len(result_filenames) == 1: # One file selected, return as is
-            with open(f"{self.output_directory}/{result_filenames[0]}") as f:
+            with open(f"{self.output_pathname}/{result_filenames[0]}") as f:
                 result = f.read()
         else: # Multiple files selected, zip and return zipfile
             result = BytesIO()
 
             with zipfile.ZipFile(result, "w", zipfile.ZIP_DEFLATED, False) as zip_file: # Open result buffer
                 for filename in result_filenames:
-                    zip_file.write(f"{self.output_directory}/{filename}", filename)
+                    zip_file.write(f"{self.output_pathname}/{filename}", filename)
         
         return StreamingResponse(iter([result.getvalue()]), media_type="application/zip")
 
