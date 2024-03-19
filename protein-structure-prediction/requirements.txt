@@ -1,2 +1,13 @@
+certifi==2024.2.2
+charset-normalizer==2.1.1
+essentials==1.1.5
 fastapi
+idna==3.6
+pip==24.0
+requests==2.28.1
+setuptools==69.0.3
+six==1.16.0
+urllib3==1.26.18
 uvicorn
+websocket-client==1.7.0
+wheel==0.42.0

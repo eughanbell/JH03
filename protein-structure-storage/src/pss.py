@@ -30,10 +30,7 @@ def get_pdb_file(uniprot_id, override_cache=False, source_dbs=None):
     source_dbs can be a list of databases to check.
     By default it will use all implemented databases.
     """
-    if source_dbs is None:
-        source_dbs = []
-    else:
-        source_dbs = resolve_aliases(source_dbs)
+    source_dbs = _resolve_sources(source_dbs)
     protein_file = ""
     if not override_cache:
         protein_file = _request_from_cache(
@@ -54,7 +51,6 @@ def get_pdb_file(uniprot_id, override_cache=False, source_dbs=None):
             logger.info(f"Considered {len(entries)} entries, "
                         + f"choosing best. id: {uniprot_id} - db: "
                         + f"{entries[0].get_entry_data('external_db_name')}")
-            print(entries[0])
             protein_file = entries[0].fetch()
             try:
                 upload_pdb_file(
@@ -68,25 +64,30 @@ def get_pdb_file(uniprot_id, override_cache=False, source_dbs=None):
     return protein_file
 
 
-def get_pdb_file_by_sequence(sequence):
-    return _request_from_cache(sequence, "/retrieve_by_sequence/")
+def get_pdb_file_by_sequence(sequence, source_dbs=None):
+    source_dbs = _resolve_sources(source_dbs)
+    return _request_from_cache(sequence, "/retrieve_by_sequence/",
+                               query=query_list_path("source_dbs", source_dbs))
 
 
 def get_pdb_file_by_db_id(db_id):
     return _request_from_cache(db_id, "/retrieve_by_db_id/")
 
 
-def get_db_id_by_uniprot_id(uniprot_id):
+def get_db_id_by_uniprot_id(uniprot_id, source_dbs=None):
     """
     returns the database id of the pdb file with the matching uniprot id
     if that uniprot id is not in the local cache, then first add it to cache
     """
+    source_dbs = _resolve_sources(source_dbs)
     db_id = _request_from_cache(
-        uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
+        uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id",
+        query=query_list_path("source_dbs", source_dbs))
     if db_id == "":
-        if get_pdb_file(uniprot_id) != "":
+        if get_pdb_file(uniprot_id, source_dbs=source_dbs) != "":
             db_id = _request_from_cache(
-                uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id")
+                uniprot_id, "/retrieve_db_id_by_uniprot_id/", field="db_id",
+            query=query_list_path("source_dbs", source_dbs))
     return db_id
 
 
@@ -95,6 +96,12 @@ def get_db_id_by_uniprot_id(uniprot_id):
 # --------------- PRIVATE HELPER FUNCTIONS ---------------
 # --------------------------------------------------------
 
+def _resolve_sources(source_dbs):
+    if source_dbs is None:
+        source_dbs = []
+    else:
+        source_dbs = resolve_aliases(source_dbs)
+    return source_dbs
 
 def _request_from_cache(search_value, cache_endpoint, query="", field="pdb_file"):
     logger.info(f"Attempting fetch from cache {cache_endpoint} - looking for {search_value}.")

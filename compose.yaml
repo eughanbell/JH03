@@ -15,6 +15,11 @@ services:
     build: protein-structure-prediction
     ports:
       - "7000:7000"
+    volumes:
+      - /home/ubuntu/alphafold:/mnt/alphafold
+      - /mnt/data:/mnt/data
+      - /tmp/alphafold:/tmp/alphafold
+      - /var/run/docker.sock:/var/run/docker.sock
   mongo:
     image: mongo
     restart: always
