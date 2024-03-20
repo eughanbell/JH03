@@ -139,17 +139,17 @@ class Calculation(threading.Thread):
         
         self.log.close()
         try:
-            os.remove(f"{CALCULATIONS_CACHE}/{id(self)}.log")
+            os.remove(f"{self.output_pathname}.log")
         except FileNotFoundError:
             self.logger.debug("Couldn't clean log file, log file doesn't exist.")
         
         try:
-            os.remove(f"{CALCULATIONS_CACHE}/_{id(self)}.fasta")
+            os.remove(f"{self.output_pathname}.fasta")
         except FileNotFoundError:
             self.logger.debug("Couldn't clean fasta file, fasta file doesn't exist.")
         
         try:
-            os.rmdir(self.output_directory)
+            os.rmdir(self.output_pathname)
         except FileNotFoundError:
             self.logger.debug("Couldn't clean output directory, directory doesn't exist.")
     
