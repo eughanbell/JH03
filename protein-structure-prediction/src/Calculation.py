@@ -7,6 +7,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import subprocess
 import time
 import threading
@@ -149,7 +150,7 @@ class Calculation(threading.Thread):
             self.logger.debug("Couldn't clean fasta file, fasta file doesn't exist.")
         
         try:
-            os.rmdir(self.output_pathname)
+            shutil.rmtree(self.output_pathname)
         except FileNotFoundError:
             self.logger.debug("Couldn't clean output directory, directory doesn't exist.")
     
